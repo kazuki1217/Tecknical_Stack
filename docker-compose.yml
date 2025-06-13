@@ -6,4 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "8080:80"      
+  frontend:
+    build: ./frontend
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
