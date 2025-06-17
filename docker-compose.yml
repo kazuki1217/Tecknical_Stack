@@ -9,7 +9,8 @@ services:
     volumes:
       - ./web/public:/usr/share/nginx/html
       - ./web/conf/default.conf:/etc/nginx/conf.d/default.conf
-      
+      - ./web/logs:/var/log/nginx
+    
   # React
   frontend:
     build: ./frontend
@@ -25,3 +26,4 @@ services:
     build: ./backend
     volumes:
       - ./backend:/var/www/html
+      
