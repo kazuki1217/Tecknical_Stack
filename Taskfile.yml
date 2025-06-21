@@ -1,32 +1,40 @@
 version: '3'
 
 tasks:
-  # すべての環境を構築
   up:
-    desc: コンテナを起動し、LaravelとReactを起動
+    desc: コンテナを起動
+    silent: false
     cmds:
       - docker compose up -d
-      - docker compose exec backend php artisan serve --host=0.0.0.0 --port=8000
-      - docker compose exec frontend npm run dev
+
+  backend:
+    desc: Laravel を起動
     silent: false
+    cmds:
+      - docker compose exec backend php artisan serve --host=0.0.0.0 --port=8000
+
+  frontend:
+    desc: React を起動
+    silent: false
+    cmds:
+      - docker compose exec frontend npm run dev
 
   down:
     desc: コンテナを停止
+    silent: false
     cmds:
       - docker compose down
 
   setup: 
     desc: すべての環境を構築
+    silent: false
     cmds:
       - docker compose up -d --build
       # Laravelに、vendorを追加
       - docker compose exec backend composer install
       # Laravelに、envファイルを追加
       - docker compose exec backend cp .env.example .env
-      # Laravelに、環境変数「APP_KEY」を生成
-      - docker compose exec backend php artisan key:generate
       # Reactに、node_module 追加
       - docker compose exec frontend npm install
       # プロジェクトの所有者を自分に変更する
       - sudo chown -R $(whoami):$(id -gn) .
-    silent: false
