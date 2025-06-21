@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Webサーバー（Nginx)
+  # Nginx
   web:
     build: ./web
     ports:
@@ -22,9 +22,11 @@ services:
     ports:
       - "5173:5173"
 
-  # PHP-FPM
+  # Laravel
   backend:
     build: ./backend
     volumes:
-      - ./backend:/var/www/html
+      - ./backend/laravel:/var/www/html
+    ports:
+      - "8000:8000"
       
