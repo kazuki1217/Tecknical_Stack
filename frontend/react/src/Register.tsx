@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // アカウント登録画面
 function Register() {
@@ -8,7 +9,9 @@ function Register() {
     password: '',
     password_confirmation: ''
   });
-  const [result, setResult] = useState('');
+  const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,7 +31,14 @@ function Register() {
     const data = await res.json();
     console.log('ステータス:', res.status);
     console.log('結果:', data);
-    setResult(JSON.stringify(data));
+
+    if (res.ok) {
+      setMessage('登録が完了しました。');
+      setSuccess(true);
+    } else {
+      setMessage(data.message || '登録に失敗しました。');
+      setSuccess(false);
+    }
   };
 
   return (
@@ -41,7 +51,15 @@ function Register() {
         <input name="password_confirmation" type="password" placeholder="パスワード確認" onChange={handleChange} /><br />
         <button type="submit">登録</button>
       </form>
-      <p>登録結果: {result}</p>
+      <p>{message}</p>
+      {success && (
+        <p>
+          <a href="/" onClick={(e) => {
+            e.preventDefault();
+            navigate('/');
+          }}>ログイン画面はこちら</a>
+        </p>
+      )}
     </div>
   );
 }
