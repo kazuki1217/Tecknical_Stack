@@ -7,11 +7,14 @@ function Login({ setUser }: { setUser: (name: string) => void }) {
   // 入力されたユーザー名とパスワードを保持するstate
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState(''); // ← 追加
   const navigate = useNavigate();
 
   // フォームの送信時の処理（ログイン）
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
+
 
     // ログイン情報を送信
     const res = await fetch('http://localhost:8000/api/login', {
@@ -21,8 +24,18 @@ function Login({ setUser }: { setUser: (name: string) => void }) {
     });
 
     if (res.ok) {
-      // トークンを取得
       const data = await res.json();
+
+      // ステータスが失敗だった場合
+      if (data.status == "error") {
+        console.log("通った2");
+
+        setErrorMsg(data.message);
+        return;
+      }
+
+
+      // 成功だった場合、トークンを取得
       const token = data.token;
       
       // トークンをローカルストレージに保存（次回以降のリクエストに使用）
@@ -42,7 +55,7 @@ function Login({ setUser }: { setUser: (name: string) => void }) {
       navigate('/posts');
 
     } else {
-      alert('ログイン失敗');
+      setErrorMsg('ログインに失敗しました。');
     }
   };
 
@@ -54,6 +67,8 @@ function Login({ setUser }: { setUser: (name: string) => void }) {
         <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="パスワード" /><br />
         <button type="submit">ログイン</button>
       </form>
+      {/* エラーメッセージを表示 */}
+      {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
       <p>アカウントをお持ちでない方はこちら</p>
       <button onClick={() => navigate('/account')}>新規登録</button>
     </div>
