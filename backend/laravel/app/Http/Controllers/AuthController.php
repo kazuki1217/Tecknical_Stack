@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+
 
 /**
  * 認証関連の処理をまとめたコントローラ
@@ -54,18 +57,33 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        
+        $throttleKey = 'login:' . Str::lower($request->ip);
+
+        // ソフトレート制限（スライディングウィンドウ方式）を用いて、直近60秒間で5回以上失敗していたらログイン拒否
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json([
+                "status" => "error",
+                "message" => "ログイン試行が多すぎます。{$seconds}秒後に再試行してください。"
+            ]);
+        }
+
         // 列名「name」に一致する行を取得
         $user = User::where('name', $request->name)->first();
 
         // ユーザーが存在しない、またはパスワードが一致しない場合
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'name' => ['The credentials are incorrect.'],
+            RateLimiter::hit($throttleKey, 60); // ← 60秒保持
+            return response()->json([
+                'status' => 'error',
+                'message' => 'ログインに失敗しました。'
             ]);
         }
-
+        
         // 認証成功 → トークンを発行して返す（トークンはDBに保存される）
         return response()->json([
+            'status' => 'success',
             'token' => $user->createToken('react')->plainTextToken,
         ]);
     }
