@@ -1,5 +1,5 @@
 // ログイン認証後の画面
-
+import Layout from './Layout';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -65,9 +65,8 @@ function PostList({ user }: { user: string }) {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <Layout onLogout={handleLogout}>
       <h1>こんにちは「{user}」さん</h1>
-      <button onClick={handleLogout}>ログアウト</button>
 
       {/* 投稿フォーム */}
       <div style={{ marginTop: '2rem', marginBottom: '1rem' }}>
@@ -100,7 +99,7 @@ function PostList({ user }: { user: string }) {
           </div>
         ))}
       </div>
-    </div>
+    </Layout>
   );
 }
 
