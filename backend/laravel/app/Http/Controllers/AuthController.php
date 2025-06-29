@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -100,14 +98,8 @@ class AuthController extends Controller
         // 現在認証されているユーザーを取得（トークンベース）
         $user = Auth::user();
 
-        // 認証済みならユーザー名を返す
-        if ($user) {
-            return response()->json([
-                'name' => $user->name,
-            ]);
-        } else {
-            // 未認証なら401エラーを返す
-            return response()->json(['message' => '未認証'], 401);
-        }
+        return response()->json([
+            'name' => $user->name,
+        ]);
     }
 }
