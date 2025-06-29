@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * 投稿関連の処理をまとめたコントローラ
@@ -44,5 +45,25 @@ class PostController extends Controller
         ]);
 
         return response()->json($post->load('user'));
+    }
+
+    /**
+     * 投稿の削除処理
+     *
+     * @param \App\Models\Post $post 
+     * @return \Illuminate\Http\JsonResponse 削除結果メッセージを返す
+     */
+    public function destroy(Post $post)
+    {
+        $user = Auth::user();
+
+        // 投稿者本人のみ削除可能にする
+        if ($post->user_id !== $user->id) {
+            return response()->json(['message' => '許可されていません。'], 403);
+        }
+
+        $post->delete();
+
+        return response()->json(['message' => '投稿を削除しました。']);
     }
 }
