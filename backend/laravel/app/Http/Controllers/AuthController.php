@@ -41,7 +41,7 @@ class AuthController extends Controller
 
         return response()->json($user);
     }
-    
+
 
     /**
      * ログイン認証処理
@@ -57,7 +57,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        
+
         $throttleKey = 'login:' . Str::lower($request->ip);
 
         // ソフトレート制限（スライディングウィンドウ方式）を用いて、直近60秒間で5回以上失敗していたらログイン拒否
@@ -80,7 +80,7 @@ class AuthController extends Controller
                 'message' => 'ログインに失敗しました。'
             ]);
         }
-        
+
         // 認証成功 → トークンを発行して返す（トークンはDBに保存される）
         return response()->json([
             'status' => 'success',

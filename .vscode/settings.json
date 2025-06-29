@@ -1,0 +1,18 @@
+{
+  // 保存するたびに自動フォーマットを実行
+  "editor.formatOnSave": true,
+
+  // TypeScript React (.tsx) の設定
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode", // フォーマッターに Prettier を採用
+    
+    // → JSX の改行を減らしたいときに設定
+    "prettier.printWidth": 200 // 1行あたりの最大文字数を 200 に設定（1行に収めたいコードを勝手に改行しないための設定）
+  },
+
+  // PHP の設定
+  "[php]": {
+    // フォーマッターに Intelephense を採用
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+  }
+}

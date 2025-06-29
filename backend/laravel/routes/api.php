@@ -17,4 +17,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'loginSuccess']); // ユーザー情報の取得（Reactでは、ベースURLアクセス時に使う）
     Route::get('/loginsuccess', [AuthController::class, 'loginSuccess']); // ユーザー情報の取得（Reactでは、ログイン情報入力後に使う）
 });
-
