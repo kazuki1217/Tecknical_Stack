@@ -24,7 +24,7 @@ function App() {
 
     // トークンが有効である場合 → ログイン状態にする
     axios
-      .get("http://localhost:8000/api/loginsuccess", {
+      .get("http://localhost:8000/api/user", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
