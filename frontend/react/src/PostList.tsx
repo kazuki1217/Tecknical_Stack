@@ -6,12 +6,12 @@ import axios from 'axios';
 
 interface Post {
   id: number;
-  user: { name: string };
+  user: { name: string | null };
   content: string;
   created_at: string;
 }
 
-function PostList({ user }: { user: string }) {
+function PostList({ user }: { user: string | null}) {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [content, setContent] = useState('');
