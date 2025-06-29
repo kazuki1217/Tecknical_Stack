@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 // アカウント登録画面
 function Register() {
@@ -20,23 +21,16 @@ function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // アカウント登録処理
-    const res = await fetch('http://localhost:8000/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(form)
-    });
-
-    const data = await res.json();
-    console.log('ステータス:', res.status);
-    console.log('結果:', data);
-
-    if (res.ok) {
+    try {
+      // アカウント登録処理
+      const res = await axios.post('http://localhost:8000/api/register', form);
+      console.log('ステータス:', res.status);
       setMessage('登録が完了しました。');
       setSuccess(true);
-    } else {
-      setMessage(data.message || '登録に失敗しました。');
+      
+    } catch (error) {
+      console.log(error);
+      setMessage('登録に失敗しました。');
       setSuccess(false);
     }
   };
