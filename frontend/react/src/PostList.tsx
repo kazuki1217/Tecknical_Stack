@@ -52,6 +52,22 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
+  // 投稿の削除
+  const deletePost = async (id: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:8000/api/posts/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // 投稿を画面から削除
+      setPosts(posts.filter((p) => p.id !== id));
+    } catch (error) {
+      console.error("削除失敗:", error);
+    }
+  };
+
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -82,6 +98,13 @@ function PostList({ user }: { user: string | null }) {
               <strong>{post.user.name}</strong> - {new Date(post.created_at).toLocaleString()}
             </p>
             <p>{post.content}</p>
+
+            {/* 自分の投稿だけ削除ボタンを表示 */}
+            {post.user.name === user && (
+              <button onClick={() => deletePost(post.id)} style={{ color: "white", backgroundColor: "red", border: "none", padding: "0.5rem", marginTop: "0.5rem" }}>
+                削除
+              </button>
+            )}
           </div>
         ))}
       </div>

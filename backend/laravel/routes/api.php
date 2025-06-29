@@ -15,4 +15,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'loginSuccess']); // ユーザー名を取得
     Route::get('/posts', [PostController::class, 'index']); // 投稿一覧を取得
     Route::post('/posts', [PostController::class, 'store']); // 投稿内容を保存
+    Route::delete('/posts/{post}', [PostController::class, 'destroy']); // 投稿を削除
+
 });
