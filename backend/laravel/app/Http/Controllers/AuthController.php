@@ -85,6 +85,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'token' => $user->createToken('react')->plainTextToken,
+            'name' => $request->name
         ]);
     }
 
