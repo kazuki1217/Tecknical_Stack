@@ -95,4 +95,27 @@ class PostController extends Controller
             'post' => $post->load('user'),
         ]);
     }
+
+    /**
+     * 投稿を検索する処理
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request)
+    {
+        // 入力した文字列を取得
+        $keyword = $request->query('keyword');
+
+        // 部分一致検索
+        if ($keyword) {
+            $query = Post::with('user')
+                ->orderByDesc('created_at')
+                ->where('content', 'LIKE', "%{$keyword}%");
+        }
+
+        $posts = $query->get();
+
+        return response()->json($posts);
+    }
 }

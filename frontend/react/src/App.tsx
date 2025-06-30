@@ -6,6 +6,7 @@ import axios from "axios";
 import Register from "./Register"; // アカウント登録ページ
 import Login from "./Login"; // ログイン情報入力ページ
 import PostList from "./PostList"; // 投稿一覧ページ
+import SearchPosts from "./SearchPosts"; // 検索ページ
 
 // ルートコンポーネント
 function App() {
@@ -45,6 +46,7 @@ function App() {
         <Route path="/" element={isLoggedIn ? <Navigate to="/posts" /> : <Login setIsLoggedIn={setIsLggedIn} setUser={setUser} />} />
         <Route path="/account" element={<Register />} />
         <Route path="/posts" element={isLoggedIn ? <PostList user={user} /> : <Navigate to="/" />} />
+        <Route path="/search" element={isLoggedIn ? <SearchPosts /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

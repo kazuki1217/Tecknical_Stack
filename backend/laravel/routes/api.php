@@ -17,4 +17,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [PostController::class, 'store']); // 投稿内容を保存
     Route::delete('/posts/{post}', [PostController::class, 'destroy']); // 投稿を削除
     Route::put('/posts/{post}', [PostController::class, 'update']); // 投稿を編集
+    Route::get('/posts/search', [PostController::class, 'search']); // 投稿を検索
 });
