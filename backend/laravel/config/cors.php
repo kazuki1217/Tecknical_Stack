@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login', 'logout'],
+    'paths' => ['api/*'],
     'allowed_methods' => ['*'],
     'allowed_origins' => ['http://localhost:5173'], // ReactのURL
     'allowed_origins_patterns' => [],
