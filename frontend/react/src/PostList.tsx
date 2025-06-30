@@ -12,8 +12,10 @@ interface Post {
 
 function PostList({ user }: { user: string | null }) {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [content, setContent] = useState("");
+  const [posts, setPosts] = useState<Post[]>([]); // 投稿一覧を管理
+  const [content, setContent] = useState(""); // 新規投稿入力欄を管理
+  const [editingPostId, setEditingPostId] = useState<number | null>(null); // 編集中の投稿IDを管理
+  const [editContent, setEditContent] = useState<string>("");
 
   // 投稿一覧を取得
   const fetchPosts = async () => {
@@ -30,7 +32,7 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
-  // 新規投稿を送信
+  // 新規投稿を作成
   const submitPost = async () => {
     if (!content) return;
 
@@ -52,7 +54,7 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
-  // 投稿の削除
+  // 投稿を削除
   const deletePost = async (id: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -65,6 +67,34 @@ function PostList({ user }: { user: string | null }) {
       setPosts(posts.filter((p) => p.id !== id));
     } catch (error) {
       console.error("削除失敗:", error);
+    }
+  };
+
+  // 編集モードを開始
+  const startEdit = (post: Post) => {
+    setEditingPostId(post.id);
+    setEditContent(post.content);
+  };
+
+  // 投稿内容を更新
+  const updatePost = async (id: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `http://localhost:8000/api/posts/${id}`,
+        { content: editContent },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setPosts(posts.map((p) => (p.id === id ? res.data.post : p))); // posts の一覧を更新
+      setEditingPostId(null); // 編集モード終了
+      setEditContent(""); // 編集内容をクリア
+    } catch (error) {
+      console.error("更新失敗:", error);
     }
   };
 
@@ -97,13 +127,30 @@ function PostList({ user }: { user: string | null }) {
             <p>
               <strong>{post.user.name}</strong> - {new Date(post.created_at).toLocaleString()}
             </p>
-            <p>{post.content}</p>
 
-            {/* 自分の投稿だけ削除ボタンを表示 */}
-            {post.user.name === user && (
-              <button onClick={() => deletePost(post.id)} style={{ color: "white", backgroundColor: "red", border: "none", padding: "0.5rem", marginTop: "0.5rem" }}>
-                削除
-              </button>
+            {/* 編集モードかどうかを判定 */}
+            {editingPostId === post.id ? (
+              <>
+                <textarea rows={4} cols={50} value={editContent} onChange={(e) => setEditContent(e.target.value)} />
+                <br />
+                <button onClick={() => updatePost(post.id)}>更新する</button>
+                <button onClick={() => setEditingPostId(null)}>キャンセル</button>
+              </>
+            ) : (
+              <>
+                {/* 投稿内容表示 */}
+                <p>{post.content}</p>
+
+                {/* 投稿者が自分の場合のみ編集・削除ボタンを表示 */}
+                {post.user.name === user && (
+                  <>
+                    <button onClick={() => startEdit(post)}>編集</button>
+                    <button onClick={() => deletePost(post.id)} style={{ color: "white", backgroundColor: "red", border: "none", padding: "0.5rem", marginLeft: "0.5rem" }}>
+                      削除
+                    </button>
+                  </>
+                )}
+              </>
             )}
           </div>
         ))}

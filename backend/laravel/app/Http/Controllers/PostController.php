@@ -66,4 +66,33 @@ class PostController extends Controller
 
         return response()->json(['message' => '投稿を削除しました。']);
     }
+
+    /**
+     * 投稿の更新処理
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Post $post
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, Post $post)
+    {
+        $user = Auth::user();
+
+        // 投稿者本人かチェック
+        if ($post->user_id !== $user->id) {
+            return response()->json(['message' => '許可されていません。'], 403);
+        }
+
+        $validated = $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        $post->content = $validated['content'];
+        $post->save();
+
+        return response()->json([
+            'message' => '投稿を更新しました。',
+            'post' => $post->load('user'),
+        ]);
+    }
 }
