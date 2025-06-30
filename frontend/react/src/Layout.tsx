@@ -19,6 +19,9 @@ function Layout({ children, onLogout }: LayoutProps) {
             <button onClick={() => navigate("/posts")}>PostList</button>
           </li>
           <li>
+            <button onClick={() => navigate("/search")}>検索</button>
+          </li>
+          <li>
             <button onClick={onLogout}>ログアウト</button>
           </li>
         </ul>
