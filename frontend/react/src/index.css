@@ -6,41 +6,39 @@ body {
 
 /* サイドバー全体の設定 */
 .sidebar {
-  width: 200px;
+  width: 230px;
   position: fixed;    
-  display: flex;
-  flex-direction: column;
   padding-top: 100px;
-
+  padding-left: 50px;
 }
 
-/* サイドバーの各アイコン */
-.sidebar-icon {
+/* サイドバーの各アイテム */
+.sidebar-item {
   cursor: pointer;
-  position: relative;
   height: 60px;
   display: flex;
   align-items: center;
-  margin-left: 20px;
 }
 
-/* サイドバーの各アイコンラベル */
-.sidebar-label {
-  margin-left: 12px;
+/* サイドバーの各アイテム内のアイコン */
+.sidebar-item__icon {
+  font-size: 24px;
   color: #fff;
-  white-space: nowrap;
-  opacity: 1;
-  pointer-events: auto;
-  transition: none;
-  font-size: 1rem;
-  position: static;
+}
+
+/* サイドバーの各アイテム内のラベル */
+.sidebar-item__label {
+  margin-left: 15px;
+  color: #fff;
+  font-size: 20px;
+  padding-bottom: 8px;
 }
 
 /* メインコンテンツ部分の設定 */
 .main-content {
   width: 100%;
   width: 50%;
-  margin-left: 200px;
+  margin-left: 230px;
   height: 100vh;
   padding: 2rem;
   border-left: 1px solid #444;
