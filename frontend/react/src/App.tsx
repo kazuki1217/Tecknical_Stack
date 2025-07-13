@@ -3,10 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 
 // 自作コンポーネント
-import Register from "./Register"; // アカウント登録ページ
-import Login from "./Login"; // ログイン情報入力ページ
-import PostList from "./PostList"; // 投稿一覧ページ
-import SearchPosts from "./SearchPosts"; // 検索ページ
+import Register from "./components/Register"; // アカウント登録ページ
+import Login from "./components/Login"; // ログイン情報入力ページ
+import PostList from "./components/PostList"; // 投稿一覧ページ
+import SearchPosts from "./components/SearchPosts"; // 検索ページ
 
 // ルートコンポーネント
 function App() {
