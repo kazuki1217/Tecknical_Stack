@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaList, FaSearch, FaSignOutAlt } from "react-icons/fa";
+import "./index.css";
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,25 +14,39 @@ function Layout({ children, onLogout }: LayoutProps) {
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       {/* サイドバー */}
-      <div style={{ width: "200px", background: "#f0f0f0", padding: "1rem", boxSizing: "border-box" }}>
-        <h3>メニュー</h3>
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          <li>
-            <button onClick={() => navigate("/posts")}>PostList</button>
-          </li>
-          <li>
-            <button onClick={() => navigate("/search")}>検索</button>
-          </li>
-          <li>
-            <button onClick={onLogout}>ログアウト</button>
-          </li>
-        </ul>
+      <div className="sidebar">
+        {/* 投稿一覧 */}
+        <SidebarIcon icon={<FaList size="24" color="#fff" />} label="投稿一覧" onClick={() => navigate("/posts")} />
+
+        {/* 検索 */}
+        <SidebarIcon icon={<FaSearch size="24" color="#fff" />} label="検索" onClick={() => navigate("/search")} />
+
+        {/* ログアウト */}
+        <SidebarIcon icon={<FaSignOutAlt size="24" color="#fff" />} label="ログアウト" onClick={onLogout} />
       </div>
 
       {/* メインコンテンツ */}
-      <div style={{ flex: 1, padding: "2rem", overflowY: "auto" }}>{children}</div>
+      <div className="main-content">{children}</div>
     </div>
   );
 }
 
 export default Layout;
+
+/**
+ * サイドバーアイコンコンポーネント
+ */
+interface SidebarIconProps {
+  icon: ReactNode;
+  label: string;
+  onClick: () => void;
+}
+
+function SidebarIcon({ icon, label, onClick }: SidebarIconProps) {
+  return (
+    <div onClick={onClick} className="sidebar-icon">
+      {icon}
+      <span className="sidebar-label">{label}</span>
+    </div>
+  );
+}

@@ -111,7 +111,7 @@ function PostList({ user }: { user: string | null }) {
 
   return (
     <Layout onLogout={handleLogout}>
-      <h1>こんにちは「{user}」さん</h1>
+      <h2>こんにちは「{user}」さん</h2>
 
       {/* 投稿フォーム */}
       <div style={{ marginTop: "2rem", marginBottom: "1rem" }}>
