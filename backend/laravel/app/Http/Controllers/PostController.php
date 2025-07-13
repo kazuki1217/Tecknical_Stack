@@ -36,12 +36,28 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'content' => 'required|string|max:1000',
+            'content' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if (empty($validated['content']) && !$request->hasFile('image')) {
+            return response()->json(['message' => 'テキストまたは画像のいずれかを入力してください。'], 422);
+        }
+
+        $imageData = null;
+        $imageMime = null;
+
+        if ($request->hasFile('image')) {
+            $imageFile = $request->file('image');
+            $imageData = file_get_contents($imageFile->getRealPath());
+            $imageMime = $imageFile->getMimeType();
+        }
 
         $post = Post::create([
             'user_id' => $request->user()->id,
-            'content' => $validated['content'],
+            'content' => $validated['content'] ?? null,
+            'image_data' => $imageData,
+            'image_mime' => $imageMime,
         ]);
 
         return response()->json($post->load('user'));
