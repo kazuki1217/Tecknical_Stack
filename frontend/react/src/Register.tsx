@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./index.css";
 
-// アカウント登録画面
+/** 新規登録画面を構成 */
 function Register() {
   const [form, setForm] = useState({
     name: "",
@@ -35,32 +36,20 @@ function Register() {
   };
 
   return (
-    <div>
-      <h2>ユーザ登録</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="auth-container">
+      <h2>新規登録</h2>
+      <form onSubmit={handleSubmit} className="auth-form">
         <input name="name" placeholder="名前" onChange={handleChange} />
-        <br />
         <input name="email" type="email" placeholder="メールアドレス" onChange={handleChange} />
-        <br />
         <input name="password" type="password" placeholder="パスワード" onChange={handleChange} />
-        <br />
         <input name="password_confirmation" type="password" placeholder="パスワード確認" onChange={handleChange} />
-        <br />
         <button type="submit">登録</button>
       </form>
-      <p>{message}</p>
+      {message && <p className={success ? "success-message" : "error-message"}>{message}</p>}
       {success && (
-        <p>
-          <a
-            href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/");
-            }}
-          >
-            ログイン画面はこちら
-          </a>
-        </p>
+        <button className="link-button" onClick={() => navigate("/")}>
+          ログイン画面はこちら
+        </button>
       )}
     </div>
   );

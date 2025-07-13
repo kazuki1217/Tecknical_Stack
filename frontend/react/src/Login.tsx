@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./index.css";
 
 interface LoginProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   setUser: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+/** ログイン画面を構成 */
 function Login({ setIsLoggedIn, setUser }: LoginProps) {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -42,19 +44,20 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
   };
 
   return (
-    <div>
+    <div className="auth-container">
       <h2>ログイン</h2>
-      <form onSubmit={handleLogin}>
-        <input type="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="名前" />
-        <br />
+      <form onSubmit={handleLogin} className="auth-form">
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="名前" />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" />
-        <br />
         <button type="submit">ログイン</button>
       </form>
       {/* エラーメッセージを表示 */}
-      {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
+      {errorMsg && <p className="error-message">{errorMsg}</p>}
+
       <p>アカウントをお持ちでない方はこちら</p>
-      <button onClick={() => navigate("/account")}>新規登録</button>
+      <button className="link-button" onClick={() => navigate("/account")}>
+        新規登録
+      </button>
     </div>
   );
 }
