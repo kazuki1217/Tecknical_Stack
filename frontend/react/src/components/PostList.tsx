@@ -2,6 +2,7 @@ import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { ChangeEvent } from "react";
 
 import { formatPostDate } from "../utils/date";
 import "../styles/index.css";
@@ -11,6 +12,7 @@ interface Post {
   user: { name: string | null };
   content: string;
   created_at: string;
+  image_base64?: string | null;
 }
 
 /** 投稿一覧画面を構成 */
@@ -20,6 +22,15 @@ function PostList({ user }: { user: string | null }) {
   const [content, setContent] = useState(""); // 新規投稿入力欄を管理
   const [editingPostId, setEditingPostId] = useState<number | null>(null); // 編集中の投稿IDを管理
   const [editContent, setEditContent] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  /** ファイル選択時の処理 */
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+    }
+  };
 
   /** 投稿一覧を取得 */
   const fetchPosts = async () => {
@@ -38,21 +49,28 @@ function PostList({ user }: { user: string | null }) {
 
   /** 新規投稿を作成 */
   const submitPost = async () => {
-    if (!content) return;
+    if (!content && !imageFile) {
+      alert("テキストまたは画像のいずれかを入力してください。");
+      return;
+    }
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "http://localhost:8000/api/posts",
-        { content },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+
+      // multipart/form-data 形式に格納
+      const formData = new FormData();
+      content && formData.append("content", content);
+      imageFile && formData.append("image", imageFile);
+
+      const res = await axios.post("http://localhost:8000/api/posts", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setPosts([res.data, ...posts]);
       setContent("");
+      setImageFile(null);
     } catch (error) {
       console.error("投稿送信エラー:", error);
     }
@@ -118,6 +136,7 @@ function PostList({ user }: { user: string | null }) {
       {/* 投稿フォーム */}
       <div className="post-form">
         <textarea placeholder="いまどうしてる？" value={content} onChange={(e) => setContent(e.target.value)} />
+        <input type="file" accept="image/*" onChange={handleImageChange} />
         <button onClick={submitPost}>ポストする</button>
       </div>
 
@@ -140,7 +159,10 @@ function PostList({ user }: { user: string | null }) {
             ) : (
               <>
                 {/* 投稿内容表示 */}
-                <p>{post.content}</p>
+                {/* テキストがあれば表示 */}
+                {post.content && <p>{post.content}</p>}
+                {/* 画像があれば表示 */}
+                {post.image_base64 && <img src={post.image_base64} alt="post" style={{ maxWidth: "300px", marginTop: "10px" }} />}
 
                 {/* 投稿者が自分の場合のみ編集・削除ボタンを表示 */}
                 {post.user.name === user && (
