@@ -11,6 +11,7 @@ interface Post {
   created_at: string;
 }
 
+/** 検索画面を構成 */
 function SearchPosts({ user }: { user: string | null }) {
   const [keyword, setKeyword] = useState<string>(""); // 検索キーワードを管理
   const [results, setResults] = useState<Post[]>([]); // 検索結果の投稿一覧を管理
