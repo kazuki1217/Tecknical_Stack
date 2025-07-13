@@ -2,7 +2,9 @@ import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import "./index.css";
+
+import { formatPostDate } from "../utils/date";
+import "../styles/index.css";
 
 interface Post {
   id: number;
@@ -19,7 +21,7 @@ function PostList({ user }: { user: string | null }) {
   const [editingPostId, setEditingPostId] = useState<number | null>(null); // 編集中の投稿IDを管理
   const [editContent, setEditContent] = useState<string>("");
 
-  // 投稿一覧を取得
+  /** 投稿一覧を取得 */
   const fetchPosts = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -34,7 +36,7 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
-  // 新規投稿を作成
+  /** 新規投稿を作成 */
   const submitPost = async () => {
     if (!content) return;
 
@@ -56,7 +58,7 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
-  // 投稿を削除
+  /** 投稿を削除 */
   const deletePost = async (id: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -72,13 +74,13 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
-  // 編集モードを開始
+  /** 編集モードを開始 */
   const startEdit = (post: Post) => {
     setEditingPostId(post.id);
     setEditContent(post.content);
   };
 
-  // 投稿内容を更新
+  /** 投稿内容を更新 */
   const updatePost = async (id: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -104,7 +106,7 @@ function PostList({ user }: { user: string | null }) {
     fetchPosts();
   }, []);
 
-  // ログアウト処理
+  /** ログアウト処理 */
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
@@ -124,7 +126,7 @@ function PostList({ user }: { user: string | null }) {
         {posts.map((post) => (
           <div key={post.id} className="post-card">
             <p>
-              <strong>{post.user.name}</strong> - {new Date(post.created_at).toLocaleString()}
+              <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
             </p>
 
             {/* 編集モードかどうかを判定 */}

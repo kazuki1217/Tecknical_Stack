@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./index.css";
+import "../styles/index.css";
 
 /** 新規登録画面を構成 */
 function Register() {

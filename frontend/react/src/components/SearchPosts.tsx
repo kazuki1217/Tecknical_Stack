@@ -1,8 +1,10 @@
 import Layout from "./Layout";
 import { useState } from "react";
 import axios from "axios";
-import "./index.css";
 import { FaSearch } from "react-icons/fa";
+
+import { formatPostDate } from "../utils/date";
+import "../styles/index.css";
 
 interface Post {
   id: number;
@@ -67,7 +69,7 @@ function SearchPosts({ user }: { user: string | null }) {
         {results.map((post) => (
           <div key={post.id} className="post-card">
             <p>
-              <strong>{post.user.name}</strong> - {new Date(post.created_at).toLocaleString()}
+              <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
             </p>
             <p>{post.content}</p>
           </div>

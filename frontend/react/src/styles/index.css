@@ -101,6 +101,12 @@ body {
   border: 2px solid #444;
 }
 
+/* 投稿日時 */
+.post-date {
+  color: #aaa;
+  font-size: 1.2rem;
+}
+
 /* 削除ボタン */
 .delete-button {
   color: white;
