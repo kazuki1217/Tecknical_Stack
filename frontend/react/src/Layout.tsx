@@ -8,21 +8,22 @@ interface LayoutProps {
   onLogout: () => void;
 }
 
+/** サイドバー全体を構成 */
 function Layout({ children, onLogout }: LayoutProps) {
   const navigate = useNavigate();
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div>
       {/* サイドバー */}
       <div className="sidebar">
         {/* 投稿一覧 */}
-        <SidebarIcon icon={<FaList size="24" color="#fff" />} label="投稿一覧" onClick={() => navigate("/posts")} />
+        <SidebarItem icon={<FaList />} label="投稿一覧" onClick={() => navigate("/posts")} />
 
         {/* 検索 */}
-        <SidebarIcon icon={<FaSearch size="24" color="#fff" />} label="検索" onClick={() => navigate("/search")} />
+        <SidebarItem icon={<FaSearch />} label="検索" onClick={() => navigate("/search")} />
 
         {/* ログアウト */}
-        <SidebarIcon icon={<FaSignOutAlt size="24" color="#fff" />} label="ログアウト" onClick={onLogout} />
+        <SidebarItem icon={<FaSignOutAlt />} label="ログアウト" onClick={onLogout} />
       </div>
 
       {/* メインコンテンツ */}
@@ -33,20 +34,18 @@ function Layout({ children, onLogout }: LayoutProps) {
 
 export default Layout;
 
-/**
- * サイドバーアイコンコンポーネント
- */
-interface SidebarIconProps {
+interface SidebarItemProps {
   icon: ReactNode;
   label: string;
   onClick: () => void;
 }
 
-function SidebarIcon({ icon, label, onClick }: SidebarIconProps) {
+/** サイドバー内の各項目（アイコンとラベル）を構成 */
+function SidebarItem({ icon, label, onClick }: SidebarItemProps) {
   return (
-    <div onClick={onClick} className="sidebar-icon">
-      {icon}
-      <span className="sidebar-label">{label}</span>
+    <div onClick={onClick} className="sidebar-item">
+      <div className="sidebar-item__icon">{icon}</div>
+      <span className="sidebar-item__label">{label}</span>
     </div>
   );
 }
