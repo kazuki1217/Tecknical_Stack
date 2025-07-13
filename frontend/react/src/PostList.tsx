@@ -2,6 +2,7 @@ import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "./index.css";
 
 interface Post {
   id: number;
@@ -10,6 +11,7 @@ interface Post {
   created_at: string;
 }
 
+/** 投稿一覧画面を構成 */
 function PostList({ user }: { user: string | null }) {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]); // 投稿一覧を管理
@@ -114,16 +116,15 @@ function PostList({ user }: { user: string | null }) {
       <h2>こんにちは「{user}」さん</h2>
 
       {/* 投稿フォーム */}
-      <div style={{ marginTop: "2rem", marginBottom: "1rem" }}>
-        <textarea rows={4} cols={50} value={content} onChange={(e) => setContent(e.target.value)} />
-        <br />
+      <div className="post-form">
+        <textarea placeholder="いまどうしてる？" value={content} onChange={(e) => setContent(e.target.value)} />
         <button onClick={submitPost}>ポストする</button>
       </div>
 
       {/* 投稿一覧 */}
       <div>
         {posts.map((post) => (
-          <div key={post.id} style={{ border: "1px solid #ccc", margin: "1rem 0", padding: "0.5rem" }}>
+          <div key={post.id} className="post-card">
             <p>
               <strong>{post.user.name}</strong> - {new Date(post.created_at).toLocaleString()}
             </p>
@@ -145,7 +146,7 @@ function PostList({ user }: { user: string | null }) {
                 {post.user.name === user && (
                   <>
                     <button onClick={() => startEdit(post)}>編集</button>
-                    <button onClick={() => deletePost(post.id)} style={{ color: "white", backgroundColor: "red", border: "none", padding: "0.5rem", marginLeft: "0.5rem" }}>
+                    <button onClick={() => deletePost(post.id)} className="delete-button">
                       削除
                     </button>
                   </>
