@@ -6,10 +6,20 @@ body {
 
 /* サイドバー全体の設定 */
 .sidebar {
-  width: 230px;
+  width: 250px;
   position: fixed;    
   padding-top: 100px;
   padding-left: 50px;
+}
+
+/* サイドバーのユーザ名 */
+.sidebar-username {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 20px;
+  width: 160px;
+  white-space: wrap;
+  text-overflow: ellipsis;
 }
 
 /* サイドバーの各アイテム */
@@ -36,12 +46,10 @@ body {
 
 /* メインコンテンツ全般の設定 */
 .main-content {
-  width: 100%;
   width: 50%;
-  margin-left: 230px;
-  height: 100vh;
-  padding: 2rem;
-  border-left: 1px solid #444;
+  margin-left: 250px;
+  /* border-left: 2px solid #444; */
+  /* border-right: 2px solid #444; */
   box-sizing: border-box;
 }
 
@@ -51,8 +59,8 @@ body {
 */
 /* 投稿フォーム */
 .post-form {
-  max-width: 600px;
-  border: 2px solid #e6e6e6;
+  padding:10px;
+  border: 2px solid #444;
   display: flex;
   flex-direction: column;
 }
@@ -79,7 +87,7 @@ body {
   border-radius: 15px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   margin-left: auto;
 }
 .post-form button:hover {
@@ -88,9 +96,9 @@ body {
 
 /* 投稿カード全体 */
 .post-card {
-  border: 1px solid #ccc;
-  margin: 1rem 0;
-  padding: 0.5rem;
+  font-size: 1.3rem;
+  padding: 10px 20px;
+  border: 2px solid #444;
 }
 
 /* 削除ボタン */
@@ -101,4 +109,43 @@ body {
   padding: 0.5rem;
   margin-left: 0.5rem;
 }
+
+/* 検索バー */
+.search-box {
+  padding: 20px 80px;
+  display: flex;
+}
+
+/* 検索バー内の入力部分 */
+.search-box input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 2px solid #444;
+  background-color: #181818;
+  color: #e6e6e6;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+}
+.search-box input::placeholder {
+  color: #888;
+}
+
+/* 検索バー内のボタン */
+.search-box button {
+  background-color: #1da1f2;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 0 5px 5px 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-box button:hover {
+  background-color: #0d8ddb;
+}
+
 

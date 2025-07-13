@@ -1,6 +1,8 @@
 import Layout from "./Layout";
 import { useState } from "react";
 import axios from "axios";
+import "./index.css";
+import { FaSearch } from "react-icons/fa";
 
 interface Post {
   id: number;
@@ -9,9 +11,10 @@ interface Post {
   created_at: string;
 }
 
-function SearchPosts() {
+function SearchPosts({ user }: { user: string | null }) {
   const [keyword, setKeyword] = useState<string>(""); // 検索キーワードを管理
   const [results, setResults] = useState<Post[]>([]); // 検索結果の投稿一覧を管理
+  const [isComposing, setIsComposing] = useState(false); // 日本語入力の変換中かどうかを管理
 
   // 検索処理
   const handleSearch = async () => {
@@ -33,21 +36,35 @@ function SearchPosts() {
 
   return (
     <Layout
+      user={user}
       onLogout={() => {
         localStorage.removeItem("token");
         window.location.href = "/";
       }}
     >
-      <h1>投稿検索</h1>
-      {/* 検索ボックス */}
-      <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="投稿内容を検索" style={{ width: "300px", marginRight: "10px" }} />
-      {/* 検索ボタン */}
-      <button onClick={handleSearch}>検索</button>
+      {/* 検索バー */}
+      <div className="search-box">
+        <input
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="投稿内容を検索"
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !isComposing) {
+              handleSearch();
+            }
+          }}
+        />
+        <button onClick={handleSearch}>
+          <FaSearch />
+        </button>
+      </div>
 
       {/* 検索結果の表示 */}
-      <div style={{ marginTop: "2rem" }}>
+      <div>
         {results.map((post) => (
-          <div key={post.id} style={{ border: "1px solid #ccc", marginBottom: "1rem", padding: "0.5rem" }}>
+          <div key={post.id} className="post-card">
             <p>
               <strong>{post.user.name}</strong> - {new Date(post.created_at).toLocaleString()}
             </p>

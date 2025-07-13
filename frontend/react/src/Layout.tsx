@@ -4,24 +4,24 @@ import { FaList, FaSearch, FaSignOutAlt } from "react-icons/fa";
 import "./index.css";
 
 interface LayoutProps {
+  user: string | null;
   children: ReactNode;
   onLogout: () => void;
 }
 
 /** サイドバー全体を構成 */
-function Layout({ children, onLogout }: LayoutProps) {
+function Layout({ user, children, onLogout }: LayoutProps) {
   const navigate = useNavigate();
 
   return (
     <div>
       {/* サイドバー */}
       <div className="sidebar">
+        <div className="sidebar-username">{user} さん</div>
         {/* 投稿一覧 */}
         <SidebarItem icon={<FaList />} label="投稿一覧" onClick={() => navigate("/posts")} />
-
         {/* 検索 */}
         <SidebarItem icon={<FaSearch />} label="検索" onClick={() => navigate("/search")} />
-
         {/* ログアウト */}
         <SidebarItem icon={<FaSignOutAlt />} label="ログアウト" onClick={onLogout} />
       </div>

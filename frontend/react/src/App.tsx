@@ -46,7 +46,7 @@ function App() {
         <Route path="/" element={isLoggedIn ? <Navigate to="/posts" /> : <Login setIsLoggedIn={setIsLggedIn} setUser={setUser} />} />
         <Route path="/account" element={<Register />} />
         <Route path="/posts" element={isLoggedIn ? <PostList user={user} /> : <Navigate to="/" />} />
-        <Route path="/search" element={isLoggedIn ? <SearchPosts /> : <Navigate to="/" />} />
+        <Route path="/search" element={isLoggedIn ? <SearchPosts user={user} /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

@@ -112,9 +112,7 @@ function PostList({ user }: { user: string | null }) {
   };
 
   return (
-    <Layout onLogout={handleLogout}>
-      <h2>こんにちは「{user}」さん</h2>
-
+    <Layout user={user} onLogout={handleLogout}>
       {/* 投稿フォーム */}
       <div className="post-form">
         <textarea placeholder="いまどうしてる？" value={content} onChange={(e) => setContent(e.target.value)} />
