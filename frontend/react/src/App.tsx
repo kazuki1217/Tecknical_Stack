@@ -14,7 +14,8 @@ function App() {
   const [isLoggedIn, setIsLggedIn] = useState<boolean>(false); // ログイン状態の有無を管理
   const [user, setUser] = useState<string | null>(null); // ログイン状態のユーザ名を管理
 
-  useEffect(() => {
+useEffect(() => {
+  const fetchUser = async () => {
     // ローカルストレージからトークンを取得
     const token = localStorage.getItem("token");
 
@@ -23,20 +24,29 @@ function App() {
       return;
     }
 
+    try {
     // トークンが有効である場合 → ログイン状態にする
-    axios
-      .get("http://localhost:8000/api/user", {
+      const res = await axios.get("http://localhost:8000/api/user", {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        console.log("ステータスコード:", res.status);
-        if (res.status === 200) {
-          setIsLggedIn(true);
-          setUser(res.data.name);
-        }
-        setLoading(false);
       });
-  }, []);
+
+      console.log("ステータスコード:", res.status);
+      if (res.status === 200) {
+        setIsLggedIn(true);
+        setUser(res.data.name);
+      }
+    } catch (error) {
+      console.log("APIエラー:", error);
+      setIsLggedIn(false);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUser();
+}, []);
+
 
   if (loading) return <p>読み込み中...</p>;
 
