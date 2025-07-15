@@ -144,8 +144,21 @@ function PostList({ user }: { user: string | null }) {
       <div>
         {posts.map((post) => (
           <div key={post.id} className="post-card">
-            <p>
-              <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
+            <p className="post-header">
+              <span className="post-info">
+                <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
+              </span>
+              {/* 投稿者が自分の場合のみ編集・削除ボタンを表示 */}
+              {post.user.name === user && (
+                <span className="post-actions">
+                  <button onClick={() => startEdit(post)} className="edit-button">
+                    編集
+                  </button>
+                  <button onClick={() => deletePost(post.id)} className="delete-button">
+                    削除
+                  </button>
+                </span>
+              )}
             </p>
 
             {/* 編集モードかどうかを判定 */}
@@ -163,16 +176,6 @@ function PostList({ user }: { user: string | null }) {
                 {post.content && <p>{post.content}</p>}
                 {/* 画像があれば表示 */}
                 {post.image_base64 && <img src={post.image_base64} alt="post" style={{ maxWidth: "300px", marginTop: "10px" }} />}
-
-                {/* 投稿者が自分の場合のみ編集・削除ボタンを表示 */}
-                {post.user.name === user && (
-                  <>
-                    <button onClick={() => startEdit(post)}>編集</button>
-                    <button onClick={() => deletePost(post.id)} className="delete-button">
-                      削除
-                    </button>
-                  </>
-                )}
               </>
             )}
           </div>

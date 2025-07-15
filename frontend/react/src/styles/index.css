@@ -6,7 +6,7 @@ body {
 
 /* サイドバー全体の設定 */
 .sidebar {
-  width: 250px;
+  width: 400px;
   position: fixed;    
   padding-top: 100px;
   padding-left: 50px;
@@ -14,10 +14,10 @@ body {
 
 /* サイドバーのユーザ名 */
 .sidebar-username {
-  font-size: 24px;
+  font-size: 30px;
   color: #fff;
-  margin-bottom: 20px;
-  width: 160px;
+  margin-bottom: 30px;
+  width: 300px;
   white-space: wrap;
   text-overflow: ellipsis;
 }
@@ -25,29 +25,29 @@ body {
 /* サイドバーの各アイテム */
 .sidebar-item {
   cursor: pointer;
-  height: 60px;
   display: flex;
   align-items: center;
+  margin-top: 20px;
 }
 
 /* サイドバーの各アイテム内のアイコン */
 .sidebar-item__icon {
-  font-size: 24px;
+  font-size: 40px;
   color: #fff;
 }
 
 /* サイドバーの各アイテム内のラベル */
 .sidebar-item__label {
-  margin-left: 15px;
+  margin-left: 25px;
   color: #fff;
-  font-size: 20px;
+  font-size: 30px;
   padding-bottom: 8px;
 }
 
 /* メインコンテンツ全般の設定 */
 .main-content {
   width: 50%;
-  margin-left: 250px;
+  margin-left: 400px;
   /* border-left: 2px solid #444; */
   /* border-right: 2px solid #444; */
   box-sizing: border-box;
@@ -70,7 +70,7 @@ body {
   width: 100%;
   background: transparent;
   color: #e6e6e6;
-  font-size: 1.3rem;
+  font-size: 30px;
   padding: 0.5rem 0;
   border: none;
   outline: none; 
@@ -96,15 +96,48 @@ body {
 
 /* 投稿カード全体 */
 .post-card {
-  font-size: 1.3rem;
+  font-size: 25px;
   padding: 10px 20px;
   border: 2px solid #444;
+}
+
+/* 投稿ユーザ・投稿日時・編集ボタン・削除ボタン */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* 投稿ユーザ・投稿日時 */
+.post-info {
+  display: inline-flex;
+  align-items: center;
 }
 
 /* 投稿日時 */
 .post-date {
   color: #aaa;
-  font-size: 1.2rem;
+  font-size: 20px;
+}
+
+/* 編集ボタン・削除ボタン */
+.post-actions {
+  display: inline-flex;
+  align-items: center;
+}
+.post-actions button {
+  margin-left: 10px;
+}
+
+/* 編集ボタン */
+.edit-button {
+  color: white;
+  background-color: rgb(77, 77, 77);
+  border: none;
+  font-size: 20px;
+  padding: 5px;
+  margin-left: 20px;
 }
 
 /* 削除ボタン */
@@ -112,8 +145,9 @@ body {
   color: white;
   background-color: red;
   border: none;
-  padding: 0.5rem;
-  margin-left: 0.5rem;
+  font-size: 20px;
+  padding: 5px;
+  margin-left: 20px;
 }
 
 /* 検索バー */
