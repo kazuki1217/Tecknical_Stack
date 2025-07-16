@@ -161,6 +161,39 @@ body {
 }
 
 
+/* 投稿フォーム内のテキストエリア */
+.edit-textarea {
+  width: 100%;
+  background: transparent;
+  color: #e6e6e6;
+  font-size: 18px;
+  padding: 0.5rem 0;
+  border: none;
+  outline: none;
+  resize: none;
+}
+
+/* 編集キャンセルボタン */
+.edit-cancel-button {
+  color: white;
+  background-color: rgb(77, 77, 77);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 5px;
+}
+
+/* 編集更新ボタン */
+.edit-update-button {
+  color: white;
+  background-color: #0d8ddb;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 5px;
+  margin-left: 10px;
+}
+
 /* 検索バー */
 .search-box {
   padding: 20px 80px;
