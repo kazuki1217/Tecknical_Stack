@@ -5,7 +5,6 @@ import { FaList, FaSearch, FaSignOutAlt } from "react-icons/fa";
 interface SidebarLayoutProps {
   user: string | null;
   children: ReactNode;
-  onLogout: () => void;
 }
 
 /**
@@ -16,8 +15,15 @@ interface SidebarLayoutProps {
  * @param onLogout - ログアウト時に呼ばれる関数
  * @returns JSX.Element
  */
-function SidebarLayout({ user, children, onLogout }: SidebarLayoutProps) {
+function SidebarLayout({ user, children }: SidebarLayoutProps) {
   const navigate = useNavigate();
+
+  /** ログアウト処理 */
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+    window.location.reload(); // App.tsx を再評価させて状態をリセット
+  };
 
   return (
     <div>
@@ -29,7 +35,7 @@ function SidebarLayout({ user, children, onLogout }: SidebarLayoutProps) {
         {/* 検索 */}
         <SidebarItem icon={<FaSearch />} label="検索" onClick={() => navigate("/search")} />
         {/* ログアウト */}
-        <SidebarItem icon={<FaSignOutAlt />} label="ログアウト" onClick={onLogout} />
+        <SidebarItem icon={<FaSignOutAlt />} label="ログアウト" onClick={() => handleLogout()} />
       </div>
 
       {/* メインコンテンツ */}

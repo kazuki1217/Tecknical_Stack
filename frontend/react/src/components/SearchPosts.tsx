@@ -4,7 +4,6 @@ import { FaSearch } from "react-icons/fa";
 
 import SidebarLayout from "./SidebarLayout";
 import { formatPostDate } from "../utils/date";
-import "../styles/index.css";
 
 interface Post {
   id: number;
@@ -44,13 +43,7 @@ function SearchPosts({ user }: { user: string | null }) {
   };
 
   return (
-    <SidebarLayout
-      user={user}
-      onLogout={() => {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      }}
-    >
+    <SidebarLayout user={user}>
       {/* 検索バー */}
       <div className="search-box">
         <input
