@@ -5,7 +5,6 @@ import axios from "axios";
 import { ChangeEvent } from "react";
 
 import { formatPostDate } from "../utils/date";
-import "../styles/index.css";
 
 interface Post {
   id: number;
