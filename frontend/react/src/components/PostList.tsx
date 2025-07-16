@@ -164,10 +164,10 @@ function PostList({ user }: { user: string | null }) {
             {/* 編集モードかどうかを判定 */}
             {editingPostId === post.id ? (
               <>
-                <textarea rows={4} cols={50} value={editContent} onChange={(e) => setEditContent(e.target.value)} />
+                <textarea className="edit-textarea" rows={4} cols={50} value={editContent} onChange={(e) => setEditContent(e.target.value)} />
                 <br />
-                <button onClick={() => updatePost(post.id)}>更新する</button>
-                <button onClick={() => setEditingPostId(null)}>キャンセル</button>
+                <button className="edit-cancel-button" onClick={() => setEditingPostId(null)}>キャンセル</button>
+                <button  className="edit-update-button" onClick={() => updatePost(post.id)}>更新する</button>
               </>
             ) : (
               <>
