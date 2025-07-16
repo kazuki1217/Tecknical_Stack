@@ -46,7 +46,15 @@ interface SidebarItemProps {
   onClick: () => void;
 }
 
-/** サイドバー内の各項目（アイコンとラベル）を構成 */
+/**
+ * サイドバーアイテムコンポーネント
+ *
+ * @param icon - 表示するアイコン（ReactNode）
+ * @param label - 項目のラベル文字列
+ * @param onClick - クリック時に呼び出す処理
+ * @returns JSX.Element
+
+ */
 function SidebarItem({ icon, label, onClick }: SidebarItemProps) {
   return (
     <div onClick={onClick} className="sidebar-item">
