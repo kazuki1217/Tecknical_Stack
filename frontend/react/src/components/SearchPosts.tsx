@@ -1,8 +1,8 @@
-import Layout from "./Layout";
 import { useState } from "react";
 import axios from "axios";
 import { FaSearch } from "react-icons/fa";
 
+import SidebarLayout from "./SidebarLayout";
 import { formatPostDate } from "../utils/date";
 import "../styles/index.css";
 
@@ -44,7 +44,7 @@ function SearchPosts({ user }: { user: string | null }) {
   };
 
   return (
-    <Layout
+    <SidebarLayout
       user={user}
       onLogout={() => {
         localStorage.removeItem("token");
@@ -85,7 +85,7 @@ function SearchPosts({ user }: { user: string | null }) {
           </div>
         ))}
       </div>
-    </Layout>
+    </SidebarLayout>
   );
 }
 
