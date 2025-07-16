@@ -7,7 +7,13 @@ interface LoginProps {
   setUser: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-/** ログイン画面を構成 */
+/**
+ * ログイン画面コンポーネント
+ *
+ * @param setIsLoggedIn - ログイン状態を更新する関数
+ * @param setUser - ログインしたユーザ名を更新する関数
+ * @returns JSX.Element
+ */
 function Login({ setIsLoggedIn, setUser }: LoginProps) {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");

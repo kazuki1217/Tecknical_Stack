@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-/** 新規登録画面を構成 */
+/**
+ * 新規登録画面コンポーネント
+ *
+ * @returns JSX.Element
+ */
 function Register() {
   const [form, setForm] = useState({
     name: "",

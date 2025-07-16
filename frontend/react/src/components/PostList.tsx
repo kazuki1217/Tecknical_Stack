@@ -1,9 +1,8 @@
-import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import axios from "axios";
-import { ChangeEvent } from "react";
 
+import Layout from "./Layout";
 import { formatPostDate } from "../utils/date";
 
 interface Post {
@@ -14,7 +13,12 @@ interface Post {
   image_base64?: string | null;
 }
 
-/** 投稿一覧画面を構成 */
+/**
+ * 投稿一覧画面コンポーネント
+ *
+ * @param user - ログイン中のユーザ名
+ * @returns JSX.Element
+ */
 function PostList({ user }: { user: string | null }) {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]); // 投稿一覧を管理
@@ -75,7 +79,16 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
-  /** 投稿を削除 */
+  /**
+   * 指定したIDの投稿を削除する
+   *
+   * @param id - 削除する投稿ID
+   * @returns Promise<void>
+   *
+   * 処理内容:
+   * - API DELETE /api/posts/{id} を呼び出す
+   * - 成功したら posts state から該当投稿を除外する
+   */
   const deletePost = async (id: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -165,8 +178,12 @@ function PostList({ user }: { user: string | null }) {
               <>
                 <textarea className="edit-textarea" rows={4} cols={50} value={editContent} onChange={(e) => setEditContent(e.target.value)} />
                 <br />
-                <button className="edit-cancel-button" onClick={() => setEditingPostId(null)}>キャンセル</button>
-                <button  className="edit-update-button" onClick={() => updatePost(post.id)}>更新する</button>
+                <button className="edit-cancel-button" onClick={() => setEditingPostId(null)}>
+                  キャンセル
+                </button>
+                <button className="edit-update-button" onClick={() => updatePost(post.id)}>
+                  更新する
+                </button>
               </>
             ) : (
               <>

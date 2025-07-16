@@ -14,7 +14,12 @@ interface Post {
   image_base64?: string | null;
 }
 
-/** 検索画面を構成 */
+/**
+ * 投稿検索画面コンポーネント。
+ *
+ * @param user - ログイン中のユーザ名
+ * @returns JSX.Element
+ */
 function SearchPosts({ user }: { user: string | null }) {
   const [keyword, setKeyword] = useState<string>(""); // 検索キーワードを管理
   const [results, setResults] = useState<Post[]>([]); // 検索結果の投稿一覧を管理
@@ -76,11 +81,8 @@ function SearchPosts({ user }: { user: string | null }) {
             {/* テキストがあれば表示 */}
             {post.content && <p>{post.content}</p>}
             {/* 画像があれば表示 */}
-            {post.image_base64 && (
-              <img src={post.image_base64} alt="post" className="post-img"/>
-            )}
+            {post.image_base64 && <img src={post.image_base64} alt="post" className="post-img" />}
           </div>
-
         ))}
       </div>
     </Layout>

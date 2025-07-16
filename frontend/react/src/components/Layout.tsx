@@ -8,7 +8,14 @@ interface LayoutProps {
   onLogout: () => void;
 }
 
-/** サイドバー全体を構成 */
+/**
+ * サイドバーコンポーネント
+ *
+ * @param user - ログイン中のユーザ名
+ * @param children - メインコンテンツとして描画するコンポーネント
+ * @param onLogout - ログアウト時に呼ばれる関数
+ * @returns JSX.Element
+ */
 function Layout({ user, children, onLogout }: LayoutProps) {
   const navigate = useNavigate();
 
