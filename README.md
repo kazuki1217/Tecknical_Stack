@@ -123,7 +123,7 @@ VITE_APP_NAME="${APP_NAME}"
 
 <details>
 <summary>適切な保存状態</summary>
-<img width="311" height="413" alt="スクリーンショット 2025-07-16 120001" src="https://github.com/user-attachments/assets/6ce58cda-0bc0-4cc2-94e6-5055f94120c3" />
+<img width="311" height="413" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/6ce58cda-0bc0-4cc2-94e6-5055f94120c3" />
 </details>
 
 <br>
@@ -147,12 +147,12 @@ docker compose exec backend php artisan migrate:fresh --seed
 
 <details>
 <summary>ログイン画面</summary>
-<img width="1919" height="824" alt="スクリーンショット 2025-07-16 120806" src="https://github.com/user-attachments/assets/42870286-e9be-4aa8-95d3-a49dc6a5c66a" />
+<img width="1919" height="824" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/42870286-e9be-4aa8-95d3-a49dc6a5c66a" />
 </details>
 
 <details>
 <summary>投稿一覧画面</summary>
-<img width="1920" height="1511" alt="postlist" src="https://github.com/user-attachments/assets/32cfd5a1-5013-414a-85a0-4a1c098f2e1d" />
+<img width="1914" height="2472" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/3253110a-6f42-49bf-aace-51eddaa110ff" />
 </details>
 
 

@@ -175,7 +175,7 @@ function PostList({ user }: { user: string | null }) {
                 {/* テキストがあれば表示 */}
                 {post.content && <p>{post.content}</p>}
                 {/* 画像があれば表示 */}
-                {post.image_base64 && <img src={post.image_base64} alt="post" style={{ maxWidth: "300px", marginTop: "10px" }} />}
+                {post.image_base64 && <img src={post.image_base64} alt="post" className="post-img" />}
               </>
             )}
           </div>

@@ -11,6 +11,7 @@ interface Post {
   user: { name: string | null };
   content: string;
   created_at: string;
+  image_base64?: string | null;
 }
 
 /** 検索画面を構成 */
@@ -71,8 +72,15 @@ function SearchPosts({ user }: { user: string | null }) {
             <p>
               <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
             </p>
-            <p>{post.content}</p>
+            {/* 投稿内容表示 */}
+            {/* テキストがあれば表示 */}
+            {post.content && <p>{post.content}</p>}
+            {/* 画像があれば表示 */}
+            {post.image_base64 && (
+              <img src={post.image_base64} alt="post" className="post-img"/>
+            )}
           </div>
+
         ))}
       </div>
     </Layout>
