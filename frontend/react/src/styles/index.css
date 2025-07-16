@@ -6,17 +6,17 @@ body {
 
 /* サイドバー全体の設定 */
 .sidebar {
-  width: 400px;
-  position: fixed;    
-  padding-top: 100px;
-  padding-left: 50px;
+  width: 220px;
+  position: fixed;
+  padding-top: 30px;
+  padding-left: 20px;
 }
 
 /* サイドバーのユーザ名 */
 .sidebar-username {
-  font-size: 30px;
+  font-size: 20px;
   color: #fff;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   width: 300px;
   white-space: wrap;
   text-overflow: ellipsis;
@@ -27,12 +27,12 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 /* サイドバーの各アイテム内のアイコン */
 .sidebar-item__icon {
-  font-size: 40px;
+  font-size: 20px;
   color: #fff;
 }
 
@@ -40,16 +40,14 @@ body {
 .sidebar-item__label {
   margin-left: 25px;
   color: #fff;
-  font-size: 30px;
+  font-size: 18px;
   padding-bottom: 8px;
 }
 
 /* メインコンテンツ全般の設定 */
 .main-content {
-  width: 50%;
-  margin-left: 400px;
-  /* border-left: 2px solid #444; */
-  /* border-right: 2px solid #444; */
+  width: 45%;
+  margin-left: 220px;
   box-sizing: border-box;
 }
 
@@ -59,7 +57,7 @@ body {
 */
 /* 投稿フォーム */
 .post-form {
-  padding:10px;
+  padding: 10px;
   border: 2px solid #444;
   display: flex;
   flex-direction: column;
@@ -70,12 +68,13 @@ body {
   width: 100%;
   background: transparent;
   color: #e6e6e6;
-  font-size: 30px;
+  font-size: 18px;
   padding: 0.5rem 0;
   border: none;
-  outline: none; 
+  outline: none;
   resize: none;
 }
+
 .post-form textarea::placeholder {
   color: #888;
 }
@@ -87,17 +86,18 @@ body {
   border-radius: 15px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 1.3rem;
+  font-size: 18px;
   margin-left: auto;
 }
+
 .post-form button:hover {
   background-color: #0d8ddb;
 }
 
 /* 投稿カード全体 */
 .post-card {
-  font-size: 25px;
-  padding: 10px 20px;
+  font-size: 18px;
+  padding: 5px 10px;
   border: 2px solid #444;
 }
 
@@ -118,7 +118,7 @@ body {
 /* 投稿日時 */
 .post-date {
   color: #aaa;
-  font-size: 20px;
+  font-size: 15px;
 }
 
 /* 編集ボタン・削除ボタン */
@@ -126,6 +126,7 @@ body {
   display: inline-flex;
   align-items: center;
 }
+
 .post-actions button {
   margin-left: 10px;
 }
@@ -135,7 +136,8 @@ body {
   color: white;
   background-color: rgb(77, 77, 77);
   border: none;
-  font-size: 20px;
+  border-radius: 8px;
+  font-size: 15px;
   padding: 5px;
   margin-left: 20px;
 }
@@ -145,7 +147,8 @@ body {
   color: white;
   background-color: red;
   border: none;
-  font-size: 20px;
+  border-radius: 8px;
+  font-size: 15px;
   padding: 5px;
   margin-left: 20px;
 }
@@ -167,6 +170,7 @@ body {
   border-radius: 5px 0 0 5px;
   outline: none;
 }
+
 .search-box input::placeholder {
   color: #888;
 }
@@ -184,6 +188,7 @@ body {
   align-items: center;
   justify-content: center;
 }
+
 .search-box button:hover {
   background-color: #0d8ddb;
 }
@@ -210,6 +215,7 @@ body {
   background-color: #333;
   color: #fff;
 }
+
 .auth-form input:focus {
   border-color: #1da1f2;
   outline: none;
@@ -229,6 +235,7 @@ body {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
 .auth-form button:hover {
   background-color: #0d8ddb;
 }
