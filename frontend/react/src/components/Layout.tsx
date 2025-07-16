@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaList, FaSearch, FaSignOutAlt } from "react-icons/fa";
-import "../styles/index.css";
 
 interface LayoutProps {
   user: string | null;

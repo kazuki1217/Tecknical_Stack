@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../styles/index.css";
 
 interface LoginProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
