@@ -22,18 +22,14 @@ interface Post {
 function PostList({ user }: { user: string | null }) {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]); // 投稿一覧を管理
-  const [content, setContent] = useState(""); // 新規投稿入力欄を管理
+  const [content, setContent] = useState(""); // 新規投稿のテキスト情報を管理
+  const [imageFile, setImageFile] = useState<File | null>(null); // 新規投稿の画像ファイルを管理
   const [editingPostId, setEditingPostId] = useState<number | null>(null); // 編集中の投稿IDを管理
-  const [editContent, setEditContent] = useState<string>("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [editContent, setEditContent] = useState<string>(""); // 編集中のテキスト情報を管理
 
-  /** ファイル選択時の処理 */
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-    }
-  };
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   /** 投稿一覧を取得 */
   const fetchPosts = async () => {
@@ -50,45 +46,42 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
+  /** 画像ファイルの状態を管理 */
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+    }
+  };
+
   /** 新規投稿を作成 */
   const submitPost = async () => {
     if (!content && !imageFile) {
       alert("テキストまたは画像のいずれかを入力してください。");
       return;
     }
-
     try {
-      const token = localStorage.getItem("token");
-
       // multipart/form-data 形式に格納
       const formData = new FormData();
       content && formData.append("content", content);
       imageFile && formData.append("image", imageFile);
 
+      const token = localStorage.getItem("token");
       const res = await axios.post("http://localhost:8000/api/posts", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      setPosts([res.data, ...posts]);
+      // 再度、投稿一覧を取得
+      await fetchPosts();
       setContent("");
       setImageFile(null);
     } catch (error) {
-      console.error("投稿送信エラー:", error);
+      console.error("新規投稿の作成に失敗しました:", error);
     }
   };
 
-  /**
-   * 指定したIDの投稿を削除する
-   *
-   * @param id - 削除する投稿ID
-   * @returns Promise<void>
-   *
-   * 処理内容:
-   * - API DELETE /api/posts/{id} を呼び出す
-   * - 成功したら posts state から該当投稿を除外する
-   */
+  /** 指定したIDの投稿を削除する */
   const deletePost = async (id: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -97,10 +90,10 @@ function PostList({ user }: { user: string | null }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      // 投稿を画面から削除
-      setPosts(posts.filter((p) => p.id !== id));
+      // 再度、投稿一覧を取得
+      await fetchPosts();
     } catch (error) {
-      console.error("削除失敗:", error);
+      console.error("投稿の削除に失敗しました:", error);
     }
   };
 
@@ -123,29 +116,18 @@ function PostList({ user }: { user: string | null }) {
           },
         }
       );
-
-      setPosts(posts.map((p) => (p.id === id ? res.data.post : p))); // posts の一覧を更新
-      setEditingPostId(null); // 編集モード終了
-      setEditContent(""); // 編集内容をクリア
+      // 再度、投稿一覧を取得
+      await fetchPosts();
+      setEditingPostId(null);
+      setEditContent("");
     } catch (error) {
       console.error("更新失敗:", error);
     }
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  /** ログアウト処理 */
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-    window.location.reload(); // App.tsx を再評価させて状態をリセット
-  };
-
   return (
-    <SidebarLayout user={user} onLogout={handleLogout}>
-      {/* 投稿フォーム */}
+    <SidebarLayout user={user}>
+      {/* 新規投稿フォーム */}
       <div className="post-form">
         <textarea placeholder="いまどうしてる？" value={content} onChange={(e) => setContent(e.target.value)} />
         <input type="file" accept="image/*" onChange={handleImageChange} />
@@ -157,10 +139,11 @@ function PostList({ user }: { user: string | null }) {
         {posts.map((post) => (
           <div key={post.id} className="post-card">
             <p className="post-header">
+              {/* ユーザ名・投稿日時 */}
               <span className="post-info">
                 <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
               </span>
-              {/* 投稿者が自分の場合のみ編集・削除ボタンを表示 */}
+              {/* 投稿者が自分の場合のみ編集ボタン・削除ボタンを表示 */}
               {post.user.name === user && (
                 <span className="post-actions">
                   <button onClick={() => startEdit(post)} className="edit-button">
@@ -173,7 +156,7 @@ function PostList({ user }: { user: string | null }) {
               )}
             </p>
 
-            {/* 編集モードかどうかを判定 */}
+            {/* 編集モードの投稿は、テキスト入力フィールド・キャンセルボタン・更新するボタンを表示 */}
             {editingPostId === post.id ? (
               <>
                 <textarea className="edit-textarea" rows={4} cols={50} value={editContent} onChange={(e) => setEditContent(e.target.value)} />
@@ -187,10 +170,9 @@ function PostList({ user }: { user: string | null }) {
               </>
             ) : (
               <>
-                {/* 投稿内容表示 */}
-                {/* テキストがあれば表示 */}
+                {/* テキスト情報があれば表示 */}
                 {post.content && <p>{post.content}</p>}
-                {/* 画像があれば表示 */}
+                {/* 画像ファイルがあれば表示 */}
                 {post.image_base64 && <img src={post.image_base64} alt="post" className="post-img" />}
               </>
             )}
