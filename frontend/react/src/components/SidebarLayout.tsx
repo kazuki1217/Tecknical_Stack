@@ -30,11 +30,8 @@ function SidebarLayout({ user, children }: SidebarLayoutProps) {
       {/* サイドバー */}
       <div className="sidebar">
         <div className="sidebar-username">{user} さん</div>
-        {/* 投稿一覧 */}
         <SidebarItem icon={<FaList />} label="投稿一覧" onClick={() => navigate("/posts")} />
-        {/* 検索 */}
         <SidebarItem icon={<FaSearch />} label="検索" onClick={() => navigate("/search")} />
-        {/* ログアウト */}
         <SidebarItem icon={<FaSignOutAlt />} label="ログアウト" onClick={() => handleLogout()} />
       </div>
 

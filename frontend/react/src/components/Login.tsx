@@ -15,23 +15,18 @@ interface LoginProps {
  * @returns JSX.Element
  */
 function Login({ setIsLoggedIn, setUser }: LoginProps) {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const [name, setName] = useState(""); // ユーザ名を管理
+  const [password, setPassword] = useState(""); // パスワードを管理
+  const [errorMsg, setErrorMsg] = useState(""); // エラーメッセージを管理
 
-  // フォームの送信時の処理（ログイン）
+  /* ログイン認証チェック */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
-    // ログイン情報を送信
     try {
-      const res = await axios.post("http://localhost:8000/api/login", {
-        name,
-        password,
-      });
-
+      const res = await axios.post("http://localhost:8000/api/login", { name, password });
       if (res.data.status === "error") {
         setErrorMsg(res.data.message);
         return;
@@ -43,7 +38,7 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
       setUser(res.data.name);
       navigate("/posts");
     } catch (error) {
-      console.log(error);
+      console.log("ログインに失敗しました:", error);
       setErrorMsg("ログインに失敗しました。");
     }
   };
