@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, ChangeEvent } from "react";
 import axios from "axios";
 
-import Layout from "./Layout";
+import SidebarLayout from "./SidebarLayout";
 import { formatPostDate } from "../utils/date";
 
 interface Post {
@@ -144,7 +144,7 @@ function PostList({ user }: { user: string | null }) {
   };
 
   return (
-    <Layout user={user} onLogout={handleLogout}>
+    <SidebarLayout user={user} onLogout={handleLogout}>
       {/* 投稿フォーム */}
       <div className="post-form">
         <textarea placeholder="いまどうしてる？" value={content} onChange={(e) => setContent(e.target.value)} />
@@ -197,7 +197,7 @@ function PostList({ user }: { user: string | null }) {
           </div>
         ))}
       </div>
-    </Layout>
+    </SidebarLayout>
   );
 }
 

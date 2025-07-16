@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaList, FaSearch, FaSignOutAlt } from "react-icons/fa";
 
-interface LayoutProps {
+interface SidebarLayoutProps {
   user: string | null;
   children: ReactNode;
   onLogout: () => void;
@@ -16,7 +16,7 @@ interface LayoutProps {
  * @param onLogout - ログアウト時に呼ばれる関数
  * @returns JSX.Element
  */
-function Layout({ user, children, onLogout }: LayoutProps) {
+function SidebarLayout({ user, children, onLogout }: SidebarLayoutProps) {
   const navigate = useNavigate();
 
   return (
@@ -38,7 +38,7 @@ function Layout({ user, children, onLogout }: LayoutProps) {
   );
 }
 
-export default Layout;
+export default SidebarLayout;
 
 interface SidebarItemProps {
   icon: ReactNode;
