@@ -20,6 +20,7 @@ services:
       - ./frontend/react:/app
     ports:
       - "5173:5173"
+    command: npm run dev
 
   # Laravel
   backend:
@@ -28,6 +29,7 @@ services:
       - ./backend/laravel:/var/www/html
     ports:
       - "8000:8000"
+    command: php artisan serve --host=0.0.0.0 --port=8000
 
   db:
     image: mysql:8.0
@@ -50,6 +52,5 @@ services:
       PMA_PORT: 3306
     depends_on:
       - db
-      
 volumes:
   db_data:
