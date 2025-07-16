@@ -21,24 +21,22 @@ interface Post {
  */
 function SearchPosts({ user }: { user: string | null }) {
   const [keyword, setKeyword] = useState<string>(""); // 検索キーワードを管理
-  const [results, setResults] = useState<Post[]>([]); // 検索結果の投稿一覧を管理
-  const [isComposing, setIsComposing] = useState(false); // 日本語入力の変換中かどうかを管理
+  const [results, setResults] = useState<Post[]>([]); // 検索にヒットした投稿一覧を管理
+  const [isComposing, setIsComposing] = useState(false); // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
 
   // 検索処理
   const handleSearch = async () => {
-    const token = localStorage.getItem("token");
-
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.get("http://localhost:8000/api/posts/search", {
-        params: { keyword }, // クエリパラメータとして keyword を追加
+        params: { keyword },
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
       setResults(res.data);
     } catch (error) {
-      console.error("検索失敗:", error);
+      console.error("検索処理に失敗しました:", error);
     }
   };
 
@@ -67,13 +65,13 @@ function SearchPosts({ user }: { user: string | null }) {
       <div>
         {results.map((post) => (
           <div key={post.id} className="post-card">
+            {/* ユーザ名・投稿日時 */}
             <p>
               <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
             </p>
-            {/* 投稿内容表示 */}
-            {/* テキストがあれば表示 */}
+            {/* テキスト情報があれば表示 */}
             {post.content && <p>{post.content}</p>}
-            {/* 画像があれば表示 */}
+            {/* 画像ファイルがあれば表示 */}
             {post.image_base64 && <img src={post.image_base64} alt="post" className="post-img" />}
           </div>
         ))}

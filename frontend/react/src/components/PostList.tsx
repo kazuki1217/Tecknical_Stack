@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState, ChangeEvent } from "react";
 import axios from "axios";
 
@@ -20,7 +19,6 @@ interface Post {
  * @returns JSX.Element
  */
 function PostList({ user }: { user: string | null }) {
-  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]); // 投稿一覧を管理
   const [content, setContent] = useState(""); // 新規投稿のテキスト情報を管理
   const [imageFile, setImageFile] = useState<File | null>(null); // 新規投稿の画像ファイルを管理
@@ -42,7 +40,7 @@ function PostList({ user }: { user: string | null }) {
       });
       setPosts(res.data);
     } catch (error) {
-      console.error("投稿一覧取得エラー:", error);
+      console.error("投稿一覧の取得に失敗しました:", error);
     }
   };
 
@@ -121,7 +119,7 @@ function PostList({ user }: { user: string | null }) {
       setEditingPostId(null);
       setEditContent("");
     } catch (error) {
-      console.error("更新失敗:", error);
+      console.error("投稿内容の更新に失敗しました:", error);
     }
   };
 
