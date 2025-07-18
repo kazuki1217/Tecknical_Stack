@@ -24,7 +24,7 @@ function SearchPosts({ user }: { user: string | null }) {
   const [results, setResults] = useState<Post[]>([]); // 検索にヒットした投稿一覧を管理
   const [isComposing, setIsComposing] = useState(false); // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
 
-  // 検索処理
+  /** キーワード検索（部分一致）にヒットした投稿一覧を取得を取得 */
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("token");
