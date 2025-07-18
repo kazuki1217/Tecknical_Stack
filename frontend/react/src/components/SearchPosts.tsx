@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaSearch } from "react-icons/fa";
 
 import SidebarLayout from "./SidebarLayout";
-import { formatPostDate } from "../utils/date";
+import PostItem from "./PostItem";
 
 interface Post {
   id: number;
@@ -40,6 +40,42 @@ function SearchPosts({ user }: { user: string | null }) {
     }
   };
 
+  /** 指定したIDの投稿を削除する */
+  const deletePost = async (id: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:8000/api/posts/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // 再度、投稿一覧を取得
+      await handleSearch();
+    } catch (error) {
+      console.error("投稿の削除に失敗しました:", error);
+    }
+  };
+
+  /** 投稿内容を更新 */
+  const updatePost = async (id: number, content: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:8000/api/posts/${id}`,
+        { content },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // 再度、投稿一覧を取得
+      await handleSearch();
+    } catch (error) {
+      console.error("投稿内容の更新に失敗しました:", error);
+    }
+  };
+
   return (
     <SidebarLayout user={user}>
       {/* 検索バー */}
@@ -64,16 +100,7 @@ function SearchPosts({ user }: { user: string | null }) {
       {/* 検索結果の表示 */}
       <div>
         {results.map((post) => (
-          <div key={post.id} className="post-card">
-            {/* ユーザ名・投稿日時 */}
-            <p>
-              <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
-            </p>
-            {/* テキスト情報があれば表示 */}
-            {post.content && <p>{post.content}</p>}
-            {/* 画像ファイルがあれば表示 */}
-            {post.image_base64 && <img src={post.image_base64} alt="post" className="post-img" />}
-          </div>
+          <PostItem key={post.id} post={post} currentUser={user} onDelete={deletePost} onUpdate={updatePost} />
         ))}
       </div>
     </SidebarLayout>
