@@ -4,6 +4,7 @@ import { FaSearch } from "react-icons/fa";
 
 import SidebarLayout from "./SidebarLayout";
 import PostItem from "./PostItem";
+import { createPostActions } from "../utils/createPostActions";
 
 interface Post {
   id: number;
@@ -40,41 +41,7 @@ function SearchPosts({ user }: { user: string | null }) {
     }
   };
 
-  /** 指定したIDの投稿を削除する */
-  const deletePost = async (id: number) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8000/api/posts/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // 再度、投稿一覧を取得
-      await handleSearch();
-    } catch (error) {
-      console.error("投稿の削除に失敗しました:", error);
-    }
-  };
-
-  /** 投稿内容を更新 */
-  const updatePost = async (id: number, content: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8000/api/posts/${id}`,
-        { content },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // 再度、投稿一覧を取得
-      await handleSearch();
-    } catch (error) {
-      console.error("投稿内容の更新に失敗しました:", error);
-    }
-  };
+  const { deletePost, updatePost } = createPostActions(handleSearch);
 
   return (
     <SidebarLayout user={user}>

@@ -4,6 +4,7 @@ import axios from "axios";
 import SidebarLayout from "./SidebarLayout";
 import PostForm from "./PostForm";
 import PostItem from "./PostItem";
+import { createPostActions } from "../utils/createPostActions";
 
 interface Post {
   id: number;
@@ -41,6 +42,8 @@ function PostList({ user }: { user: string | null }) {
     }
   };
 
+  const { deletePost, updatePost } = createPostActions(fetchPosts);
+
   /** 新規投稿を作成 */
   const submitPost = async (content: string, imageFile: File | null) => {
     try {
@@ -59,42 +62,6 @@ function PostList({ user }: { user: string | null }) {
       await fetchPosts();
     } catch (error) {
       console.error("新規投稿の作成に失敗しました:", error);
-    }
-  };
-
-  /** 指定したIDの投稿を削除する */
-  const deletePost = async (id: number) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8000/api/posts/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // 再度、投稿一覧を取得
-      await fetchPosts();
-    } catch (error) {
-      console.error("投稿の削除に失敗しました:", error);
-    }
-  };
-
-  /** 投稿内容を更新 */
-  const updatePost = async (id: number, content: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8000/api/posts/${id}`,
-        { content },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // 再度、投稿一覧を取得
-      await fetchPosts();
-    } catch (error) {
-      console.error("投稿内容の更新に失敗しました:", error);
     }
   };
 
