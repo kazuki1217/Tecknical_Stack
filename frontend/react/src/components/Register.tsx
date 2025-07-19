@@ -37,9 +37,9 @@ function Register() {
   };
 
   return (
-    <div className="auth-container">
+    <div className="register-container">
       <h2>新規登録</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
+      <form onSubmit={handleSubmit} className="register-form">
         <input name="name" placeholder="名前" onChange={handleChange} />
         <input name="email" type="email" placeholder="メールアドレス" onChange={handleChange} />
         <input name="password" type="password" placeholder="パスワード" onChange={handleChange} />
@@ -47,9 +47,9 @@ function Register() {
         <button type="submit">登録</button>
       </form>
       {/* アカウント登録に失敗したか否かを表示 */}
-      {message && <p className={success ? "success-message" : "error-message"}>{message}</p>}
+      {message && <p className={success ? "register-success-message" : "register-error-message"}>{message}</p>}
       {success && (
-        <button className="link-button" onClick={() => navigate("/")}>
+        <button className="register-link-button" onClick={() => navigate("/")}>
           ログイン画面はこちら
         </button>
       )}
