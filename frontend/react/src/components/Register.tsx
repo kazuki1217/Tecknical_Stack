@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import "../styles/Register.css";
+
 /**
  * 新規登録画面コンポーネント
  *

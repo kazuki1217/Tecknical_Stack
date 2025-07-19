@@ -1,5 +1,7 @@
 import { useState, ChangeEvent } from "react";
 
+import "../styles/PostForm.css";
+
 interface PostFormProps {
   onSubmit: (content: string, imageFile: File | null) => void;
 }
