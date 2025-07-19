@@ -4,6 +4,7 @@ import { FaSearch } from "react-icons/fa";
 
 import SidebarLayout from "./SidebarLayout";
 import PostItem from "./PostItem";
+import "../styles/SearchPosts.css";
 import { createPostActions } from "../utils/createPostActions";
 
 interface Post {

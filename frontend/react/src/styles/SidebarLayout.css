@@ -1,0 +1,47 @@
+
+/* サイドバー全体の設定 */
+.sidebar {
+  width: 220px;
+  position: fixed;
+  padding-top: 30px;
+  padding-left: 20px;
+}
+
+/* サイドバーのユーザ名 */
+.sidebar-username {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 20px;
+  width: 300px;
+  white-space: wrap;
+  text-overflow: ellipsis;
+}
+
+/* サイドバーの各アイテム */
+.sidebar-item {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* サイドバーの各アイテム内のアイコン */
+.sidebar-item__icon {
+  font-size: 20px;
+  color: #fff;
+}
+
+/* サイドバーの各アイテム内のラベル */
+.sidebar-item__label {
+  margin-left: 25px;
+  color: #fff;
+  font-size: 18px;
+  padding-bottom: 8px;
+}
+
+/* メインコンテンツ全般の設定 */
+.main-content {
+  width: 45%;
+  margin-left: 220px;
+  box-sizing: border-box;
+}

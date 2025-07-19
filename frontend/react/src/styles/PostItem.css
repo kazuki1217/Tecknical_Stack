@@ -1,0 +1,100 @@
+
+/* 投稿カード全体 */
+.post-card {
+  font-size: 18px;
+  padding: 5px 10px;
+  border: 2px solid #444;
+}
+
+/* 投稿ユーザ・投稿日時・編集ボタン・削除ボタン */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* 投稿ユーザ・投稿日時 */
+.post-info {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 投稿日時 */
+.post-date {
+  color: #aaa;
+  font-size: 15px;
+}
+
+/* 編集ボタン・削除ボタン */
+.post-actions {
+  display: inline-flex;
+  align-items: center;
+}
+
+.post-actions button {
+  margin-left: 10px;
+}
+
+/* 編集ボタン */
+.edit-button {
+  color: white;
+  background-color: rgb(77, 77, 77);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 5px;
+  margin-left: 20px;
+}
+
+/* 削除ボタン */
+.delete-button {
+  color: white;
+  background-color: red;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 5px;
+  margin-left: 20px;
+}
+
+/* 投稿カード内の画像 */
+.post-img {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+
+/* 投稿フォーム内のテキストエリア */
+.edit-textarea {
+  width: 100%;
+  background: transparent;
+  color: #e6e6e6;
+  font-size: 18px;
+  padding: 0.5rem 0;
+  border: none;
+  outline: none;
+  resize: none;
+}
+
+/* 編集キャンセルボタン */
+.edit-cancel-button {
+  color: white;
+  background-color: rgb(77, 77, 77);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 5px;
+}
+
+/* 編集更新ボタン */
+.edit-update-button {
+  color: white;
+  background-color: #0d8ddb;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 5px;
+  margin-left: 10px;
+}

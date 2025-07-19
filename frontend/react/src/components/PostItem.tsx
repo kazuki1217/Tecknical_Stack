@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { formatPostDate } from "../utils/date";
 
+import "../styles/PostItem.css";
+
 interface Post {
   id: number;
   user: { name: string | null };

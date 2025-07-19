@@ -1,0 +1,40 @@
+
+/* 検索バー */
+.search-box {
+  padding: 20px 80px;
+  display: flex;
+}
+
+/* 検索バー内の入力部分 */
+.search-box input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 2px solid #444;
+  background-color: #181818;
+  color: #e6e6e6;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+}
+
+.search-box input::placeholder {
+  color: #888;
+}
+
+/* 検索バー内のボタン */
+.search-box button {
+  background-color: #1da1f2;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 0 5px 5px 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-box button:hover {
+  background-color: #0d8ddb;
+}
