@@ -1,6 +1,6 @@
 
-/* 新規登録画面、ログイン画面全体の設定 */
-.auth-container {
+/* 新規登録画面全体の設定 */
+.register-container {
   max-width: 300px;
   margin: 50px auto;
   background-color: #222;
@@ -11,7 +11,7 @@
 }
 
 /* 名前・メールアドレス・パスワードの入力部分 */
-.auth-form input {
+.register-form input {
   width: 90%;
   padding: 5px;
   margin: 10px 0;
@@ -22,13 +22,13 @@
   color: #fff;
 }
 
-.auth-form input:focus {
+.register-form input:focus {
   border-color: #1da1f2;
   outline: none;
 }
 
-/* ログインボタン・登録ボタン */
-.auth-form button {
+/* 登録ボタン */
+.register-form button {
   width: 50%;
   margin-top: 12px;
   padding: 5px;
@@ -42,18 +42,12 @@
   transition: background-color 0.3s;
 }
 
-.auth-form button:hover {
+.register-form button:hover {
   background-color: #0d8ddb;
 }
 
-/* 文字「アカウントをお持ちでない方はこちら」 */
-.auth-container p {
-  padding-top: 20px;
-  font-size: 16px;
-}
-
 /* リンクボタン */
-.link-button {
+.register-link-button {
   background: transparent;
   color: #1da1f2;
   border: none;
@@ -63,13 +57,12 @@
 }
 
 /* エラーメッセージ */
-.error-message {
+.register-error-message {
   color: red;
   margin-top: 10px;
 }
 
 /* 成功メッセージ */
-.success-message {
-  color: #1da1f2;
+.register-success-message {
   margin-top: 10px;
 }

@@ -46,18 +46,18 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
   };
 
   return (
-    <div className="auth-container">
+    <div className="login-container">
       <h2>ログイン</h2>
-      <form onSubmit={handleLogin} className="auth-form">
+      <form onSubmit={handleLogin} className="login-form">
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="名前" />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" />
         <button type="submit">ログイン</button>
       </form>
       {/* エラーメッセージを表示 */}
-      {errorMsg && <p className="error-message">{errorMsg}</p>}
+      {errorMsg && <p className="login-error-message">{errorMsg}</p>}
 
       <p>アカウントをお持ちでない方はこちら</p>
-      <button className="link-button" onClick={() => navigate("/account")}>
+      <button className="login-link-button" onClick={() => navigate("/account")}>
         新規登録
       </button>
     </div>
