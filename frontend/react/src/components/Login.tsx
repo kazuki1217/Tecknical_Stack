@@ -5,7 +5,7 @@ import axios from "axios";
 import "../styles/Login.css";
 
 interface LoginProps {
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean | null>>;
   setUser: React.Dispatch<React.SetStateAction<string | null>>;
 }
 

@@ -13,7 +13,7 @@ import SearchPosts from "./components/SearchPosts";
  * @returns JSX.Element
  */
 function App() {
-  const [isLoggedIn, setIsLggedIn] = useState<boolean>(false); // ログイン状態の有無を管理
+  const [isLoggedIn, setIsLggedIn] = useState<boolean | null>(null); // ログイン状態の有無を管理
   const [user, setUser] = useState<string | null>(null); // ログイン状態のユーザ名を管理
 
   useEffect(() => {
@@ -45,6 +45,9 @@ function App() {
       setIsLggedIn(false);
     }
   };
+
+  // チェック中なら何も表示しない
+  if (isLoggedIn === null) return null;
 
   return (
     <BrowserRouter>
