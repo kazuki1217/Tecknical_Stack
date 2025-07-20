@@ -79,10 +79,17 @@ class AuthController extends Controller
             ]);
         }
 
-        // 認証成功 → トークンを発行して返す（トークンはDBに保存される）
+        // トークンを作成
+        $tokenResult = $user->createToken('react');
+        $token = $tokenResult->accessToken;
+
+        // トークンの有効期限を「今から10分後」に設定
+        $token->expires_at = now()->addSeconds(600);
+        $token->save();
+
         return response()->json([
             'status' => 'success',
-            'token' => $user->createToken('react')->plainTextToken,
+            'token' => $tokenResult->plainTextToken,
             'name' => $request->name
         ]);
     }

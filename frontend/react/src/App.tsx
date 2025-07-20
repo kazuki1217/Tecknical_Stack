@@ -16,33 +16,35 @@ function App() {
   const [isLoggedIn, setIsLggedIn] = useState<boolean>(false); // ログイン状態の有無を管理
   const [user, setUser] = useState<string | null>(null); // ログイン状態のユーザ名を管理
 
-  // ログイン認証チェック（トークン有無で画面遷移を制御）
   useEffect(() => {
-    async () => {
-      // ローカルストレージからトークンを取得
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setIsLggedIn(false);
-        return;
-      }
-
-      try {
-        // トークンが有効である場合 → ログイン状態にする
-        const res = await axios.get("http://localhost:8000/api/user", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        console.log("ステータスコード:", res.status);
-        if (res.status === 200) {
-          setIsLggedIn(true);
-          setUser(res.data.name);
-        }
-      } catch (error) {
-        console.log("APIエラー:", error);
-        setIsLggedIn(false);
-      }
-    };
+    checkAuth();
   }, []);
+
+  /** ログイン認証チェック（トークン有無で画面遷移を制御） */
+  const checkAuth = async () => {
+    // ローカルストレージからトークンを取得
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsLggedIn(false);
+      return;
+    }
+
+    try {
+      // トークンが有効である場合 → ログイン状態にする
+      const res = await axios.get("http://localhost:8000/api/user", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("ステータスコード:", res.status);
+      if (res.status === 200) {
+        setIsLggedIn(true);
+        setUser(res.data.name);
+      }
+    } catch (error) {
+      console.log("APIエラー:", error);
+      setIsLggedIn(false);
+    }
+  };
 
   return (
     <BrowserRouter>
