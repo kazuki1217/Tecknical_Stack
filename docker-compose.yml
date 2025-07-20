@@ -40,6 +40,7 @@ services:
       MYSQL_DATABASE: laravel
       MYSQL_USER: laravel
       MYSQL_PASSWORD: secret
+      TZ: Asia/Tokyo
     volumes:
       - db_data:/var/lib/mysql
 
