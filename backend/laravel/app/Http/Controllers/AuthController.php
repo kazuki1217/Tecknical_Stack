@@ -21,7 +21,7 @@ class AuthController extends Controller
      * アカウント登録処理
      *
      * @param Request $request name, email, password, password_confirmation を含むリクエスト
-     * @return \Illuminate\Http\JsonResponse 成功時は成功メッセージを返し、失敗時は失敗エラーメッセージを返す。
+     * @return \Illuminate\Http\JsonResponse 成功時は成功メッセージを返し、失敗時は失敗エラーメッセージを返す
      */
     public function register(Request $request)
     {
@@ -39,9 +39,6 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-
-            return response()->json($user);
-
 
             return response()->json(['message' => 'アカウント登録が正常に完了しました。'], 201);
         } catch (ValidationException $e) {
