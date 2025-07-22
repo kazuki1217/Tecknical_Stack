@@ -36,7 +36,7 @@ function PostList({ user }: { user: string | null }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      setPosts(res.data);
+      setPosts(res.data.data);
     } catch (error) {
       console.error("投稿一覧の取得に失敗しました:", error);
     }
