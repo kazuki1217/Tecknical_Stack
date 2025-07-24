@@ -36,7 +36,7 @@ function SearchPosts({ user }: { user: string | null }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      setResults(res.data);
+      setResults(res.data.post);
     } catch (error) {
       console.error("検索処理に失敗しました:", error);
     }
