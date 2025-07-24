@@ -39,9 +39,13 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
       setIsLoggedIn(true);
       setUser(res.data.name);
       navigate("/posts");
-    } catch (error) {
-      console.log("ログインに失敗しました:", error);
-      setErrorMsg("ログインに失敗しました。");
+    } catch (error: any) {
+      if (error.response && error.response.status === 429) {
+        setErrorMsg(error.response.data.message);
+      } else {
+        console.log("ログインに失敗しました:", error);
+        setErrorMsg("ログインに失敗しました。");
+      }
     }
   };
 
