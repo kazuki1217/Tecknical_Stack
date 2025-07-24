@@ -60,11 +60,6 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            // バリデーション：nameとpasswordが必須
-            $request->validate([
-                'name' => 'required',
-                'password' => 'required',
-            ]);
 
             $throttleKey = 'login:' . Str::lower($request->ip);
 
@@ -75,13 +70,19 @@ class AuthController extends Controller
                 return response()->json(["message" => "短時間でのログイン試行回数が多すぎます。{$seconds}秒後に再試行してください。"], 429);
             }
 
+            // バリデーション：nameとpasswordが必須
+            $request->validate([
+                'name' => 'required',
+                'password' => 'required',
+            ]);
+
             // 列名「name」に一致する行を取得
             $user = User::where('name', $request->name)->first();
 
             // ユーザーが存在しない、またはパスワードが一致しない場合
             if (! $user || ! Hash::check($request->password, $user->password)) {
                 RateLimiter::hit($throttleKey, 60); // ← 60秒保持
-                Log::info('ログインに失敗しました。', ['ip' => $request->ip(), 'name' => $request->name,]);
+                Log::info('ログイン登録処理で、名前とパスワードが一致しませんでした。', ['ip' => $request->ip(), 'name' => $request->name,]);
                 return response()->json(['message' => 'ログインに失敗しました。'], 401);
             }
 
@@ -95,6 +96,7 @@ class AuthController extends Controller
 
             return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'token' => $tokenResult->plainTextToken, 'name' => $request->name], 200);
         } catch (ValidationException $e) {
+            RateLimiter::hit($throttleKey, 60); // ← 60秒保持
             Log::info('ログイン登録処理で、入力内容に誤りがありました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(),]);
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors(),], 422);
         } catch (\Throwable $e) {
