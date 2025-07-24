@@ -1,4 +1,5 @@
 ## 環境構築の手順書
+
 ### 0. 環境の前提条件
 
 以下の環境を満たしていることを確認してください。
@@ -9,7 +10,8 @@
 
 <br>
 
-### 1. CLIツール「Task」をインストール
+### 1. CLI ツール「Task」をインストール
+
 以下のコマンドを実行し、「Task」をインストールします。<br>
 
 ```
@@ -28,7 +30,8 @@ task --version
 
 <br>
 
-### 2. Nginx・React・Laravel等 のイメージを作成
+### 2. Nginx・React・Laravel 等 のイメージを作成
+
 以下のコマンドを実行し、すべての環境を一括で構築します。
 
 ```
@@ -38,34 +41,38 @@ task setup
 <br>
 
 ### 3. Laravel の .env を更新
+
 以下の内容を Tecknical_Stack/backend/laravel 配下の .env に反映します。
 
 <details>
 <summary>.env</summary>
 
 ```dotenv
+# アプリケーション基本設定
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=base64:cgO0y7cyTt+eTp1LgXu8M5HHVZyTY0GY7OIUYK13C7g=
 APP_DEBUG=true
 APP_URL=http://localhost
 
+# アプリの言語設定
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
 APP_FAKER_LOCALE=en_US
 
+# メンテナンスモード関連
 APP_MAINTENANCE_DRIVER=file
-# APP_MAINTENANCE_STORE=database
 
-PHP_CLI_SERVER_WORKERS=4
-
+# ハッシュ設定
 BCRYPT_ROUNDS=12
 
+# ログ設定
 LOG_CHANNEL=stack
 LOG_STACK=single
 LOG_DEPRECATIONS_CHANNEL=null
 LOG_LEVEL=debug
 
+# データベース接続設定
 DB_CONNECTION=mysql
 DB_HOST=db
 DB_PORT=3306
@@ -73,26 +80,26 @@ DB_DATABASE=laravel
 DB_USERNAME=laravel
 DB_PASSWORD=secret
 
+# セッション管理設定
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
 SESSION_DOMAIN=null
 
-BROADCAST_CONNECTION=log
+# ファイル保存先の設定
 FILESYSTEM_DISK=local
-QUEUE_CONNECTION=database
 
-CACHE_STORE=database
-# CACHE_PREFIX=
+# キャッシュの保存先を設定
+CACHE_STORE=file
 
-MEMCACHED_HOST=127.0.0.1
-
+# Redis設定
 REDIS_CLIENT=phpredis
 REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
 
+# メール送信設定（MailpitやSMTPなど）
 MAIL_MAILER=log
 MAIL_SCHEME=null
 MAIL_HOST=127.0.0.1
@@ -102,19 +109,23 @@ MAIL_PASSWORD=null
 MAIL_FROM_ADDRESS="hello@example.com"
 MAIL_FROM_NAME="${APP_NAME}"
 
+# AWS設定（S3を使う場合）
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
 
+# Viteフロントエンド用設定（JS側でAPP_NAMEを使いたい場合
 VITE_APP_NAME="${APP_NAME}"
 ```
+
 </details>
 
 <br>
 
 ### 4. Laravel のストレージ配下に画像を保存
+
 以下の画像をダウンロードし、Tecknical_Stack/backend/laravel/storage/app/public 配下に保存します。
 
 - [sample1](https://github.com/user-attachments/assets/bd8aca01-200e-4d33-a4a1-9609e6e92563)
@@ -129,6 +140,7 @@ VITE_APP_NAME="${APP_NAME}"
 <br>
 
 ### 5. DB の初期化
+
 以下のコマンドを実行し、DB に必要なテーブルやサンプルデータ等を作成します。
 
 ```
@@ -138,7 +150,8 @@ docker compose exec backend php artisan migrate:fresh --seed
 <br>
 
 ### 6. 動作の確認
-以下のURL にアクセスし、ログイン画面を表示します。
+
+以下の URL にアクセスし、ログイン画面を表示します。
 
 - http://localhost:5173/
 
@@ -154,6 +167,3 @@ docker compose exec backend php artisan migrate:fresh --seed
 <summary>投稿一覧画面</summary>
 <img width="1914" height="2472" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/3253110a-6f42-49bf-aace-51eddaa110ff" />
 </details>
-
-
-
