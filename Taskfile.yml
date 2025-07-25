@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 tasks:
   up:
@@ -13,7 +13,7 @@ tasks:
     cmds:
       - docker compose down
 
-  setup: 
+  setup:
     desc: すべての環境を構築
     silent: false
     cmds:
@@ -24,6 +24,8 @@ tasks:
       - docker compose exec backend cp .env.example .env
       # Reactに、node_module 追加
       - docker compose exec frontend npm install
+      # 静的コンテンツを生成
+      - docker compose exec frontend npm run build
       # プロジェクトの所有者を自分に変更する
       - sudo chown -R $(whoami):$(id -gn) .
 
@@ -39,8 +41,8 @@ tasks:
   export-web-env:
     desc: Nginx のバージョン情報を web_env.txt に出力
     cmds:
-      - > 
-          > ./web/web_env.txt
+      - >
+        > ./web/web_env.txt
       - echo "===== Dockerfile =====" >> ./web/web_env.txt
       - cat ./web/Dockerfile >> ./web/web_env.txt
       - echo "" >> ./web/web_env.txt
@@ -49,23 +51,23 @@ tasks:
     desc: React 環境のバージョン情報を frontend_env.txt に出力
     cmds:
       - >
-          docker compose exec frontend sh -c '
-          FILE="/app/frontend_env.txt";
-          > "$FILE";
-          echo "===== node -v =====" >> "$FILE";
-          node -v >> "$FILE";
-          echo "" >> "$FILE";
-          echo "===== npm --version =====" >> "$FILE";
-          npm --version >> "$FILE";
-          echo "" >> "$FILE";
-          echo "===== react version =====" >> "$FILE";
-          npm list react >> "$FILE";
-          echo "" >> "$FILE";
-          echo "===== vite version =====" >> "$FILE";
-          npm list vite >> "$FILE";
-          echo "" >> "$FILE";
-          echo "React環境情報を書き出しました => $FILE";
-          '
+        docker compose exec frontend sh -c '
+        FILE="/app/frontend_env.txt";
+        > "$FILE";
+        echo "===== node -v =====" >> "$FILE";
+        node -v >> "$FILE";
+        echo "" >> "$FILE";
+        echo "===== npm --version =====" >> "$FILE";
+        npm --version >> "$FILE";
+        echo "" >> "$FILE";
+        echo "===== react version =====" >> "$FILE";
+        npm list react >> "$FILE";
+        echo "" >> "$FILE";
+        echo "===== vite version =====" >> "$FILE";
+        npm list vite >> "$FILE";
+        echo "" >> "$FILE";
+        echo "React環境情報を書き出しました => $FILE";
+        '
       - echo "===== Dockerfile =====" >> ./frontend/react/frontend_env.txt
       - cat ./frontend/Dockerfile >> ./frontend/react/frontend_env.txt
       - echo "" >> ./frontend/react/frontend_env.txt
@@ -93,40 +95,39 @@ tasks:
       - cat ./backend/Dockerfile >> ./backend/laravel/backend_env.txt
       - echo "" >> ./backend/laravel/backend_env.txt
 
-
   export-environment-info:
     desc: 各バージョン情報、その他環境に必要な情報をすべて environment_info.txt に出力
     cmds:
       - >
-          ROOT="/Users/nukuikazuki/Desktop/Tecknical_Stack";
-          ENV_FILE="$ROOT/environment_info.txt";
-          > "$ENV_FILE";
-          if [ -f "$ROOT/web/web_env.txt" ]; then
-            echo "===== web_env.txt =====" >> "$ENV_FILE";
-            cat "$ROOT/web/web_env.txt" >> "$ENV_FILE";
-            echo "" >> "$ENV_FILE";
-          fi;
-          if [ -f "$ROOT/frontend/react/frontend_env.txt" ]; then
-            echo "===== frontend_env.txt =====" >> "$ENV_FILE";
-            cat "$ROOT/frontend/react/frontend_env.txt" >> "$ENV_FILE";
-            echo "" >> "$ENV_FILE";
-          fi;
-          if [ -f "$ROOT/backend/laravel/backend_env.txt" ]; then
-            echo "===== backend_env.txt =====" >> "$ENV_FILE";
-            cat "$ROOT/backend/laravel/backend_env.txt" >> "$ENV_FILE";
-            echo "" >> "$ENV_FILE";
-          fi;
-          if [ -f "$ROOT/docker-compose.yml" ]; then
-            echo "===== docker-compose.yml =====" >> "$ENV_FILE";
-            cat "$ROOT/docker-compose.yml" >> "$ENV_FILE";
-            echo "" >> "$ENV_FILE";
-          fi;
-          echo "===== tree -L 3 =====" >> "$ENV_FILE";
-          cd "$ROOT";
-          tree -L 3 >> "$ENV_FILE";
+        ROOT="/Users/nukuikazuki/Desktop/Tecknical_Stack";
+        ENV_FILE="$ROOT/environment_info.txt";
+        > "$ENV_FILE";
+        if [ -f "$ROOT/web/web_env.txt" ]; then
+          echo "===== web_env.txt =====" >> "$ENV_FILE";
+          cat "$ROOT/web/web_env.txt" >> "$ENV_FILE";
           echo "" >> "$ENV_FILE";
-          echo "environment_info.txt を作成しました: $ENV_FILE";
-          rm -f "$ROOT/web/web_env.txt";
-          rm -f "$ROOT/frontend/react/frontend_env.txt";
-          rm -f "$ROOT/backend/laravel/backend_env.txt";
-          echo "個別のenvファイルを削除しました。";
+        fi;
+        if [ -f "$ROOT/frontend/react/frontend_env.txt" ]; then
+          echo "===== frontend_env.txt =====" >> "$ENV_FILE";
+          cat "$ROOT/frontend/react/frontend_env.txt" >> "$ENV_FILE";
+          echo "" >> "$ENV_FILE";
+        fi;
+        if [ -f "$ROOT/backend/laravel/backend_env.txt" ]; then
+          echo "===== backend_env.txt =====" >> "$ENV_FILE";
+          cat "$ROOT/backend/laravel/backend_env.txt" >> "$ENV_FILE";
+          echo "" >> "$ENV_FILE";
+        fi;
+        if [ -f "$ROOT/docker-compose.yml" ]; then
+          echo "===== docker-compose.yml =====" >> "$ENV_FILE";
+          cat "$ROOT/docker-compose.yml" >> "$ENV_FILE";
+          echo "" >> "$ENV_FILE";
+        fi;
+        echo "===== tree -L 3 =====" >> "$ENV_FILE";
+        cd "$ROOT";
+        tree -L 3 >> "$ENV_FILE";
+        echo "" >> "$ENV_FILE";
+        echo "environment_info.txt を作成しました: $ENV_FILE";
+        rm -f "$ROOT/web/web_env.txt";
+        rm -f "$ROOT/frontend/react/frontend_env.txt";
+        rm -f "$ROOT/backend/laravel/backend_env.txt";
+        echo "個別のenvファイルを削除しました。";

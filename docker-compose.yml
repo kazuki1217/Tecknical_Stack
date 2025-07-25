@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./web/public:/usr/share/nginx/html
+      - ./frontend/react/dist:/usr/share/nginx/html
       - ./web/conf/default.conf:/etc/nginx/conf.d/default.conf
       - ./web/logs:/var/log/nginx
 
