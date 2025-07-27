@@ -111,7 +111,7 @@ tasks:
     desc: 各バージョン情報、その他環境に必要な情報をすべて environment_info.txt に出力
     cmds:
       - >
-        ROOT="/Users/nukuikazuki/Desktop/Tecknical_Stack";
+        ROOT="/home/kazukinukui/Tecknical_Stack";
         ENV_FILE="$ROOT/environment_info.txt";
         > "$ENV_FILE";
         if [ -f "$ROOT/web/web_env.txt" ]; then

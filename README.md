@@ -10,22 +10,26 @@
 
 <br>
 
-### 1. CLI ツール「Task」をインストール
+### 1. 「Task」と「Tree」をインストール
 
 以下のコマンドを実行し、「Task」をインストールします。<br>
 
 ```
-# Mac の場合
-brew install go-task/tap/go-task
-
-# Windows の場合
 sudo snap install task --classic
+```
+
+以下のコマンドを実行し、「Tree」をインストールします。<br>
+
+```
+sudo apt update
+sudo apt install tree
 ```
 
 以下のコマンドを実行し、バージョン情報が表示されれば、インストールが完了です<br>
 
 ```
 task --version
+tree --version
 ```
 
 <br>
