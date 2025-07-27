@@ -31,7 +31,7 @@ function App() {
 
     try {
       // トークンが有効である場合 → ログイン状態にする
-      const res = await axios.get("http://localhost:8000/api/user", {
+      const res = await axios.get("http://localhost:8080/api/user", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -30,7 +30,7 @@ function SearchPosts({ user }: { user: string | null }) {
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8000/api/posts/search", {
+      const res = await axios.get("http://localhost:8080/api/posts/search", {
         params: { keyword },
         headers: {
           Authorization: `Bearer ${token}`,

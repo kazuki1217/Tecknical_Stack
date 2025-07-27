@@ -156,12 +156,6 @@ docker compose exec backend php artisan migrate:fresh --seed
 
 ### 6. 動作の確認
 
-以下のコマンドを実行し、PHPの組み込みWebサーバを起動
-
-```
-task backend
-```
-
 以下の URL にアクセスし、ログイン画面を表示します。
 
 - http://localhost:8080/
