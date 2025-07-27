@@ -5,7 +5,7 @@ FROM nginx:1.28.0-alpine
 
 ===== frontend_env.txt =====
 ===== node -v =====
-v20.19.3
+v20.19.4
 
 ===== npm --version =====
 10.8.2
@@ -13,6 +13,8 @@ v20.19.3
 ===== react version =====
 app@0.0.0 /app
 +-- react-dom@19.1.0
+| `-- react@19.1.0 deduped
++-- react-icons@5.5.0
 | `-- react@19.1.0 deduped
 +-- react-router-dom@7.6.2
 | +-- react-router@7.6.2
@@ -34,12 +36,12 @@ WORKDIR /app
 
 ===== backend_env.txt =====
 ===== php -v =====
-PHP 8.2.0 (cli) (built: Dec  8 2022 19:21:15) (NTS)
+PHP 8.2.0 (cli) (built: Dec  8 2022 20:06:26) (NTS)
 Copyright (c) The PHP Group
 Zend Engine v4.2.0, Copyright (c) Zend Technologies
 
 ===== composer --version =====
-Composer version 2.8.9 2025-05-13 14:01:37
+Composer version 2.8.10 2025-07-10 19:08:33
 
 ===== php artisan --version =====
 Laravel Framework 12.19.3
@@ -65,7 +67,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./web/public:/usr/share/nginx/html
+      - ./frontend/react/dist:/usr/share/nginx/html
       - ./web/conf/default.conf:/etc/nginx/conf.d/default.conf
       - ./web/logs:/var/log/nginx
 
@@ -96,6 +98,7 @@ services:
       MYSQL_DATABASE: laravel
       MYSQL_USER: laravel
       MYSQL_PASSWORD: secret
+      TZ: Asia/Tokyo
     volumes:
       - db_data:/var/lib/mysql
 
@@ -108,9 +111,9 @@ services:
       PMA_PORT: 3306
     depends_on:
       - db
-      
 volumes:
   db_data:
+
 ===== tree -L 3 =====
 .
 ├── README.md
@@ -144,6 +147,7 @@ volumes:
 │   └── react
 │       ├── README.md
 │       ├── deps
+│       ├── dist
 │       ├── eslint.config.js
 │       ├── frontend_env.txt
 │       ├── index.html
@@ -165,5 +169,5 @@ volumes:
     │   └── hello.html
     └── web_env.txt
 
-23 directories, 29 files
+24 directories, 29 files
 

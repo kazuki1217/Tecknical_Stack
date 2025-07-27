@@ -12,7 +12,7 @@ export function createPostActions(onAfterChange: () => Promise<void>) {
   const deletePost = async (id: number) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8000/api/posts/${id}`, {
+      await axios.delete(`http://localhost:8080/api/posts/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -28,7 +28,7 @@ export function createPostActions(onAfterChange: () => Promise<void>) {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:8000/api/posts/${id}`,
+        `http://localhost:8080/api/posts/${id}`,
         { content },
         {
           headers: {

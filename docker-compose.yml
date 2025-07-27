@@ -26,8 +26,7 @@ services:
     build: ./backend
     volumes:
       - ./backend/laravel:/var/www/html
-    ports:
-      - "8000:8000"
+      - ./backend/php-fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
 
   db:
     image: mysql:8.0

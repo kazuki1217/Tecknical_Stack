@@ -25,7 +25,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8000/api/register", form);
+      const res = await axios.post("http://localhost:8080/api/register", form);
       console.log("ステータス:", res.status);
       setMessage("登録が完了しました。");
       setSuccess(true);
