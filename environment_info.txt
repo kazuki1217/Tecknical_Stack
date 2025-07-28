@@ -86,8 +86,7 @@ services:
     build: ./backend
     volumes:
       - ./backend/laravel:/var/www/html
-    ports:
-      - "8000:8000"
+      - ./backend/php-fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
 
   db:
     image: mysql:8.0
@@ -121,25 +120,27 @@ volumes:
 ├── backend
 │   ├── Dockerfile
 │   ├── index.php
-│   └── laravel
-│       ├── README.md
-│       ├── app
-│       ├── artisan
-│       ├── backend_env.txt
-│       ├── bootstrap
-│       ├── composer.json
-│       ├── composer.lock
-│       ├── config
-│       ├── database
-│       ├── package.json
-│       ├── phpunit.xml
-│       ├── public
-│       ├── resources
-│       ├── routes
-│       ├── storage
-│       ├── tests
-│       ├── vendor
-│       └── vite.config.js
+│   ├── laravel
+│   │   ├── README.md
+│   │   ├── app
+│   │   ├── artisan
+│   │   ├── backend_env.txt
+│   │   ├── bootstrap
+│   │   ├── composer.json
+│   │   ├── composer.lock
+│   │   ├── config
+│   │   ├── database
+│   │   ├── package.json
+│   │   ├── phpunit.xml
+│   │   ├── public
+│   │   ├── resources
+│   │   ├── routes
+│   │   ├── storage
+│   │   ├── tests
+│   │   ├── vendor
+│   │   └── vite.config.js
+│   └── php-fpm
+│       └── www.conf
 ├── docker-compose.yml
 ├── environment_info.txt
 ├── frontend
@@ -169,5 +170,5 @@ volumes:
     │   └── hello.html
     └── web_env.txt
 
-24 directories, 29 files
+25 directories, 30 files
 

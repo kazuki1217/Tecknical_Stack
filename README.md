@@ -158,7 +158,7 @@ docker compose exec backend php artisan migrate:fresh --seed
 
 以下の URL にアクセスし、ログイン画面を表示します。
 
-- http://localhost:8080/
+- http://localhost:5173/
 
 名前に「sample1」パスワードに「sample1pass」を入力し、ボタン名「ログイン」を押下します。
 投稿一覧画面が表示されれば、環境構築は成功です。
