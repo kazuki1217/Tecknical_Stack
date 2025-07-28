@@ -28,7 +28,7 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
     setErrorMsg("");
 
     try {
-      const res = await axios.post("http://localhost:8080/api/login", { name, password });
+      const res = await axios.post("https://localhost:8443/api/login", { name, password });
       if (res.data.status === "error") {
         setErrorMsg(res.data.message);
         return;
