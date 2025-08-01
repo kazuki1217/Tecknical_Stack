@@ -25,7 +25,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("https://localhost:8443/api/register", form);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/register`, form);
       console.log("ステータス:", res.status);
       setMessage("登録が完了しました。");
       setSuccess(true);

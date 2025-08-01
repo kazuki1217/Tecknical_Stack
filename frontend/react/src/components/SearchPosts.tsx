@@ -30,7 +30,7 @@ function SearchPosts({ user }: { user: string | null }) {
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://localhost:8443/api/posts/search", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/posts/search`, {
         params: { keyword },
         headers: {
           Authorization: `Bearer ${token}`,

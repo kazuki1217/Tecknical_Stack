@@ -1,3 +1,4 @@
 *.log 
 web/certs/localhost.crt
 web/certs/localhost.key
+.env*

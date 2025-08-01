@@ -31,7 +31,7 @@ function PostList({ user }: { user: string | null }) {
   const fetchPosts = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://localhost:8443/api/posts", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/posts`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -53,7 +53,7 @@ function PostList({ user }: { user: string | null }) {
       imageFile && formData.append("image", imageFile);
 
       const token = localStorage.getItem("token");
-      await axios.post("https://localhost:8443/api/posts", formData, {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/posts`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
