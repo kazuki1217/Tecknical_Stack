@@ -6,8 +6,8 @@ services:
       args:
         APP_ENV: ${APP_ENV}
     ports:
-      - "8080:80"
-      - "8443:443"  # 追加（ローカルHTTPS用）
+      - "80:80"
+      - "443:443"  # 追加（ローカルHTTPS用）
     volumes:
       - ./frontend/react/dist:/usr/share/nginx/html
       - ./web/certs:/etc/nginx/certs   # 証明書追加
