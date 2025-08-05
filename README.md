@@ -1,3 +1,26 @@
+
+## 概要
+
+|　目的　　　　|　Web開発の全体像を実践的に理解するために制作　|
+|--------------------|-------------------------------------------------------|
+| サービスの URL | https://tecknical-stack.com/ |
+| サービスの主な機能 | ユーザー投稿の作成・閲覧・検索ができるWebアプリ |
+
+<br>
+
+## 使用技術
+
+| 分類 | 技術スタック |
+|-|-|
+| フロントエンド | React (Vite, TypeScript, React Router) |
+| バックエンド | Laravel (Sanctum認証, RESTful API, Eloquent ORM) |
+| データベース | MySQL |
+| コンテナ | Docker (マルチコンテナ構成: Nginx + PHP-FPM + MySQL + phpMyAdmin + Node) |
+| インフラ | AWS Lightsail, Route 53, Nginx (HTTPS対応) |
+| 開発環境 | macOS（M1） / Windows 11 （両OSでDocker + 開発環境構築） |
+
+<br>
+
 ## 環境構築の手順書
 
 ### 0. 環境の前提条件
@@ -7,8 +30,6 @@
 - Docker がインストールされていること
 - 本リポジトリをローカルにクローン済みであること
 - プロジェクトのルートディレクトリに移動していること
-
-<br>
 
 ### 1. 「Task」と「Tree」をインストール
 
@@ -32,7 +53,6 @@ task --version
 tree --version
 ```
 
-<br>
 
 ### 2. Nginx・React・Laravel 等 のイメージを作成
 
@@ -42,7 +62,6 @@ tree --version
 task setup
 ```
 
-<br>
 
 ### 3. Laravel の .env を更新
 
@@ -126,7 +145,6 @@ VITE_APP_NAME="${APP_NAME}"
 
 </details>
 
-<br>
 
 ### 4. Laravel のストレージ配下に画像を保存
 
@@ -141,7 +159,6 @@ VITE_APP_NAME="${APP_NAME}"
 <img width="311" height="413" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/6ce58cda-0bc0-4cc2-94e6-5055f94120c3" />
 </details>
 
-<br>
 
 ### 5. DB の初期化
 
@@ -150,8 +167,6 @@ VITE_APP_NAME="${APP_NAME}"
 ```
 docker compose exec backend php artisan migrate:fresh --seed
 ```
-
-<br>
 
 
 ### 6. 動作の確認
