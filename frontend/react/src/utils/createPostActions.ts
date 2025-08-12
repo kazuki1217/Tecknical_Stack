@@ -27,7 +27,7 @@ export function createPostActions(onAfterChange: () => Promise<void>) {
   const updatePost = async (id: number, content: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      await axios.patch(
         `${import.meta.env.VITE_API_BASE_URL}/api/posts/${id}`,
         { content },
         {

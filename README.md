@@ -175,7 +175,7 @@ VITE_APP_NAME="${APP_NAME}"
 <summary>.env.dev</summary>
 
 ```dotenv
-VITE_API_BASE_URL=https://localhost:8443
+VITE_API_BASE_URL=https://localhost:443
 ```
 
 </details>
