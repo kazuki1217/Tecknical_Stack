@@ -23,7 +23,7 @@
 | 分類 | 技術スタック |
 |-|-|
 | フロントエンド | React (Vite, TypeScript, React Router) |
-| バックエンド | Laravel (Sanctum認証, RESTful API, Eloquent ORM) |
+| バックエンド | Laravel (RESTful API, Sanctum の APIトークン認証) |
 | データベース | MySQL |
 | コンテナ | Docker (マルチコンテナ構成: Nginx + PHP-FPM + MySQL + phpMyAdmin + Node) |
 | インフラ | AWS Lightsail, Route 53, Nginx (HTTPS対応) |
