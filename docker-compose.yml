@@ -12,6 +12,7 @@ services:
       - ./frontend/react/dist:/usr/share/nginx/html
       - ./web/certs:/etc/nginx/certs   # 証明書追加
       - ./web/logs:/var/log/nginx
+      - ./web/conf/default.dev.conf:/etc/nginx/conf.d/default.conf
 
   # React
   frontend:
