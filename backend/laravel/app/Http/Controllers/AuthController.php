@@ -107,16 +107,16 @@ class AuthController extends Controller
 
 
     /**
-     * ログイン状態のユーザ情報を取得
+     * ログイン状態のユーザー情報を取得
      *
-     * @return \Illuminate\Http\JsonResponse 成功時はユーザ名を返し、失敗時は失敗メッセージを返す
+     * @return \Illuminate\Http\JsonResponse 成功時はユーザー名を返し、失敗時は失敗メッセージを返す
      */
     public function loginSuccess()
     {
         try {
             // トークン認証されたユーザー情報を取得
             $user = Auth::user();
-            return response()->json(['message' => 'ログイン状態のユーザ情報を取得しました。', 'name' => $user->name], 200);
+            return response()->json(['message' => 'ログイン状態のユーザー情報を取得しました。', 'name' => $user->name], 200);
         } catch (\Throwable $e) {
             Log::error('トークン認証されたユーザー情報を取得する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
             return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);

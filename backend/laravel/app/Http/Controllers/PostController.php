@@ -30,7 +30,7 @@ class PostController extends Controller
             return response()->json(['message' => '全ての投稿データを取得しました。', 'data' => $posts], 200);
         } catch (\Throwable $e) {
             Log::error('全ての投稿データを取得する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '投稿一覧の取得時に、予期せぬエラーが発生しました。'], 500);
+            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
         }
     }
 
@@ -51,7 +51,7 @@ class PostController extends Controller
 
             // 本文と画像ファイルの両方が存在しない場合
             if (empty($validated['content']) && !$request->hasFile('image')) {
-                return response()->json(['message' => 'テキストまたは画像のいずれかを入力してください。'], 422);
+                return response()->json(['message' => '本文または画像のいずれかを入力してください。'], 422);
             }
 
             // 画像データとMIMEタイプを初期化
@@ -79,7 +79,7 @@ class PostController extends Controller
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
             Log::error('投稿内容を作成する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '新規投稿の登録処理で、予期せぬエラーが発生しました。'], 500);
+            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
         }
     }
 
@@ -105,8 +105,8 @@ class PostController extends Controller
 
             return response()->json(['message' => '投稿データを削除しました。'], 200);
         } catch (\Throwable $e) {
-            Log::error('投稿の削除処理で、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '投稿の削除処理で、予期せぬエラーが発生しました。'], 500);
+            Log::error('投稿データを削除する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
         }
     }
 
@@ -125,7 +125,7 @@ class PostController extends Controller
 
             // 投稿者本人の投稿データではない場合
             if ($post->user_id !== $user->id) {
-                return response()->json(['message' => '許可されていません。'], 403);
+                return response()->json(['message' => '投稿者本人の投稿データではないため、許可されていません。'], 403);
             }
 
             // バリデーション
@@ -142,7 +142,7 @@ class PostController extends Controller
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
             Log::error('投稿データを更新する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '投稿の更新処理で、予期せぬエラーが発生しました。'], 500);
+            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
         }
     }
 
