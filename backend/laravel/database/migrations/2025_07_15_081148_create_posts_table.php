@@ -17,10 +17,10 @@ return new class extends Migration
                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                user_id BIGINT UNSIGNED NOT NULL,
                content TEXT NULL,
-               created_at TIMESTAMP NULL,
-               updated_at TIMESTAMP NULL,
                image_mime VARCHAR(255) NULL,
-               image_data LONGBLOB NULL
+               image_data LONGBLOB NULL,
+               created_at TIMESTAMP NULL,
+               updated_at TIMESTAMP NULL
            )
        ");
     }
