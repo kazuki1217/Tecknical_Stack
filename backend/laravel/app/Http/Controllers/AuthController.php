@@ -20,33 +20,32 @@ class AuthController extends Controller
     /**
      * アカウント登録処理
      *
-     * @param Request $request name, email, password, password_confirmation を含むリクエスト
+     * @param Request $request 登録情報（名前・メールアドレス・パスワード・パスワード確認）を含むリクエスト
      * @return \Illuminate\Http\JsonResponse 成功時は成功メッセージを返し、失敗時は失敗エラーメッセージを返す
      */
     public function register(Request $request)
     {
         try {
-            // 入力バリデーション（name, email, password）
+            // バリデーション
             $request->validate([
-                'name' => 'required|string',
-                'email' => 'required|email|unique:users',
-                'password' => 'required|min:6|confirmed',
+                'name' => 'required|string', // 入力必須 | 文字列であること
+                'email' => 'required|email|unique:users', // 入力必須 | @ を含むメール形式であること | users テーブル内で重複しないこと
+                'password' => 'required|min:6|confirmed', // 入力必須 | 6文字以上であること | password_confirmation と一致すること
             ]);
 
-            // ユーザ情報をDBに保存（パスワードはハッシュ化して保存）
+            // ユーザー情報を DB に保存
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->password), // パスワードはハッシュ化して保存
             ]);
 
             return response()->json(['message' => 'アカウント登録が正常に完了しました。'], 201);
         } catch (ValidationException $e) {
-            Log::info('アカウント登録処理で、入力内容に誤りがありました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(),]);
-            return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors(),], 422);
+            return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
-            Log::error('アカウント登録処理で、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(),]);
-            return response()->json(['message' => '予期せぬエラーが発生しました。',], 500);
+            Log::error('アカウント登録処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
         }
     }
 
@@ -54,71 +53,73 @@ class AuthController extends Controller
     /**
      * ログイン認証処理
      *
-     * @param Request $request name, password, password_confirmation を含むリクエスト
+     * @param Request $request ログイン情報（名前・パスワード）を含むリクエスト
      * @return \Illuminate\Http\JsonResponse 成功時はトークンを返し、失敗時は失敗メッセージを返す
      */
     public function login(Request $request)
     {
         try {
+            // リクエスト元の IPアドレスを取得
+            $throttleKey = 'login:' . Str::lower($request->ip());
 
-            $throttleKey = 'login:' . Str::lower($request->ip);
-
-            // ソフトレート制限（スライディングウィンドウ方式）を用いて、直近60秒間で5回以上失敗していたらログイン拒否
+            // 直近60秒間で5回以上ログインに失敗した場合
             if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+
+                // 次に試行できるまでの残り秒数を取得
                 $seconds = RateLimiter::availableIn($throttleKey);
-                Log::info('ログイン試行を制限しました。', ['ip' => $request->ip(), 'name' => $request->name]);
+
+                Log::warning('ログイン認証処理において、直近60秒間で5回以上ログインに失敗したため、試行を制限してます。', ['ip' => $request->ip(), '名前' => $request->name, '制限した時間' => $seconds]);
                 return response()->json(["message" => "短時間でのログイン試行回数が多すぎます。{$seconds}秒後に再試行してください。"], 429);
             }
 
-            // バリデーション：nameとpasswordが必須
+            // バリデーション
             $request->validate([
-                'name' => 'required',
-                'password' => 'required',
+                'name' => 'required', // 入力必須
+                'password' => 'required', // 入力必須
             ]);
 
-            // 列名「name」に一致する行を取得
+            // 名前に一致するデータを1行取得
             $user = User::where('name', $request->name)->first();
 
             // ユーザーが存在しない、またはパスワードが一致しない場合
             if (! $user || ! Hash::check($request->password, $user->password)) {
-                RateLimiter::hit($throttleKey, 60); // ← 60秒保持
-                Log::info('ログイン登録処理で、名前とパスワードが一致しませんでした。', ['ip' => $request->ip(), 'name' => $request->name,]);
+                RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
                 return response()->json(['message' => 'ログインに失敗しました。'], 401);
             }
 
             // トークンを作成
-            $tokenResult = $user->createToken('react');
+            $tokenResult = $user->createToken('user_login');
             $token = $tokenResult->accessToken;
 
-            // トークンの有効期限を「今から10分後」に設定
+            // トークンの有効期限を「10分間」に設定
             $token->expires_at = now()->addSeconds(600);
             $token->save();
 
             return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'token' => $tokenResult->plainTextToken, 'name' => $request->name], 200);
         } catch (ValidationException $e) {
-            RateLimiter::hit($throttleKey, 60); // ← 60秒保持
-            Log::info('ログイン登録処理で、入力内容に誤りがありました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(),]);
-            return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors(),], 422);
+            RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
+            return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
-            Log::error('ログイン登録処理で、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(),]);
-            return response()->json(['message' => '予期せぬエラーが発生しました。',], 500);
+            Log::error('ログイン認証処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
         }
     }
 
 
     /**
-     * ログイン状態のユーザ情報の取得
+     * ログイン状態のユーザ情報を取得
      *
      * @return \Illuminate\Http\JsonResponse 成功時はユーザ名を返し、失敗時は失敗メッセージを返す
      */
     public function loginSuccess()
     {
         try {
+            // トークン認証されたユーザー情報を取得
             $user = Auth::user();
-            return response()->json(['message' => 'ログイン状態のユーザ情報を取得しました。', 'name' => $user->name,], 200);
+            return response()->json(['message' => 'ログイン状態のユーザ情報を取得しました。', 'name' => $user->name], 200);
         } catch (\Throwable $e) {
-            Log::error('ログイン状態のユーザ情報を取得する際に、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(),]);
-            return response()->json(['message' => 'ログイン状態のユーザ情報を取得する際に、予期せぬエラーが発生しました。',], 500);
+            Log::error('トークン認証されたユーザー情報を取得する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
         }
     }
 }
