@@ -31,10 +31,10 @@ class PostsTableSeeder extends Seeder
             $data[] = [
                 'user_id'    => $userId,
                 'content'    => "サンプル投稿{$userId}の内容です。",
-                'created_at' => now(),
-                'updated_at' => now(),
                 'image_mime' => $mimeType,
                 'image_data' => $imageData,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
         }
 
