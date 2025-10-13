@@ -18,7 +18,7 @@ interface LoginProps {
  */
 function Login({ setIsLoggedIn, setUser }: LoginProps) {
   const navigate = useNavigate();
-  const [name, setName] = useState(""); // ユーザ名を管理
+  const [email, setEmail] = useState(""); // メールアドレスを管理
   const [password, setPassword] = useState(""); // パスワードを管理
   const [errorMsg, setErrorMsg] = useState(""); // エラーメッセージを管理
 
@@ -28,7 +28,7 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
     setErrorMsg("");
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, { name, password });
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, { email, password });
       if (res.data.status === "error") {
         setErrorMsg(res.data.message);
         return;
@@ -53,7 +53,7 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
     <div className="login-container">
       <h2>ログイン</h2>
       <form onSubmit={handleLogin} className="login-form">
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="名前" />
+        <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="メールアドレス" />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" />
         <button type="submit">ログイン</button>
       </form>

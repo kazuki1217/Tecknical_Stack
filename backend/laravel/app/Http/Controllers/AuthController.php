@@ -53,7 +53,7 @@ class AuthController extends Controller
     /**
      * ログイン認証処理
      *
-     * @param Request $request ログイン情報（名前・パスワード）を含むリクエスト
+     * @param Request $request ログイン情報（メールアドレス・パスワード）を含むリクエスト
      * @return \Illuminate\Http\JsonResponse 成功時はトークンを返し、失敗時は失敗メッセージを返す
      */
     public function login(Request $request)
@@ -74,12 +74,12 @@ class AuthController extends Controller
 
             // バリデーション
             $request->validate([
-                'name' => 'required', // 入力必須
+                'email' => 'required', // 入力必須
                 'password' => 'required', // 入力必須
             ]);
 
-            // 名前に一致するデータを1行取得
-            $user = User::where('name', $request->name)->first();
+            // メールアドレスに一致するデータを1行取得
+            $user = User::where('email', $request->email)->first();
 
             // ユーザーが存在しない、またはパスワードが一致しない場合
             if (! $user || ! Hash::check($request->password, $user->password)) {
@@ -95,7 +95,7 @@ class AuthController extends Controller
             $token->expires_at = now()->addSeconds(600);
             $token->save();
 
-            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'token' => $tokenResult->plainTextToken, 'name' => $request->name], 200);
+            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'token' => $tokenResult->plainTextToken, 'name' => $user->name], 200);
         } catch (ValidationException $e) {
             RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
