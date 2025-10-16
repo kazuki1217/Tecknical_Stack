@@ -6,6 +6,7 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import PostList from "./components/PostList";
 import SearchPosts from "./components/SearchPosts";
+import NotFound from "./components/NotFound";
 
 /**
  * ルートコンポーネント
@@ -56,6 +57,8 @@ function App() {
         <Route path="/account" element={<Register />} />
         <Route path="/posts" element={isLoggedIn ? <PostList user={user} /> : <Navigate to="/" />} />
         <Route path="/search" element={isLoggedIn ? <SearchPosts user={user} /> : <Navigate to="/" />} />
+        {/* どのパスにも一致しなかった場合 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
