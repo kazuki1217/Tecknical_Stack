@@ -22,12 +22,11 @@
 
 | 分類 | 技術スタック |
 |-|-|
-| フロントエンド | React (Vite, TypeScript, React Router) |
-| バックエンド | Laravel (RESTful API, Sanctum の APIトークン認証) |
-| データベース | MySQL |
-| コンテナ | Docker (マルチコンテナ構成: Nginx + PHP-FPM + MySQL + phpMyAdmin + Node) |
-| インフラ | AWS Lightsail, Route 53, Nginx (HTTPS対応) |
-| 開発環境 | macOS（M1） / Windows 11 （両OSでDocker + 開発環境構築） |
+| フロントエンド |  Node.js, Vite, TypeScript, React, HTML, CSS |
+| バックエンド | PHP-FPM, PHP, Larave, RESTful API, APIトークン認証 |
+| データベース | MySQL, phpMyAdmin |
+| インフラ | AWS Lightsail, Route 53, Docker（マルチコンテナ構成）, Nginx (HTTPS対応) |
+| その他 | Windows 11, macOS（M1）, VSCode, Vim, Bash |
 
 <br>
 
@@ -55,9 +54,9 @@
 ## 機能一覧
 
 |ログイン画面|新規登録画面|
-|-----------------------------------------------------|-|
-| <img width="1280" height="658" alt="スクリーンショット 2025-08-06 23 30 47" src="https://github.com/user-attachments/assets/bca59faa-a865-4101-83b9-f6296df0ae91" /> | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 22 21 19" src="https://github.com/user-attachments/assets/d0ad8b36-4808-4168-93fb-5deb7a3aa3a2" />  |
-|ログイン認証機能を実装しました。短時間に複数回失敗すると一定期間ログインができなくなります。　　　　　　　|アカウント登録機能を実装しました。登録処理を行いたくない場合、ログイン画面で「名前: sample1, パスワード: sample1pass」を入力するとログインできるように設定されています。|
+|-|-|
+| <img width="1280" height="658" alt="スクリーンショット 2025-08-06 23 30 47" src="https://github.com/user-attachments/assets/4b0b17e8-2bcc-4969-84e8-edd96e163ed9" />           | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 22 21 19" src="https://github.com/user-attachments/assets/e701cb6b-f21f-4b75-9e15-3638453c82d5" />  |
+|ログイン認証機能を実装しました。短時間に複数回失敗すると一定期間ログインができなくなります。　　　　　　　　　　　　　|アカウント登録機能を実装しました。登録処理を行いたくない場合、ログイン画面で「メールアドレス: sample1@example.com, パスワード: sample1pass」を入力するとログインできるように設定されています。|
 
 
 |投稿一覧画面|検索画面|
@@ -89,7 +88,6 @@ sudo snap install task --classic
 
 ```
 task --version
-tree --version
 ```
 
 
@@ -138,7 +136,7 @@ LOG_LEVEL=debug
 DB_CONNECTION=mysql
 DB_HOST=db
 DB_PORT=3306
-DB_DATABASE=laravel
+DB_DATABASE=laravel_dev
 DB_USERNAME=laravel
 DB_PASSWORD=secret
 
@@ -170,16 +168,6 @@ MAIL_USERNAME=null
 MAIL_PASSWORD=null
 MAIL_FROM_ADDRESS="hello@example.com"
 MAIL_FROM_NAME="${APP_NAME}"
-
-# AWS設定（S3を使う場合）
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-AWS_USE_PATH_STYLE_ENDPOINT=false
-
-# Viteフロントエンド用設定（JS側でAPP_NAMEを使いたい場合
-VITE_APP_NAME="${APP_NAME}"
 ```
 
 </details>
@@ -192,7 +180,7 @@ VITE_APP_NAME="${APP_NAME}"
 <summary>.env.dev</summary>
 
 ```dotenv
-VITE_API_BASE_URL=https://localhost:443
+VITE_API_BASE_URL=http://localhost:80
 ```
 
 </details>
@@ -212,6 +200,7 @@ MYSQL_USER=laravel
 MYSQL_PASSWORD=secret
 ```
 </details>
+
 
 ### 4. 　Laravelのストレージ配下に画像を保存
 
@@ -238,11 +227,17 @@ docker compose exec backend php artisan migrate:fresh --seed
 
 ### 6. 　動作確認
 
+以下のコマンドを実行し、Vite を開発モードで起動します。
+
+```
+docker compose exec frontend npm run dev
+```
+
 以下の URL にアクセスし、ログイン画面を表示します。
 
 - http://localhost:5173/
 
-名前に「sample1」パスワードに「sample1pass」を入力し、ボタン名「ログイン」を押下します。
+メールアドレスに「sample1@example.com」パスワードに「sample1pass」を入力し、ボタン名「ログイン」を押下します。
 投稿一覧画面が表示されれば、環境構築は成功です。
 
 <details>
