@@ -1,11 +1,14 @@
 FROM node:20-slim
-WORKDIR /app
 ARG APP_ENV
+ARG UID
+ARG GID
+WORKDIR /app
 
-# 本番環境のみユーザーを作成
-RUN if [ "$APP_ENV" = "production" ]; then \
-    if ! getent group 1000 > /dev/null; then addgroup --gid 1000 app; fi; \
-    if ! getent passwd 1000 > /dev/null; then adduser --uid 1000 --disabled-password --gecos '' --gid 1000 appuser; fi; \
+# グループが存在しない場合のみ作成
+RUN getent group "$GID" >/dev/null || addgroup -g "$GID" appuser; \
+    # ユーザーが存在しない場合のみ作成
+    getent passwd "$UID" >/dev/null || adduser -D -u "$UID" -G appuser appuser; \
+    # アプリケーション用の作業ディレクトリを作成
     mkdir -p /app && \
-    chown -R 1000:1000 /app || echo "Warning: chown failed, but continuing"; \
-    fi
+    # 所有権を付与
+    chown -R appuser:appuser /app 2>/dev/null || true; \    
