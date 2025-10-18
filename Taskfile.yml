@@ -5,6 +5,13 @@ tasks:
     desc: コンテナを起動
     silent: false
     cmds:
+      # .env の環境変数名「UID・GID」を削除
+      - sed -i '/^UID=/d' .env 2>/dev/null || true
+      - sed -i '/^GID=/d' .env 2>/dev/null || true
+      # .env の環境変数名「UID・GID」を追加
+      - echo "UID=$(id -u)" >> .env
+      - echo "GID=$(id -g)" >> .env
+      # コンテナを起動
       - docker compose up -d
 
   backend:
@@ -29,6 +36,13 @@ tasks:
     desc: すべての環境を構築
     silent: false
     cmds:
+      # .env の環境変数名「UID・GID」を削除
+      - sed -i '/^UID=/d' .env 2>/dev/null || true
+      - sed -i '/^GID=/d' .env 2>/dev/null || true
+      # .env の環境変数名「UID・GID」を追加
+      - echo "UID=$(id -u)" >> .env
+      - echo "GID=$(id -g)" >> .env
+      # イメージを再作成し、コンテナを起動
       - docker compose up -d --build
       # Laravelに、vendorを追加
       - docker compose exec backend composer install
