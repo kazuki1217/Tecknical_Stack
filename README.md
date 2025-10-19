@@ -33,19 +33,18 @@
 
 ## 設計書
 
-
 <table>
   <tr>
     <td>API仕様書</td>
-    <td>https://github.com/user-attachments/files/22886611/2025_10_13_API.pdf</td>
+    <td>https://drive.google.com/file/d/1sxDLyl4k6MclzXv9wF6pt54K82BmdbkR/view?usp=drive_link</td>
   </tr>
   <tr>
     <td>ER図</td>
-    <td>https://github.com/user-attachments/assets/4e097e04-530f-4fb6-af47-ccc7c7e1a9fc</td>
+    <td>https://drive.google.com/file/d/1vUoyyXPO4wGQjWshCElPLsJWU1Rozrcd/view?usp=drive_link</td>
   </tr>
   <tr>
     <td>テーブル定義書</td>
-    <td>https://github.com/user-attachments/files/22886898/default.pdf</td>
+    <td>https://drive.google.com/file/d/1L6Y48aPuIeCGPCFdQW_NbMewZPmVLxQo/view?usp=drive_link</td>
   </tr>
 </table>
 
@@ -62,7 +61,7 @@
 |投稿一覧画面|検索画面|
 |-|-|
 | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 22 25 44" src="https://github.com/user-attachments/assets/791b82fc-0c60-4c80-b783-30240e3540a2" /> | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 22 27 02" src="https://github.com/user-attachments/assets/74a59c2f-5cd2-46eb-bf4a-ca7abd3ae8cb" /> |
-|全ユーザの投稿内容を一覧で表示する機能を実装しました。また画面上部からテキストと画像を投稿できる機能も実装しました。ユーザ自身が投稿したものは編集・削除が可能です。|検索キーワードにヒットした投稿内容を表示する機能を実装しました。こちらでもユーザ自身が投稿したものは編集・削除が可能です。　　|
+|全ユーザーの投稿内容を一覧で表示する機能を実装しました。また画面上部からテキストと画像を投稿できる機能も実装しました。ユーザー自身が投稿したものは編集・削除が可能です。|検索キーワードにヒットした投稿内容を表示する機能を実装しました。こちらでもユーザー自身が投稿したものは編集・削除が可能です。　　|
 
 <br>
 
