@@ -19,3 +19,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/posts/{post}', [PostController::class, 'update']); // 投稿を編集
     Route::get('/posts/search', [PostController::class, 'search']); // 投稿を検索
 });
+
+// 死活監視（UptimeRobot を活用し、5分おきにチェック）
+Route::get('/health', function () {
+    return response()->json('正常に稼働しています。', 200);
+});
