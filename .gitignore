@@ -1,4 +1,4 @@
-*.log 
+*.log*
 web/certs/localhost.crt
 web/certs/localhost.key
 docker-compose.prod.yml
