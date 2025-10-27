@@ -1,5 +1,5 @@
 services:
-  # Nginx
+  # Nginx（開発用Webサーバ）
   web:
     build:
       context: ./web
@@ -13,6 +13,18 @@ services:
       - tecknical_stack_default
     profiles: ["dev"]
 
+  # Mailpit（開発用のメール送信テストツール）
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    ports:
+      - "8025:8025"   # Web UI (http://localhost:8025)
+      - "1025:1025"   # SMTP ポート
+    networks:
+      - tecknical_stack_default
+    profiles: ["dev"]
+
+  # Nginx（本番用Webサーバ）
   web-prod:
     build:
       context: ./web

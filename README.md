@@ -159,14 +159,14 @@ REDIS_PASSWORD=null
 REDIS_PORT=6379
 
 # メール送信設定（MailpitやSMTPなど）
-MAIL_MAILER=log
-MAIL_SCHEME=null
-MAIL_HOST=127.0.0.1
-MAIL_PORT=2525
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
 MAIL_USERNAME=null
 MAIL_PASSWORD=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
+MAIL_FROM_ADDRESS=dev@example.com
+MAIL_FROM_NAME="Local Dev"
+LOG_MAIL_TO=dev@example.com
 ```
 
 </details>
