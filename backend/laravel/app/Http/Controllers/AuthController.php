@@ -84,7 +84,7 @@ class AuthController extends Controller
             // ユーザーが存在しない、またはパスワードが一致しない場合
             if (! $user || ! Hash::check($request->password, $user->password)) {
                 RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
-                return response()->json(['message' => 'ログインに失敗しました。'], 401);
+                return response()->json(['message' => 'ログイン認証に失敗しました。'], 401);
             }
 
             // トークンを作成
