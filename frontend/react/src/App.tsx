@@ -39,7 +39,7 @@ function App() {
       console.log("ステータスコード:", res.status);
       if (res.status === 200) {
         setIsLggedIn(true);
-        setUser(res.data.name);
+        setUser(res.data.data.name);
       }
     } catch (error) {
       console.log("APIエラー:", error);
