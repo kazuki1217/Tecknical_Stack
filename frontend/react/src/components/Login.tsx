@@ -29,15 +29,11 @@ function Login({ setIsLoggedIn, setUser }: LoginProps) {
 
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, { email, password });
-      if (res.data.status === "error") {
-        setErrorMsg(res.data.message);
-        return;
-      }
 
-      // トークンをローカルストレージに保存（次回以降のリクエストに使用）
-      localStorage.setItem("token", res.data.token);
+      
+      localStorage.setItem("token", res.data.data.token); // トークンをローカルストレージに保存（次回以降のリクエストに使用）
       setIsLoggedIn(true);
-      setUser(res.data.name);
+      setUser(res.data.data.name);
       navigate("/posts");
     } catch (error: any) {
       if (error.response && error.response.status === 429) {

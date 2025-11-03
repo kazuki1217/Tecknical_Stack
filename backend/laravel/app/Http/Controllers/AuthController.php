@@ -95,7 +95,7 @@ class AuthController extends Controller
             $token->expires_at = now()->addSeconds(600);
             $token->save();
 
-            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'token' => $tokenResult->plainTextToken, 'name' => $user->name], 200);
+            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'data' => ['token' => $tokenResult->plainTextToken, 'name' => $user->name]], 200);
         } catch (ValidationException $e) {
             RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
@@ -116,7 +116,7 @@ class AuthController extends Controller
         try {
             // トークン認証されたユーザー情報を取得
             $user = Auth::user();
-            return response()->json(['message' => 'ログイン状態のユーザー情報を取得しました。', 'name' => $user->name], 200);
+            return response()->json(['message' => 'ログイン状態のユーザー情報を取得しました。', 'data' => ['name' => $user->name]], 200);
         } catch (\Throwable $e) {
             Log::error('トークン認証されたユーザー情報を取得する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
             return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);

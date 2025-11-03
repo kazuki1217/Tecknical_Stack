@@ -100,10 +100,10 @@ class PostController extends Controller
                 return response()->json(['message' => '投稿者本人の投稿データではないため、削除できません。'], 403);
             }
 
-            // 投稿データを削除
-            $post->delete();
+            $post->load('user'); // 投稿データにユーザー情報を含める
+            $post->delete(); // 投稿データを削除
 
-            return response()->json(['message' => '投稿データを削除しました。'], 200);
+            return response()->json(['message' => '投稿データを削除しました。', 'data' => $post], 200);
         } catch (\Throwable $e) {
             Log::error('投稿データを削除する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
             return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
@@ -137,7 +137,7 @@ class PostController extends Controller
             $post->content = $validated['content'];
             $post->save();
 
-            return response()->json(['message' => '投稿データを更新しました。', 'post' => $post->load('user')], 200);
+            return response()->json(['message' => '投稿データを更新しました。', 'data' => $post->load('user')], 200);
         } catch (ValidationException $e) {
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
@@ -164,7 +164,7 @@ class PostController extends Controller
                     ->where('content', 'LIKE', "%{$keyword}%") // 投稿データの本文に部分一致するデータを抽出
                     ->get();
             }
-            return response()->json(['message' => 'キーワード検索に一致した投稿データを取得しました。', 'post' => $posts], 200);
+            return response()->json(['message' => 'キーワード検索に一致した投稿データを取得しました。', 'data' => $posts], 200);
         } catch (\Throwable $e) {
             Log::error('投稿データを検索する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
             return response()->json(['message' => '投稿を検索する処理で、予期せぬエラーが発生しました。'], 500);
