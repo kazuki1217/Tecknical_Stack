@@ -21,16 +21,20 @@ class PostController extends Controller
      */
     public function index()
     {
+        Log::info('[投稿一覧] 処理を開始します。');
+
         try {
             // 全ての投稿データを取得
             $posts = Post::with('user') // ユーザー情報を含める
                 ->orderByDesc('created_at') // 作成日が新しい順番に並び替え
                 ->get();
 
+            Log::debug("[投稿一覧] 取得したデータ", $posts->toArray());
+            Log::info('[投稿一覧] データの取得に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '全ての投稿データを取得しました。', 'data' => $posts], 200);
         } catch (\Throwable $e) {
-            Log::error('全ての投稿データを取得する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
+            Log::error('[投稿一覧] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }
     }
 
@@ -42,6 +46,8 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('[投稿作成] 処理を開始します。');
+
         try {
             // バリデーション
             $validated = $request->validate([
@@ -74,12 +80,14 @@ class PostController extends Controller
                 'image_mime' => $imageMime,
             ]);
 
+            Log::info('[投稿作成] データの作成に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを作成しました。', 'data' => $post->load('user')], 201);
         } catch (ValidationException $e) {
+            Log::info('[投稿作成] 入力内容に不備があったため、作成に失敗しました。');
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
-            Log::error('投稿内容を作成する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
+            Log::error('[投稿作成] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }
     }
 
@@ -91,6 +99,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        Log::info('[投稿削除] 処理を開始します。');
+
         try {
             // トークン認証されたユーザー情報を取得
             $user = Auth::user();
@@ -103,10 +113,11 @@ class PostController extends Controller
             $post->load('user'); // 投稿データにユーザー情報を含める
             $post->delete(); // 投稿データを削除
 
+            Log::info('[投稿削除] データの削除に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを削除しました。', 'data' => $post], 200);
         } catch (\Throwable $e) {
-            Log::error('投稿データを削除する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
+            Log::error('[投稿削除] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }
     }
 
@@ -119,6 +130,8 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        Log::info('[投稿更新] 処理を開始します。');
+
         try {
             // トークン認証されたユーザー情報を取得
             $user = Auth::user();
@@ -137,12 +150,14 @@ class PostController extends Controller
             $post->content = $validated['content'];
             $post->save();
 
+            Log::info('[投稿更新] データの更新に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを更新しました。', 'data' => $post->load('user')], 200);
         } catch (ValidationException $e) {
+            Log::info('[投稿更新] 入力内容に不備があったため、更新に失敗しました。');
             return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
-            Log::error('投稿データを更新する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '予期せぬエラーが発生しました。'], 500);
+            Log::error('[投稿更新] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }
     }
 
@@ -154,9 +169,13 @@ class PostController extends Controller
      */
     public function search(Request $request)
     {
+        Log::info('[投稿検索] 処理を開始します。');
+
         try {
-            // 検索バーに入力した文字が存在した場合
             $keyword = $request->query('keyword');
+            Log::debug('[投稿検索] 検索バーに入力した文字', ['キーワード' => $keyword]);
+
+            // 検索バーに入力した文字が存在した場合
             if ($keyword) {
                 // 検索処理を実行
                 $posts = Post::with('user') // ユーザー情報を含める
@@ -164,10 +183,11 @@ class PostController extends Controller
                     ->where('content', 'LIKE', "%{$keyword}%") // 投稿データの本文に部分一致するデータを抽出
                     ->get();
             }
+            Log::info('[投稿検索] 一致したデータの取得に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => 'キーワード検索に一致した投稿データを取得しました。', 'data' => $posts], 200);
         } catch (\Throwable $e) {
-            Log::error('投稿データを検索する処理において、予期せぬエラーが発生しました。', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-            return response()->json(['message' => '投稿を検索する処理で、予期せぬエラーが発生しました。'], 500);
+            Log::error('[投稿検索] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }
     }
 }
