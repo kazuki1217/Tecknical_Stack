@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\RegisterRequest;
+use App\Services\AuthService;
 
 
 /**
@@ -18,6 +17,9 @@ use App\Http\Requests\RegisterRequest;
  */
 class AuthController extends Controller
 {
+    public function __construct(private AuthService $authService)
+    {
+    }
     /**
      * アカウント登録処理
      *
@@ -32,11 +34,7 @@ class AuthController extends Controller
             $validated = $request->validated();
 
             // ユーザー情報を DB に保存
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']), // パスワードはハッシュ化して保存
-            ]);
+            $user = $this->authService->register($validated);
             Log::info('[アカウント登録] 登録に成功しました。', ['ユーザーID' => $user?->id, 'ユーザー名' => $user?->name]);
             return response()->json(['message' => 'アカウント登録が正常に完了しました。'], 201);
         } catch (\Throwable $e) {
@@ -76,26 +74,18 @@ class AuthController extends Controller
                 'password' => 'required', // 入力必須
             ]);
 
-            // メールアドレスに一致するデータを1行取得
-            $user = User::where('email', $request->email)->first();
-            Log::debug('[ログイン] メールアドレスに一致したデータ', ['ユーザーID' => $user->id, 'ユーザー名' => $user->name]);
-
-            // ユーザーが存在しない、またはパスワードが一致しない場合
-            if (! $user || ! Hash::check($request->password, $user->password)) {
+            $result = $this->authService->attemptLogin($request->email, $request->password);
+            if (! $result) {
                 RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
-                Log::warning('[ログイン] ユーザーが存在しない、またはパスワードが一致しないため、ログイン認証に失敗しました。', ['ユーザーID' => $user->id, 'ユーザー名' => $user->name]);
+                Log::warning('[ログイン] ユーザーが存在しない、またはパスワードが一致しないため、ログイン認証に失敗しました。', ['ユーザーID' => null, 'ユーザー名' => null]);
                 return response()->json(['message' => 'ログイン認証に失敗しました。'], 401);
             }
 
-            // トークンを作成
-            $tokenResult = $user->createToken('user_login');
-            $token = $tokenResult->accessToken;
-
-            // トークンの有効期限を「10分間」に設定
-            $token->expires_at = now()->addSeconds(600);
-            $token->save();
+            $user = $result['user'];
+            $plainTextToken = $result['plainTextToken'];
+            Log::debug('[ログイン] メールアドレスに一致したデータ', ['ユーザーID' => $user?->id, 'ユーザー名' => $user?->name]);
             Log::info('[ログイン] 認証に成功しました。', ['ユーザーID' => $user?->id, 'ユーザー名' => $user?->name]);
-            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'data' => ['token' => $tokenResult->plainTextToken, 'name' => $user->name]], 200);
+            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'data' => ['token' => $plainTextToken, 'name' => $user->name]], 200);
         } catch (ValidationException $e) {
             RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
             Log::info('[ログイン] 入力内容に不備があったため、認証に失敗しました。');
