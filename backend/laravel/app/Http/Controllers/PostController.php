@@ -9,12 +9,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\PostStoreRequest;
 use App\Http\Requests\PostUpdateRequest;
+use App\Services\PostService;
 
 /**
  * 投稿関連の処理をまとめたコントローラ
  */
 class PostController extends Controller
 {
+    public function __construct(private PostService $postService)
+    {
+    }
     /**
      * 全ての投稿データを取得
      *
@@ -26,9 +30,7 @@ class PostController extends Controller
 
         try {
             // 全ての投稿データを取得
-            $posts = Post::with('user') // ユーザー情報を含める
-                ->orderByDesc('created_at') // 作成日が新しい順番に並び替え
-                ->get();
+            $posts = $this->postService->getAll();
 
             Log::debug("[投稿一覧] 取得したデータ", $posts->toArray());
             Log::info('[投稿一覧] データの取得に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
@@ -57,25 +59,11 @@ class PostController extends Controller
                 return response()->json(['message' => '本文または画像のいずれかを入力してください。'], 422);
             }
 
-            // 画像データとMIMEタイプを初期化
-            $imageData = null;
-            $imageMime = null;
-
             // 画像ファイルが存在する場合
-            if ($request->hasFile('image')) {
-
-                $imageFile = $request->file('image'); // 送信された画像ファイルを取得
-                $imageData = file_get_contents($imageFile->getRealPath()); // 画像ファイルの中身をバイナリデータとして読み込む
-                $imageMime = $imageFile->getMimeType(); // 画像のMIMEタイプ（例: image/jpeg, image/pngなど）を取得
-            }
+            $imageFile = $request->hasFile('image') ? $request->file('image') : null;
 
             // フォームに投稿した情報を DB に保存
-            $post = Post::create([
-                'user_id' => $request->user()->id,
-                'content' => $validated['content'] ?? null,
-                'image_data' => $imageData,
-                'image_mime' => $imageMime,
-            ]);
+            $post = $this->postService->create($request->user(), $validated, $imageFile);
 
             Log::info('[投稿作成] データの作成に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを作成しました。', 'data' => $post->load('user')], 201);
@@ -104,8 +92,7 @@ class PostController extends Controller
                 return response()->json(['message' => '投稿者本人の投稿データではないため、削除できません。'], 403);
             }
 
-            $post->load('user'); // 投稿データにユーザー情報を含める
-            $post->delete(); // 投稿データを削除
+            $post = $this->postService->delete($post);
 
             Log::info('[投稿削除] データの削除に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを削除しました。', 'data' => $post], 200);
@@ -138,8 +125,7 @@ class PostController extends Controller
             $validated = $request->validated();
 
             // 投稿データを更新
-            $post->content = $validated['content'];
-            $post->save();
+            $post = $this->postService->update($post, $validated);
 
             Log::info('[投稿更新] データの更新に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを更新しました。', 'data' => $post->load('user')], 200);
@@ -164,13 +150,7 @@ class PostController extends Controller
             Log::debug('[投稿検索] 検索バーに入力した文字', ['キーワード' => $keyword]);
 
             // 検索バーに入力した文字が存在した場合
-            if ($keyword) {
-                // 検索処理を実行
-                $posts = Post::with('user') // ユーザー情報を含める
-                    ->orderByDesc('created_at') // 作成日が新しい順に並べ替え
-                    ->where('content', 'LIKE', "%{$keyword}%") // 投稿データの本文に部分一致するデータを抽出
-                    ->get();
-            }
+            $posts = $this->postService->search($keyword);
             Log::info('[投稿検索] 一致したデータの取得に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => 'キーワード検索に一致した投稿データを取得しました。', 'data' => $posts], 200);
         } catch (\Throwable $e) {
