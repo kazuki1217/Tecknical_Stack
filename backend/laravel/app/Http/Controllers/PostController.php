@@ -7,7 +7,8 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
+use App\Http\Requests\PostStoreRequest;
+use App\Http\Requests\PostUpdateRequest;
 
 /**
  * 投稿関連の処理をまとめたコントローラ
@@ -41,19 +42,15 @@ class PostController extends Controller
     /**
      * 投稿データを作成
      *
-     * @param \Illuminate\Http\Request $request 投稿データの本文または画像ファイルを含むリクエスト
+     * @param PostStoreRequest $request 投稿データの本文または画像ファイルを含むリクエスト
      * @return \Illuminate\Http\JsonResponse 成功時は登録された投稿情報を返し、失敗時は失敗メッセージを返す
      */
-    public function store(Request $request)
+    public function store(PostStoreRequest $request)
     {
         Log::info('[投稿作成] 処理を開始します。');
 
         try {
-            // バリデーション
-            $validated = $request->validate([
-                'content' => 'nullable|string|max:1000', // 入力は任意 | 文字列であること | 1000文字以下であること
-                'image' => 'nullable|image|max:2048', // 入力は任意 | 画像ファイルであること | 2048KB以下であること
-            ]);
+            $validated = $request->validated();
 
             // 本文と画像ファイルの両方が存在しない場合
             if (empty($validated['content']) && !$request->hasFile('image')) {
@@ -82,9 +79,6 @@ class PostController extends Controller
 
             Log::info('[投稿作成] データの作成に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを作成しました。', 'data' => $post->load('user')], 201);
-        } catch (ValidationException $e) {
-            Log::info('[投稿作成] 入力内容に不備があったため、作成に失敗しました。');
-            return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
             Log::error('[投稿作成] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
@@ -124,11 +118,11 @@ class PostController extends Controller
     /**
      * 投稿データを更新
      *
-     * @param \Illuminate\Http\Request $request 更新された本文情報を含むリクエスト
+     * @param PostUpdateRequest $request 更新された本文情報を含むリクエスト
      * @param \App\Models\Post $post 対象の投稿（ルートモデルバインディングにより自動で取得）
      * @return \Illuminate\Http\JsonResponse 成功時は更新した投稿を返し、失敗時は失敗メッセージを返す
      */
-    public function update(Request $request, Post $post)
+    public function update(PostUpdateRequest $request, Post $post)
     {
         Log::info('[投稿更新] 処理を開始します。');
 
@@ -141,10 +135,7 @@ class PostController extends Controller
                 return response()->json(['message' => '投稿者本人の投稿データではないため、許可されていません。'], 403);
             }
 
-            // バリデーション
-            $validated = $request->validate([
-                'content' => 'required|string|max:1000', // 入力必須 | 文字列であること | 1000文字以下であること
-            ]);
+            $validated = $request->validated();
 
             // 投稿データを更新
             $post->content = $validated['content'];
@@ -152,9 +143,6 @@ class PostController extends Controller
 
             Log::info('[投稿更新] データの更新に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを更新しました。', 'data' => $post->load('user')], 200);
-        } catch (ValidationException $e) {
-            Log::info('[投稿更新] 入力内容に不備があったため、更新に失敗しました。');
-            return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
             Log::error('[投稿更新] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);

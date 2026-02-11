@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\RegisterRequest;
 
 
 /**
@@ -20,32 +21,24 @@ class AuthController extends Controller
     /**
      * アカウント登録処理
      *
-     * @param Request $request 登録情報（名前・メールアドレス・パスワード・パスワード確認）を含むリクエスト
+     * @param RegisterRequest $request 登録情報（名前・メールアドレス・パスワード・パスワード確認）を含むリクエスト
      * @return \Illuminate\Http\JsonResponse 成功時は成功メッセージを返し、失敗時は失敗エラーメッセージを返す
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
         Log::info('[アカウント登録] 処理を開始します。');
 
         try {
-            // バリデーション
-            $request->validate([
-                'name' => 'required|string', // 入力必須 | 文字列であること
-                'email' => 'required|email|unique:users', // 入力必須 | @ を含むメール形式であること | users テーブル内で重複しないこと
-                'password' => 'required|min:6|confirmed', // 入力必須 | 6文字以上であること | password_confirmation と一致すること
-            ]);
+            $validated = $request->validated();
 
             // ユーザー情報を DB に保存
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password), // パスワードはハッシュ化して保存
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']), // パスワードはハッシュ化して保存
             ]);
             Log::info('[アカウント登録] 登録に成功しました。', ['ユーザーID' => $user?->id, 'ユーザー名' => $user?->name]);
             return response()->json(['message' => 'アカウント登録が正常に完了しました。'], 201);
-        } catch (ValidationException $e) {
-            Log::info('[アカウント登録] 入力内容に不備があったため、登録に失敗しました。');
-            return response()->json(['message' => '入力内容に誤りがあります。', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
             Log::error('[アカウント登録] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
