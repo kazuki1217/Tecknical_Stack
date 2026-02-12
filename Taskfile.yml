@@ -1,5 +1,8 @@
 version: "3"
 
+dotenv:
+  - .env
+
 tasks:
   up:
     desc: コンテナを起動
@@ -12,25 +15,40 @@ tasks:
       - echo "UID=$(id -u)" >> .env
       - echo "GID=$(id -g)" >> .env
       # コンテナを起動
-      - docker compose up -d
-
-  backend:
-    desc: Laravel を起動
-    silent: false
-    cmds:
-      - docker compose exec backend php artisan serve --host=0.0.0.0 --port=8000
-
-  frontend:
-    desc: React を起動
-    silent: false
-    cmds:
-      - docker compose exec frontend npm run dev
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose --profile {{if eq .APP_ENV "production"}}prod{{else}}dev{{end}} up -d --build'
 
   down:
     desc: コンテナを停止
     silent: false
     cmds:
-      - docker compose down
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose --profile {{if eq .APP_ENV "production"}}prod{{else}}dev{{end}} down'
+
+  frontend-build:
+    desc: React をビルド
+    silent: false
+    cmds:
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec frontend npm run build'
+
+  frontend-dev:
+    desc: React を開発モードで起動
+    silent: false
+    cmds:
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec frontend npm run dev'
+
+  db-reset:
+    desc: DBを初期化
+    silent: false
+    cmds:
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend php artisan migrate:fresh --seed'
+
+  cache-clear:
+    desc: キャッシュクリア
+    silent: false
+    cmds:
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend php artisan config:clear'
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend php artisan route:clear'
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend php artisan cache:clear'
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend php artisan view:clear'
 
   setup:
     desc: すべての環境を構築
@@ -43,117 +61,14 @@ tasks:
       - echo "UID=$(id -u)" >> .env
       - echo "GID=$(id -g)" >> .env
       # イメージを再作成し、コンテナを起動
-      - docker compose up -d --build
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose --profile {{if eq .APP_ENV "production"}}prod{{else}}dev{{end}} up -d --build'
       # Laravelに、vendorを追加
-      - docker compose exec backend composer install
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend composer install'
       # Laravelに、envファイルを追加
-      - docker compose exec backend cp .env.example .env
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend cp .env.example .env'
       # Reactに、node_module 追加
-      - docker compose exec frontend npm install
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec frontend npm install'
       # 静的コンテンツを生成
-      - docker compose exec frontend npm run build
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec frontend npm run build'
       # プロジェクトの所有者を自分に変更する
       - sudo chown -R $(whoami):$(id -gn) .
-
-  cache-clear:
-    desc: キャッシュクリア
-    silent: false
-    cmds:
-      - docker-compose exec backend php artisan config:clear
-      - docker-compose exec backend php artisan route:clear
-      - docker-compose exec backend php artisan cache:clear
-      - docker-compose exec backend php artisan view:clear
-
-  export-web-env:
-    desc: Nginx のバージョン情報を web_env.txt に出力
-    cmds:
-      - >
-        > ./web/web_env.txt
-      - echo "===== Dockerfile =====" >> ./web/web_env.txt
-      - cat ./web/Dockerfile >> ./web/web_env.txt
-      - echo "" >> ./web/web_env.txt
-
-  export-frontend-env:
-    desc: React 環境のバージョン情報を frontend_env.txt に出力
-    cmds:
-      - >
-        docker compose exec frontend sh -c '
-        FILE="/app/frontend_env.txt";
-        > "$FILE";
-        echo "===== node -v =====" >> "$FILE";
-        node -v >> "$FILE";
-        echo "" >> "$FILE";
-        echo "===== npm --version =====" >> "$FILE";
-        npm --version >> "$FILE";
-        echo "" >> "$FILE";
-        echo "===== react version =====" >> "$FILE";
-        npm list react >> "$FILE";
-        echo "" >> "$FILE";
-        echo "===== vite version =====" >> "$FILE";
-        npm list vite >> "$FILE";
-        echo "" >> "$FILE";
-        echo "React環境情報を書き出しました => $FILE";
-        '
-      - echo "===== Dockerfile =====" >> ./frontend/react/frontend_env.txt
-      - cat ./frontend/Dockerfile >> ./frontend/react/frontend_env.txt
-      - echo "" >> ./frontend/react/frontend_env.txt
-
-  export-backend-env:
-    desc: Laravel 環境のバージョン情報を env_backend.txt に出力
-    cmds:
-      - >
-        docker compose exec backend sh -c '
-        FILE="/var/www/html/backend_env.txt";
-        > "$FILE";
-        echo "===== php -v =====" >> "$FILE";
-        php -v >> "$FILE";
-        echo "" >> "$FILE";
-        echo "===== composer --version =====" >> "$FILE";
-        composer --version >> "$FILE";
-        echo "" >> "$FILE";
-        echo "===== php artisan --version =====" >> "$FILE";
-        php artisan --version >> "$FILE";
-        echo "" >> "$FILE";
-        echo "環境情報を書き出しました => $FILE";
-        '
-      # ホスト側で Dockerfile を末尾に追記
-      - echo "===== Dockerfile =====" >> ./backend/laravel/backend_env.txt
-      - cat ./backend/Dockerfile >> ./backend/laravel/backend_env.txt
-      - echo "" >> ./backend/laravel/backend_env.txt
-
-  export-environment-info:
-    desc: 各バージョン情報、その他環境に必要な情報をすべて environment_info.txt に出力
-    cmds:
-      - >
-        ROOT="/home/kazukinukui/Tecknical_Stack";
-        ENV_FILE="$ROOT/environment_info.txt";
-        > "$ENV_FILE";
-        if [ -f "$ROOT/web/web_env.txt" ]; then
-          echo "===== web_env.txt =====" >> "$ENV_FILE";
-          cat "$ROOT/web/web_env.txt" >> "$ENV_FILE";
-          echo "" >> "$ENV_FILE";
-        fi;
-        if [ -f "$ROOT/frontend/react/frontend_env.txt" ]; then
-          echo "===== frontend_env.txt =====" >> "$ENV_FILE";
-          cat "$ROOT/frontend/react/frontend_env.txt" >> "$ENV_FILE";
-          echo "" >> "$ENV_FILE";
-        fi;
-        if [ -f "$ROOT/backend/laravel/backend_env.txt" ]; then
-          echo "===== backend_env.txt =====" >> "$ENV_FILE";
-          cat "$ROOT/backend/laravel/backend_env.txt" >> "$ENV_FILE";
-          echo "" >> "$ENV_FILE";
-        fi;
-        if [ -f "$ROOT/docker-compose.yml" ]; then
-          echo "===== docker-compose.yml =====" >> "$ENV_FILE";
-          cat "$ROOT/docker-compose.yml" >> "$ENV_FILE";
-          echo "" >> "$ENV_FILE";
-        fi;
-        echo "===== tree -L 3 =====" >> "$ENV_FILE";
-        cd "$ROOT";
-        tree -L 3 >> "$ENV_FILE";
-        echo "" >> "$ENV_FILE";
-        echo "environment_info.txt を作成しました: $ENV_FILE";
-        rm -f "$ROOT/web/web_env.txt";
-        rm -f "$ROOT/frontend/react/frontend_env.txt";
-        rm -f "$ROOT/backend/laravel/backend_env.txt";
-        echo "個別のenvファイルを削除しました。";
