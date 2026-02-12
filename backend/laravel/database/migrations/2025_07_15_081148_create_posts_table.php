@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -18,10 +19,15 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->text('content')->nullable();
             $table->string('image_mime')->nullable();
-            // SQLiteでも確実に通るBLOB型に寄せる
+            // テスト時に使用するSQLiteは、LONGBLOBに対応していない都合により、一時的にBLOB型で設定
             $table->binary('image_data')->nullable();
             $table->timestamps();
         });
+
+        // MySQLの場合、LONGBLOBへ拡張（SQLiteはそのまま）
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE posts MODIFY image_data LONGBLOB NULL');
+        }
     }
 
     /**

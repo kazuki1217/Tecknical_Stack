@@ -38,7 +38,7 @@ class PostService
         $imageMime = null;
 
         // 画像ファイルが存在する場合
-        if ($validated['image']) {
+        if (array_key_exists('image', $validated) && $validated['image']) {
             // 送信された画像ファイルを取得し、バイナリ化
             $imageData = file_get_contents($validated['image']->getRealPath());
             // 画像のMIMEタイプ（例: image/jpeg, image/pngなど）を取得
