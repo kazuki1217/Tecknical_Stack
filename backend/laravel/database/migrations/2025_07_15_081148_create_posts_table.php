@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -12,17 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("
-           CREATE TABLE posts (
-               id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-               user_id BIGINT UNSIGNED NOT NULL,
-               content TEXT NULL,
-               image_mime VARCHAR(255) NULL,
-               image_data LONGBLOB NULL,
-               created_at TIMESTAMP NULL,
-               updated_at TIMESTAMP NULL
-           )
-       ");
+        Schema::create('posts', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->text('content')->nullable();
+            $table->string('image_mime')->nullable();
+            // SQLiteでも確実に通るBLOB型に寄せる
+            $table->binary('image_data')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS posts");
+        Schema::dropIfExists('posts');
     }
 };
