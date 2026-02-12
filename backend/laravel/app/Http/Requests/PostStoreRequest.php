@@ -28,8 +28,8 @@ class PostStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'nullable|string|max:1000', // 入力は任意 | 文字列であること | 1000文字以下であること
-            'image' => 'nullable|image|max:2048', // 入力は任意 | 画像ファイルであること | 2048KB以下であること
+            'content' => 'required_without:image|nullable|string|max:1000', // 画像が無い場合は必須 | 文字列 | 1000文字以下
+            'image' => 'required_without:content|nullable|image|max:2048', // 本文が無い場合は必須 | 画像 | 2048KB以下
         ];
     }
 
