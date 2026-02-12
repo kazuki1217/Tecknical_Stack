@@ -29,21 +29,20 @@ class PostService
      *
      * @param User $user 投稿者
      * @param array<string, mixed> $validated バリデーション済み入力
-     * @param UploadedFile|null $imageFile 画像ファイル
      * @return Post 作成された投稿
      */
-    public function create(User $user, array $validated, ?UploadedFile $imageFile): Post
+    public function create(User $user, array $validated): Post
     {
         // 画像データとMIMEタイプを初期化
         $imageData = null;
         $imageMime = null;
 
         // 画像ファイルが存在する場合
-        if ($imageFile) {
+        if ($validated['image']) {
             // 送信された画像ファイルを取得し、バイナリ化
-            $imageData = file_get_contents($imageFile->getRealPath());
+            $imageData = file_get_contents($validated['image']->getRealPath());
             // 画像のMIMEタイプ（例: image/jpeg, image/pngなど）を取得
-            $imageMime = $imageFile->getMimeType();
+            $imageMime = $validated['image']->getMimeType();
         }
 
         // フォームに投稿した情報を DB に保存

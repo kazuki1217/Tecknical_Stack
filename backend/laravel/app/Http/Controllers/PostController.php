@@ -16,9 +16,8 @@ use App\Services\PostService;
  */
 class PostController extends Controller
 {
-    public function __construct(private PostService $postService)
-    {
-    }
+    public function __construct(private PostService $postService) {}
+
     /**
      * 全ての投稿データを取得
      *
@@ -54,16 +53,8 @@ class PostController extends Controller
         try {
             $validated = $request->validated();
 
-            // 本文と画像ファイルの両方が存在しない場合
-            if (empty($validated['content']) && !$request->hasFile('image')) {
-                return response()->json(['message' => '本文または画像のいずれかを入力してください。'], 422);
-            }
-
-            // 画像ファイルが存在する場合
-            $imageFile = $request->hasFile('image') ? $request->file('image') : null;
-
             // フォームに投稿した情報を DB に保存
-            $post = $this->postService->create($request->user(), $validated, $imageFile);
+            $post = $this->postService->create($request->user(), $validated);
 
             Log::info('[投稿作成] データの作成に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
             return response()->json(['message' => '投稿データを作成しました。', 'data' => $post->load('user')], 201);
