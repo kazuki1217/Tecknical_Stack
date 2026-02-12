@@ -1,0 +1,85 @@
+name: CD
+
+on:
+  # CI ワークフロー完了後にCDを実行
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+# 同時デプロイを防ぎ、最新pushを優先
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    # CI が成功、かつ対象ブランチが main のときだけ実行
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    # GitHubが用意する標準Linux環境で実行
+    runs-on: ubuntu-latest
+    # 無限ループ対策。20分で強制終了
+    timeout-minutes: 20
+
+    steps:
+      # リポジトリのコードを取得
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # CIが実行されたコミットをチェックアウト
+          ref: ${{ github.event.workflow_run.head_sha }}
+          # 1つ前のコミットとの比較に必要な履歴だけ取得
+          fetch-depth: 2
+
+      # push 差分に frontend/react が含まれるか判定
+      - name: Detect frontend changes
+        id: changes
+        run: |
+          # 比較対象コミットが取れない場合（履歴1件のみ等）は安全側でビルドする
+          if ! git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+            echo "frontend_changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 2つのコミット差分に frontend/react 配下の変更が含まれるか判定
+          # true のときだけ本番で task frontend-build を実行する
+          if git diff --name-only HEAD~1 HEAD | grep -q '^frontend/react/'; then
+            echo "frontend_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "frontend_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 本番サーバー接続用のSSH鍵と known_hosts を設定
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          # Secretの改行コード混在(CRLF)で鍵読み込みに失敗するのを防ぐ
+          printf '%s\n' "${{ secrets.PROD_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # 鍵が壊れている場合はこの時点で失敗させる
+          ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null
+          ssh-keyscan -H "${{ secrets.PROD_HOST }}" >> ~/.ssh/known_hosts
+
+      # 本番サーバーに接続し、mainへ強制同期して必要時のみフロントをビルド
+      - name: Deploy on production server
+        env:
+          PROD_HOST: ${{ secrets.PROD_HOST }}
+          PROD_USER: ${{ secrets.PROD_USER }}
+          PROD_APP_DIR: ${{ secrets.PROD_APP_DIR }}
+          FRONTEND_CHANGED: ${{ steps.changes.outputs.frontend_changed }}
+        run: |
+          APP_DIR="${PROD_APP_DIR:-/home/${PROD_USER}/Tecknical_Stack}"
+
+          # 本番サーバーにSSH接続して、以下を順番に実行:
+          # 1) アプリディレクトリへ移動
+          # 2) origin/main の最新状態を取得して強制同期
+          # 3) frontend/react に差分があったときだけ task frontend-build を実行
+          ssh "${PROD_USER}@${PROD_HOST}" "\
+            set -euo pipefail; \
+            cd '${APP_DIR}'; \
+            git fetch origin main; \
+            git reset --hard origin/main; \
+            if [ '${FRONTEND_CHANGED}' = 'true' ]; then \
+              task frontend-build; \
+            else \
+              echo 'No frontend/react changes, skip task frontend-build'; \
+            fi"
