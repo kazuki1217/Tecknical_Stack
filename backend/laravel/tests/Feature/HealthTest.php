@@ -10,6 +10,6 @@ class HealthTest extends TestCase
     {
         $this->getJson('/api/health')
             ->assertStatus(200)
-            ->assertExactJson('正常に稼働しています。');
+            ->assertJson(['message' => '正常に稼働しています。']);
     }
 }
