@@ -31,8 +31,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email', // 入力必須 | @ を含むメール形式であること
-            'password' => 'required|string', // 入力必須 | 文字列であること
+            'email' => 'required|string|email|max:255', // 入力必須 | 文字列 | @ を含むメール形式 | 255文字以内
+            'password' => 'required|string|min:6|max:255', // 入力必須 | 文字列 | 6文字以上 | 255文字以内
         ];
     }
 
