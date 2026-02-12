@@ -71,12 +71,14 @@ jobs:
 
           # 本番サーバーにSSH接続して、以下を順番に実行:
           # 1) アプリディレクトリへ移動
-          # 2) origin/main の最新状態を取得して強制同期
-          # 3) frontend/react に差分があったときだけ task frontend-build を実行
+          # 2) main ブランチへ移動（なければ作成）
+          # 3) origin/main の最新状態を取得して強制同期
+          # 4) frontend/react に差分があったときだけ task frontend-build を実行
           ssh "${PROD_USER}@${PROD_HOST}" "\
             set -euo pipefail; \
             cd '${APP_DIR}'; \
             git fetch origin main; \
+            git checkout main || git checkout -b main; \
             git reset --hard origin/main; \
             if [ '${FRONTEND_CHANGED}' = 'true' ]; then \
               task frontend-build; \
