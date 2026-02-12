@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  # main ブランチへの push でCIを実行
+  push:
+    branches: ["main"]
+  # PR作成時・PRコミット時にCIを実行
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    # GitHubが用意する標準Linux環境で実行
+    runs-on: ubuntu-latest
+    # 無限ループ対策。20分で強制終了
+    timeout-minutes: 20
+    steps:
+      # リポジトリのコードを取得
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # PHP（Laravelの実行環境）を用意
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+
+      # Laravel側の依存ライブラリをインストール
+      - name: Install backend dependencies
+        working-directory: backend/laravel
+        run: composer install --no-interaction --prefer-dist
+
+      # Unit / Feature テストを実行
+      - name: Run backend tests
+        working-directory: backend/laravel
+        run: php artisan test --colors=always
