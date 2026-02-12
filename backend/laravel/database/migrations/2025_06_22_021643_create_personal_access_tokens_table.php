@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,21 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("
-            CREATE TABLE personal_access_tokens (
-                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                tokenable_type VARCHAR(255) NOT NULL,
-                tokenable_id BIGINT UNSIGNED NOT NULL,
-                name VARCHAR(255) NOT NULL,
-                token CHAR(64) NOT NULL UNIQUE,
-                abilities TEXT NULL,
-                last_used_at TIMESTAMP NULL,
-                expires_at TIMESTAMP NULL,
-                created_at TIMESTAMP NULL DEFAULT NULL,
-                updated_at TIMESTAMP NULL DEFAULT NULL,
-                INDEX tokenable_type_tokenable_id_index (tokenable_type, tokenable_id)
-            )
-        ");
+        Schema::create('personal_access_tokens', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('tokenable_type');
+            $table->unsignedBigInteger('tokenable_id');
+            $table->string('name');
+            $table->string('token', 64)->unique();
+            $table->text('abilities')->nullable();
+            $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamps();
+
+            $table->index(['tokenable_type', 'tokenable_id'], 'tokenable_type_tokenable_id_index');
+        });
     }
 
     /**
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS personal_access_tokens");
+        Schema::dropIfExists('personal_access_tokens');
     }
 };
