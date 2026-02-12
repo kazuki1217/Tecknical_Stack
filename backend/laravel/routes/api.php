@@ -22,5 +22,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // 死活監視（UptimeRobot を活用し、5分おきにチェック）
 Route::get('/health', function () {
-    return response()->json('正常に稼働しています。', 200);
+    return response()->json(['message' => '正常に稼働しています。'], 200);
 });
