@@ -17,9 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
         ]);
-
-        // すべてのリクエストに一意の Request ID を付与し、ログに紐づける
-        $middleware->append(\App\Http\Middleware\RequestIdMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $e, $request) {
