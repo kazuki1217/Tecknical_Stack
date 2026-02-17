@@ -101,79 +101,19 @@ task setup
 
 ### 3.　 .envの作成
 
-以下の内容を Tecknical_Stack/backend/laravel 配下の .env に反映します。
+以下のコマンドを実行し、`backend/laravel/.env.example` から `.env` を作成します。
 
-<details>
-<summary>.env</summary>
-
-```dotenv
-# アプリケーション基本設定
-APP_NAME=Laravel
-APP_ENV=local
-APP_KEY=base64:cgO0y7cyTt+eTp1LgXu8M5HHVZyTY0GY7OIUYK13C7g=
-APP_DEBUG=true
-APP_URL=http://localhost
-
-# アプリの言語設定
-APP_LOCALE=en
-APP_FALLBACK_LOCALE=en
-APP_FAKER_LOCALE=en_US
-
-# メンテナンスモード関連
-APP_MAINTENANCE_DRIVER=file
-
-# ハッシュ設定
-BCRYPT_ROUNDS=12
-
-# ログ設定
-LOG_CHANNEL=stack
-LOG_STACK=single
-LOG_DEPRECATIONS_CHANNEL=null
-LOG_LEVEL=debug
-
-# データベース接続設定
-DB_CONNECTION=mysql
-DB_HOST=db
-DB_PORT=3306
-DB_DATABASE=laravel_dev
-DB_USERNAME=laravel
-DB_PASSWORD=secret
-
-# セッション管理設定
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
-SESSION_ENCRYPT=false
-SESSION_PATH=/
-SESSION_DOMAIN=null
-
-# ファイル保存先の設定
-FILESYSTEM_DISK=local
-
-# キャッシュの保存先を設定
-CACHE_STORE=file
-
-# Redis設定
-REDIS_CLIENT=phpredis
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-# メール送信設定（MailpitやSMTPなど）
-MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_FROM_ADDRESS=dev@example.com
-MAIL_FROM_NAME="Local Dev"
-LOG_MAIL_TO=dev@example.com
+```bash
+cp backend/laravel/.env.example backend/laravel/.env
 ```
 
-</details>
+続けて、Laravel の `APP_KEY` を生成します。
 
+```bash
+docker compose exec backend php artisan key:generate
+```
 
-
-以下の内容を Tecknical_Stack/frontend 配下の .env.dev に反映します。
+以下の内容を `Tecknical_Stack/frontend/react` 配下の `.env.dev` に反映します。
 
 <details>
 <summary>.env.dev</summary>
@@ -184,7 +124,7 @@ VITE_API_BASE_URL=http://localhost:80
 
 </details>
 
-以下の内容を Tecknical_Stack 配下の .env に反映します。
+以下の内容を `Tecknical_Stack` 配下の `.env` に反映します。
 
 <details>
 <summary>.env</summary>
