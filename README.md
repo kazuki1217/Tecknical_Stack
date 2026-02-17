@@ -1,6 +1,6 @@
 
 ## 概要
-あああ
+
 <table>
   <tr>
     <td>目的</td>
@@ -25,8 +25,8 @@
 | フロントエンド |  Node.js, Vite, TypeScript, React, HTML, CSS |
 | バックエンド | PHP-FPM, PHP, Larave, RESTful API, APIトークン認証 |
 | データベース | MySQL, phpMyAdmin |
-| インフラ | AWS Lightsail, Route 53, Docker（マルチコンテナ構成）, Nginx (HTTPS対応) |
-| その他 | Windows 11, macOS（M1）, VSCode, Vim, Bash |
+| インフラ | AWS Lightsail, Route 53, Linux, Docker（マルチコンテナ構成）, Nginx (HTTPS対応), Mailpit|
+| その他 | Windows 11, macOS（M1）, VSCode, Codex|
 
 <br>
 
