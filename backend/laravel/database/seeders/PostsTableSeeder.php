@@ -10,15 +10,15 @@ class PostsTableSeeder extends Seeder
     public function run(): void
     {
         $images = [
-            1 => 'sample1.jpg',
-            2 => 'sample2.jpg',
-            3 => 'sample3.jpg',
+            1 => ['file' => 'sample1.jpg', 'content' => 'クラゲですー'],
+            2 => ['file' => 'sample2.jpg', 'content' => '植物ですー'],
+            3 => ['file' => 'sample3.jpg', 'content' => '焚火ですー'],
         ];
 
         $data = [];
 
-        foreach ($images as $userId => $fileName) {
-            $imagePath = storage_path('app/public/' . $fileName);
+        foreach ($images as $userId => $post) {
+            $imagePath = storage_path('app/public/' . $post['file']);
 
             if (file_exists($imagePath)) {
                 $imageData = file_get_contents($imagePath);
@@ -30,7 +30,7 @@ class PostsTableSeeder extends Seeder
 
             $data[] = [
                 'user_id'    => $userId,
-                'content'    => "サンプル投稿{$userId}の内容です。",
+                'content'    => $post['content'],
                 'image_mime' => $mimeType,
                 'image_data' => $imageData,
                 'created_at' => now(),
