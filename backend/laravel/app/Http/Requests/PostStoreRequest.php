@@ -30,6 +30,7 @@ class PostStoreRequest extends FormRequest
         return [
             'content' => 'required_without:image|nullable|string|max:1000', // 画像が無い場合は必須 | 文字列 | 1000文字以下
             'image' => 'required_without:content|nullable|image|max:2048', // 本文が無い場合は必須 | 画像 | 2048KB以下
+            'tags' => 'nullable|string|max:255', // カンマ区切りのタグ文字列
         ];
     }
 

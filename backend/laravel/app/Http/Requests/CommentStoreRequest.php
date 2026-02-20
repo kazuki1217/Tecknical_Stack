@@ -8,9 +8,9 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Log;
 
 /**
- * 投稿更新の入力を検証するリクエスト
+ * コメント作成の入力を検証するリクエスト
  */
-class PostUpdateRequest extends FormRequest
+class CommentStoreRequest extends FormRequest
 {
     /**
      * 認可の判定（認証済みユーザーのみ想定）
@@ -28,8 +28,7 @@ class PostUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'required|string|max:1000', // 入力必須 | 文字列であること | 1000文字以下であること
-            'tags' => 'nullable|string|max:255', // カンマ区切りのタグ文字列
+            'content' => 'required|string|max:500', // 入力必須 | 文字列 | 500文字以内
         ];
     }
 
@@ -38,7 +37,7 @@ class PostUpdateRequest extends FormRequest
      */
     protected function failedValidation(Validator $validator): void
     {
-        Log::info('[投稿更新] 入力内容に不備があったため、更新に失敗しました。');
+        Log::info('[コメント作成] 入力内容に不備があったため、作成に失敗しました。');
 
         throw new HttpResponseException(
             response()->json(

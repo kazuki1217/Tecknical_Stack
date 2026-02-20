@@ -31,9 +31,21 @@ class Post extends Model
         return null;
     }
 
-    // 投稿にユーザ情報を含めように設定
+    // ユーザーテーブルと多対一のリレーションを定義
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // コメントテーブルと一対多のリレーションを定義
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    // タグテーブルと多対多のリレーションを定義
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 }

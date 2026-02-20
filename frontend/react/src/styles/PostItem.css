@@ -98,3 +98,80 @@
   padding: 5px;
   margin-left: 10px;
 }
+
+/* 投稿に紐づくタグ一覧 */
+.post-tags {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* タグ1件 */
+.post-tag {
+  font-size: 13px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid #2f7ca5;
+  color: #8ed0f2;
+}
+
+/* コメントエリア全体 */
+.post-comments {
+  margin-top: 14px;
+  border-top: 1px solid #3a3a3a;
+  padding-top: 10px;
+}
+
+/* コメント件数の見出し */
+.post-comments-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #b5b5b5;
+}
+
+/* コメント1件の行 */
+.post-comment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+/* コメント削除ボタン */
+.comment-delete-button {
+  color: #fff;
+  background: #7b1e1e;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+/* コメント投稿フォーム */
+.post-comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* コメント入力欄 */
+.post-comment-form input {
+  flex: 1;
+  background: #111;
+  color: #e6e6e6;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+/* コメント送信ボタン */
+.post-comment-form button {
+  background-color: #1da1f2;
+  color: #fff;
+  border: 1px solid #1da1f2;
+  border-radius: 8px;
+  padding: 6px 12px;
+}

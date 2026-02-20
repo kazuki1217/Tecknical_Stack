@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy']); // 投稿を削除
     Route::patch('/posts/{post}', [PostController::class, 'update']); // 投稿を編集
     Route::get('/posts/search', [PostController::class, 'search']); // 投稿を検索
+    Route::post('/posts/{post}/comments', [PostController::class, 'storeComment']); // 投稿にコメントを追加
+    Route::delete('/comments/{comment}', [PostController::class, 'destroyComment']); // コメントを削除
 });
 
 // 死活監視（UptimeRobot を活用し、5分おきにチェック）

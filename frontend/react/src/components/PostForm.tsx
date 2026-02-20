@@ -3,7 +3,7 @@ import { useState, ChangeEvent } from "react";
 import "../styles/PostForm.css";
 
 interface PostFormProps {
-  onSubmit: (content: string, imageFile: File | null) => void;
+  onSubmit: (content: string, imageFile: File | null, tags: string) => void;
 }
 
 /**
@@ -15,6 +15,7 @@ interface PostFormProps {
 function PostForm({ onSubmit }: PostFormProps) {
   const [content, setContent] = useState(""); // 新規投稿のテキスト情報を管理
   const [imageFile, setImageFile] = useState<File | null>(null); // 新規投稿の画像ファイルを管理
+  const [tags, setTags] = useState(""); // 新規投稿のタグ情報（カンマ区切り）
 
   /** 新規投稿を作成 */
   const handleSubmit = async () => {
@@ -22,9 +23,10 @@ function PostForm({ onSubmit }: PostFormProps) {
       alert("テキストまたは画像のいずれかを入力してください。");
       return;
     }
-    await onSubmit(content, imageFile);
+    await onSubmit(content, imageFile, tags);
     setContent("");
     setImageFile(null);
+    setTags("");
   };
 
   /** 画像ファイルの状態を管理 */
@@ -36,6 +38,7 @@ function PostForm({ onSubmit }: PostFormProps) {
   return (
     <div className="post-form">
       <textarea placeholder="いまどうしてる？" value={content} onChange={(e) => setContent(e.target.value)} />
+      <input type="text" placeholder="タグをカンマ区切りで入力（例: Laravel,React）" value={tags} onChange={(e) => setTags(e.target.value)} />
       <input type="file" accept="image/*" onChange={handleImageChange} />
       <button onClick={handleSubmit}>ポストする</button>
     </div>

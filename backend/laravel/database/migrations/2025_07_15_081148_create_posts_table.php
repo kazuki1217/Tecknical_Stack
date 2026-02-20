@@ -22,6 +22,8 @@ return new class extends Migration
             // テスト時に使用するSQLiteは、LONGBLOBに対応していない都合により、一時的にBLOB型で設定
             $table->binary('image_data')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         // MySQLの場合、LONGBLOBへ拡張（SQLiteはそのまま）
