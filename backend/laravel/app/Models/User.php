@@ -28,4 +28,16 @@ class User extends Authenticatable
 
     // APIレスポンス時に隠すカラムを設定
     protected $hidden = ['password'];
+
+    // 投稿テーブルと一対多のリレーションを定義
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    // コメントテーブルと一対多のリレーションを定義
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

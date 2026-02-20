@@ -5,22 +5,15 @@ import SidebarLayout from "./SidebarLayout";
 import PostForm from "./PostForm";
 import PostItem from "./PostItem";
 import { createPostActions } from "../utils/createPostActions";
-
-interface Post {
-  id: number;
-  user: { name: string | null };
-  content: string;
-  created_at: string;
-  image_base64?: string | null;
-}
+import { Post } from "../types/post";
 
 /**
  * 投稿一覧画面コンポーネント
  *
- * @param user - ログイン中のユーザ名
+ * @param loggedInUserName - ログイン中のユーザ名
  * @returns JSX.Element
  */
-function PostList({ user }: { user: string | null }) {
+function PostList({ loggedInUserName }: { loggedInUserName: string | null }) {
   const [posts, setPosts] = useState<Post[]>([]); // 投稿一覧を管理
 
   useEffect(() => {
@@ -45,12 +38,13 @@ function PostList({ user }: { user: string | null }) {
   const { deletePost, updatePost } = createPostActions(fetchPosts);
 
   /** 新規投稿を作成 */
-  const submitPost = async (content: string, imageFile: File | null) => {
+  const submitPost = async (content: string, imageFile: File | null, tags: string) => {
     try {
       // multipart/form-data 形式に格納
       const formData = new FormData();
       content && formData.append("content", content);
       imageFile && formData.append("image", imageFile);
+      tags.trim() && formData.append("tags", tags.trim());
 
       const token = localStorage.getItem("token");
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/posts`, formData, {
@@ -66,14 +60,14 @@ function PostList({ user }: { user: string | null }) {
   };
 
   return (
-    <SidebarLayout user={user}>
+    <SidebarLayout loggedInUserName={loggedInUserName}>
       {/* 新規投稿フォーム */}
       <PostForm onSubmit={submitPost} />
 
       {/* 投稿一覧 */}
       <div>
         {posts.map((post) => (
-          <PostItem key={post.id} post={post} currentUser={user} onDelete={deletePost} onUpdate={updatePost} />
+          <PostItem key={post.id} post={post} loggedInUserName={loggedInUserName} onDelete={deletePost} onUpdate={updatePost} onRefresh={fetchPosts} />
         ))}
       </div>
     </SidebarLayout>

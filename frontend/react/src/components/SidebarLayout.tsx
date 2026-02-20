@@ -5,19 +5,19 @@ import { FaList, FaSearch, FaSignOutAlt } from "react-icons/fa";
 import "../styles/SidebarLayout.css";
 
 interface SidebarLayoutProps {
-  user: string | null;
+  loggedInUserName: string | null;
   children: ReactNode;
 }
 
 /**
  * サイドバーコンポーネント
  *
- * @param user - ログイン中のユーザ名
+ * @param loggedInUserName - ログイン中のユーザ名
  * @param children - メインコンテンツとして描画するコンポーネント
  * @param onLogout - ログアウト時に呼ばれる関数
  * @returns JSX.Element
  */
-function SidebarLayout({ user, children }: SidebarLayoutProps) {
+function SidebarLayout({ loggedInUserName, children }: SidebarLayoutProps) {
   const navigate = useNavigate();
 
   /** ログアウト処理 */
@@ -31,7 +31,7 @@ function SidebarLayout({ user, children }: SidebarLayoutProps) {
     <div>
       {/* サイドバー */}
       <div className="sidebar">
-        <div className="sidebar-username">{user} さん</div>
+        <div className="sidebar-username">{loggedInUserName} さん</div>
         <SidebarItem icon={<FaList />} label="投稿一覧" onClick={() => navigate("/posts")} />
         <SidebarItem icon={<FaSearch />} label="検索" onClick={() => navigate("/search")} />
         <SidebarItem icon={<FaSignOutAlt />} label="ログアウト" onClick={() => handleLogout()} />

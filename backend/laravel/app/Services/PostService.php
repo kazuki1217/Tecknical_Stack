@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 
 /**
@@ -19,7 +20,7 @@ class PostService
      */
     public function getAll(): Collection
     {
-        return Post::with('user') // ユーザー情報を含める
+        return Post::with(['user', 'tags', 'comments.user']) // ユーザー・タグ・コメント情報を含める
             ->orderByDesc('created_at') // 作成日が新しい順番に並び替え
             ->get(); // 全件取得
     }
@@ -46,12 +47,17 @@ class PostService
         }
 
         // フォームに投稿した情報を DB に保存
-        return Post::create([
+        $post = Post::create([
             'user_id' => $user->id,
             'content' => $validated['content'] ?? null,
             'image_data' => $imageData,
             'image_mime' => $imageMime,
         ]);
+
+        // タグの紐付け
+        $post->tags()->sync($this->resolveTagIds($validated['tags'] ?? null));
+
+        return $post->load(['user', 'tags']);
     }
 
     /**
@@ -62,7 +68,7 @@ class PostService
      */
     public function delete(Post $post): Post
     {
-        $post->load('user'); // 投稿データにユーザー情報を含める
+        $post->load(['user', 'tags', 'comments.user']); // 関連情報を含める
         $post->delete(); // 投稿データを削除
 
         return $post;
@@ -81,7 +87,11 @@ class PostService
         $post->content = $validated['content'];
         $post->save();
 
-        return $post->load('user');
+        if (array_key_exists('tags', $validated)) {
+            $post->tags()->sync($this->resolveTagIds($validated['tags']));
+        }
+
+        return $post->load(['user', 'tags', 'comments.user']);
     }
 
     /**
@@ -96,9 +106,74 @@ class PostService
             return collect();
         }
 
-        return Post::with('user') // ユーザー情報を含める
+        return Post::with(['user', 'tags', 'comments.user']) // ユーザー・タグ・コメント情報を含める
             ->orderByDesc('created_at') // 作成日が新しい順に並べ替え
             ->where('content', 'LIKE', "%{$keyword}%") // 投稿データの本文に部分一致するデータを抽出
             ->get(); // 一致データを取得
+    }
+
+    /**
+     * コメントを作成する
+     *
+     * @param Post $post 対象の投稿
+     * @param User $user コメント投稿者
+     * @param string $content コメント本文
+     * @return Comment 作成されたコメント
+     */
+    public function createComment(Post $post, User $user, string $content): Comment
+    {
+        $comment = $post->comments()->create([
+            'user_id' => $user->id,
+            'content' => $content,
+        ]);
+
+        return $comment->load('user');
+    }
+
+    /**
+     * コメントを削除する
+     *
+     * @param Comment $comment 対象コメント
+     * @return Comment 削除されたコメント
+     */
+    public function deleteComment(Comment $comment): Comment
+    {
+        $comment->load('user');
+        $comment->delete();
+
+        return $comment;
+    }
+
+    /**
+     * カンマ区切りのタグ文字列を tag_id 配列に変換する
+     *
+     * @param string|null $rawTags 例: "Laravel,React,API"
+     * @return array<int, int> tag_id の配列
+     */
+    private function resolveTagIds(?string $rawTags): array
+    {
+        if (! $rawTags) {
+            return [];
+        }
+
+        $tagNames = collect(explode(',', $rawTags))
+            ->map(fn($name) => trim($name))
+            ->filter() // 空文字を除外
+            ->unique() // 重複を除外
+            ->take(10) // 最大10件までに制限
+            ->values(); // キーを 0,1,2,... に振り直す
+
+        if ($tagNames->isEmpty()) {
+            return [];
+        }
+
+        $tagIds = [];
+        foreach ($tagNames as $name) {
+            // タグ名が既に存在する場合はそのIDを、存在しない場合は新規作成してIDを取得
+            $tag = Tag::firstOrCreate(['name' => $name]);
+            $tagIds[] = $tag->id;
+        }
+
+        return $tagIds;
     }
 }

@@ -22,6 +22,21 @@
   color: #888;
 }
 
+/* 投稿フォーム内のタグ入力欄 */
+.post-form input[type="text"] {
+  background: #111;
+  color: #e6e6e6;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 6px 0;
+}
+
+/* 投稿フォーム内の画像ファイル入力欄 */
+.post-form input[type="file"] {
+  margin: 6px 0 10px;
+}
+
 /* 投稿フォーム内の投稿ボタン */
 .post-form button {
   background-color: #1da1f2;

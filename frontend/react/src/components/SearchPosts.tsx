@@ -6,22 +6,15 @@ import SidebarLayout from "./SidebarLayout";
 import PostItem from "./PostItem";
 import "../styles/SearchPosts.css";
 import { createPostActions } from "../utils/createPostActions";
-
-interface Post {
-  id: number;
-  user: { name: string | null };
-  content: string;
-  created_at: string;
-  image_base64?: string | null;
-}
+import { Post } from "../types/post";
 
 /**
  * 投稿検索画面コンポーネント。
  *
- * @param user - ログイン中のユーザ名
+ * @param loggedInUserName - ログイン中のユーザ名
  * @returns JSX.Element
  */
-function SearchPosts({ user }: { user: string | null }) {
+function SearchPosts({ loggedInUserName }: { loggedInUserName: string | null }) {
   const [keyword, setKeyword] = useState<string>(""); // 検索キーワードを管理
   const [results, setResults] = useState<Post[]>([]); // 検索にヒットした投稿一覧を管理
   const [isComposing, setIsComposing] = useState(false); // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
@@ -45,7 +38,7 @@ function SearchPosts({ user }: { user: string | null }) {
   const { deletePost, updatePost } = createPostActions(handleSearch);
 
   return (
-    <SidebarLayout user={user}>
+    <SidebarLayout loggedInUserName={loggedInUserName}>
       {/* 検索バー */}
       <div className="search-box">
         <input
@@ -68,7 +61,7 @@ function SearchPosts({ user }: { user: string | null }) {
       {/* 検索結果の表示 */}
       <div>
         {results.map((post) => (
-          <PostItem key={post.id} post={post} currentUser={user} onDelete={deletePost} onUpdate={updatePost} />
+          <PostItem key={post.id} post={post} loggedInUserName={loggedInUserName} onDelete={deletePost} onUpdate={updatePost} onRefresh={handleSearch} />
         ))}
       </div>
     </SidebarLayout>

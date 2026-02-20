@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CommentStoreRequest;
 use App\Models\Post;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -57,7 +59,7 @@ class PostController extends Controller
             $post = $this->postService->create($request->user(), $validated);
 
             Log::info('[投稿作成] データの作成に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
-            return response()->json(['message' => '投稿データを作成しました。', 'data' => $post->load('user')], 201);
+            return response()->json(['message' => '投稿データを作成しました。', 'data' => $post], 201);
         } catch (\Throwable $e) {
             Log::error('[投稿作成] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
@@ -119,7 +121,7 @@ class PostController extends Controller
             $post = $this->postService->update($post, $validated);
 
             Log::info('[投稿更新] データの更新に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
-            return response()->json(['message' => '投稿データを更新しました。', 'data' => $post->load('user')], 200);
+            return response()->json(['message' => '投稿データを更新しました。', 'data' => $post], 200);
         } catch (\Throwable $e) {
             Log::error('[投稿更新] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
@@ -146,6 +148,56 @@ class PostController extends Controller
             return response()->json(['message' => 'キーワード検索に一致した投稿データを取得しました。', 'data' => $posts], 200);
         } catch (\Throwable $e) {
             Log::error('[投稿検索] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
+        }
+    }
+
+    /**
+     * コメントデータを作成
+     *
+     * @param CommentStoreRequest $request コメント本文を含むリクエスト
+     * @param Post $post コメント先の投稿
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeComment(CommentStoreRequest $request, Post $post)
+    {
+        Log::info('[コメント作成] 処理を開始します。');
+
+        try {
+            $validated = $request->validated();
+            $comment = $this->postService->createComment($post, $request->user(), $validated['content']);
+
+            Log::info('[コメント作成] データの作成に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
+            return response()->json(['message' => 'コメントを作成しました。', 'data' => $comment], 201);
+        } catch (\Throwable $e) {
+            Log::error('[コメント作成] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
+        }
+    }
+
+    /**
+     * コメントデータを削除
+     *
+     * @param Comment $comment 対象コメント
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroyComment(Comment $comment)
+    {
+        Log::info('[コメント削除] 処理を開始します。');
+
+        try {
+            $user = Auth::user();
+
+            if ($comment->user_id !== $user->id) {
+                return response()->json(['message' => '投稿者本人のコメントではないため、削除できません。'], 403);
+            }
+
+            $comment = $this->postService->deleteComment($comment);
+
+            Log::info('[コメント削除] データの削除に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
+            return response()->json(['message' => 'コメントを削除しました。', 'data' => $comment], 200);
+        } catch (\Throwable $e) {
+            Log::error('[コメント削除] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }
     }
