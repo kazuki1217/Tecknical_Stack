@@ -44,15 +44,15 @@ class PostServiceTest extends TestCase
     }
 
     /**
-     * キーワード未指定の場合は空コレクションになることを確認する
+     * 空文字キーワードの場合は空コレクションになることを確認する
      */
-    public function test_search_returns_empty_collection_when_keyword_is_null(): void
+    public function test_search_returns_empty_collection_when_keyword_is_empty_string(): void
     {
-        // 検索キーワードが無いケースを想定する
+        // 検索キーワードが空文字のケースを想定する
         $service = new PostService();
 
         // 空のコレクションが返ることを確認する
-        $this->assertTrue($service->search(null)->isEmpty());
+        $this->assertTrue($service->search('')->isEmpty());
     }
 
     /**
