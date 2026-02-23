@@ -25,7 +25,7 @@
 | フロントエンド |  Node.js, Vite, TypeScript, React, HTML, CSS |
 | バックエンド | PHP-FPM, PHP, Larave, RESTful API, APIトークン認証 |
 | データベース | MySQL, phpMyAdmin |
-| インフラ | AWS Lightsail, Route 53, Linux, Docker（マルチコンテナ構成）, Nginx (HTTPS対応), Mailpit|
+| インフラ | AWS Lightsail, Route 53, Linux, Docker（マルチコンテナ構成）, Nginx (HTTPS対応), Mailpit, Swagger UI|
 | その他 | Windows 11, macOS（M1）, VSCode, Codex|
 
 <br>
@@ -36,15 +36,15 @@
 <table>
   <tr>
     <td>API仕様書</td>
-    <td>https://drive.google.com/file/d/1sxDLyl4k6MclzXv9wF6pt54K82BmdbkR/view?usp=drive_link</td>
+    <td>https://tecknical-stack.com/swagger/</td>
   </tr>
   <tr>
     <td>ER図</td>
-    <td>https://drive.google.com/file/d/1vUoyyXPO4wGQjWshCElPLsJWU1Rozrcd/view?usp=drive_link</td>
+    <td>https://drive.google.com/file/d/15Kd0Uj8qotax89-T8h6T86mNoCkUcNbO/view?usp=drive_link</td>
   </tr>
   <tr>
     <td>テーブル定義書</td>
-    <td>https://drive.google.com/file/d/1L6Y48aPuIeCGPCFdQW_NbMewZPmVLxQo/view?usp=drive_link</td>
+    <td>https://docs.google.com/spreadsheets/d/1ZPOSIcpXlJsZoPeQGQVwp6CLlsZXchHMbivNd0aBBik/edit?gid=0#gid=0</td>
   </tr>
 </table>
 
@@ -62,6 +62,8 @@
 |-|-|
 | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 22 25 44" src="https://github.com/user-attachments/assets/791b82fc-0c60-4c80-b783-30240e3540a2" /> | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 22 27 02" src="https://github.com/user-attachments/assets/74a59c2f-5cd2-46eb-bf4a-ca7abd3ae8cb" /> |
 |全ユーザーの投稿内容を一覧で表示する機能を実装しました。また画面上部からテキストと画像を投稿できる機能も実装しました。ユーザー自身が投稿したものは編集・削除が可能です。|検索キーワードにヒットした投稿内容を表示する機能を実装しました。こちらでもユーザー自身が投稿したものは編集・削除が可能です。　　|
+
+※ハッシュタグ検索・投稿へのコメント機能も追加実装しております。
 
 <br>
 
