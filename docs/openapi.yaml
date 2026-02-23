@@ -1,0 +1,851 @@
+openapi: 3.0.3
+info:
+  title: Tecknical Stack API
+  version: 1.0.0
+  description: Tecknical Stack の既存 API 仕様
+servers:
+  - url: http://localhost
+    description: Local
+tags:
+  - name: Auth
+  - name: Posts
+  - name: Comments
+  - name: Health
+paths:
+  /api/register:
+    post:
+      tags: [Auth]
+      summary: アカウント登録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, password_confirmation]
+              properties:
+                name:
+                  type: string
+                  example: sample1
+                email:
+                  type: string
+                  format: email
+                  example: sample1@example.com
+                password:
+                  type: string
+                  minLength: 6
+                  example: sample1pass
+                password_confirmation:
+                  type: string
+                  minLength: 6
+                  example: sample1pass
+      responses:
+        "201":
+          description: 登録成功
+          content:
+            application/json:
+              example:
+                message: アカウント登録が正常に完了しました。
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "422":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/login:
+    post:
+      tags: [Auth]
+      summary: ログイン
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: sample1@example.com
+                password:
+                  type: string
+                  minLength: 6
+                  example: sample1pass
+      responses:
+        "200":
+          description: 認証成功
+          content:
+            application/json:
+              example:
+                message: ログイン認証が正常に完了しました。
+                data:
+                  token: 1|example-token
+                  name: sample1
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      name:
+                        type: string
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              example:
+                message: ログイン認証に失敗しました。
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+        "429":
+          description: 試行回数制限
+          content:
+            application/json:
+              example:
+                message: 短時間でのログイン試行回数が多すぎます。60秒後に再試行してください。
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/user:
+    get:
+      tags: [Auth]
+      summary: ログイン中ユーザー情報取得
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              example:
+                message: ログイン状態のユーザー情報を取得しました。
+                data:
+                  name: sample1
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        nullable: true
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/posts:
+    get:
+      tags: [Posts]
+      summary: 投稿一覧取得
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              example:
+                message: 全ての投稿データを取得しました。
+                data:
+                  - id: 1
+                    user_id: 1
+                    content: クラゲですー
+                    image_mime: image/jpeg
+                    image_base64: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...
+                    created_at: 2026-02-23T10:00:00Z
+                    updated_at: 2026-02-23T10:00:00Z
+                    user:
+                      id: 1
+                      name: sample1
+                    tags:
+                      - id: 1
+                        name: 海
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        pivot:
+                          post_id: 1
+                          tag_id: 1
+                          created_at: 2026-02-23T10:00:00Z
+                          updated_at: 2026-02-23T10:00:00Z
+                      - id: 2
+                        name: クラゲ
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        pivot:
+                          post_id: 1
+                          tag_id: 2
+                          created_at: 2026-02-23T10:00:00Z
+                          updated_at: 2026-02-23T10:00:00Z
+                    comments:
+                      - id: 1
+                        post_id: 1
+                        user_id: 1
+                        content: 癒される。
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        user:
+                          id: 1
+                          name: sample1
+                      - id: 2
+                        post_id: 1
+                        user_id: 2
+                        content: きれい。
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        user:
+                          id: 2
+                          name: sample2
+              schema:
+                $ref: "#/components/schemas/PostListResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    post:
+      tags: [Posts]
+      summary: 投稿作成
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  maxLength: 1000
+                tags:
+                  type: string
+                  nullable: true
+                  description: カンマ区切り
+                  example: Laravel,React
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  maxLength: 1000
+                  nullable: true
+                image:
+                  type: string
+                  format: binary
+                  nullable: true
+                tags:
+                  type: string
+                  nullable: true
+                  description: カンマ区切り
+                  example: Laravel,React
+      responses:
+        "201":
+          description: 作成成功
+          content:
+            application/json:
+              example:
+                message: 投稿データを作成しました。
+                data:
+                  id: 1
+                  user_id: 1
+                  content: クラゲですー
+                  image_mime: image/jpeg
+                  image_base64: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...
+                  created_at: 2026-02-23T10:00:00Z
+                  updated_at: 2026-02-23T10:00:00Z
+                  user:
+                    id: 1
+                    name: sample1
+                  tags:
+                    - id: 1
+                      name: 海
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      pivot:
+                        post_id: 1
+                        tag_id: 1
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                    - id: 2
+                      name: クラゲ
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      pivot:
+                        post_id: 1
+                        tag_id: 2
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+              schema:
+                $ref: "#/components/schemas/PostSingleResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "422":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/posts/{post}:
+    patch:
+      tags: [Posts]
+      summary: 投稿更新
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: post
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  maxLength: 1000
+                tags:
+                  type: string
+                  nullable: true
+                  description: カンマ区切り
+                  example: Laravel,React
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              example:
+                message: 投稿データを更新しました。
+                data:
+                  id: 1
+                  user_id: 1
+                  content: クラゲですー
+                  image_mime: image/jpeg
+                  image_base64: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...
+                  created_at: 2026-02-23T10:00:00Z
+                  updated_at: 2026-02-23T10:10:00Z
+                  user:
+                    id: 1
+                    name: sample1
+                  tags:
+                    - id: 1
+                      name: 海
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      pivot:
+                        post_id: 1
+                        tag_id: 1
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                    - id: 2
+                      name: クラゲ
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      pivot:
+                        post_id: 1
+                        tag_id: 2
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                  comments:
+                    - id: 1
+                      post_id: 1
+                      user_id: 1
+                      content: 癒される。
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      user:
+                        id: 1
+                        name: sample1
+                    - id: 2
+                      post_id: 1
+                      user_id: 2
+                      content: きれい。
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      user:
+                        id: 2
+                        name: sample2
+              schema:
+                $ref: "#/components/schemas/PostSingleResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "403":
+          description: 権限なし
+          content:
+            application/json:
+              example:
+                message: 投稿者本人の投稿データではないため、許可されていません。
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      tags: [Posts]
+      summary: 投稿削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: post
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 削除成功
+          content:
+            application/json:
+              example:
+                message: 投稿データを削除しました。
+                data:
+                  id: 1
+                  user_id: 1
+                  content: クラゲですー
+                  image_mime: image/jpeg
+                  image_base64: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...
+                  created_at: 2026-02-23T10:00:00Z
+                  updated_at: 2026-02-23T10:00:00Z
+                  user:
+                    id: 1
+                    name: sample1
+                  tags:
+                    - id: 1
+                      name: 海
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      pivot:
+                        post_id: 1
+                        tag_id: 1
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                    - id: 2
+                      name: クラゲ
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      pivot:
+                        post_id: 1
+                        tag_id: 2
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                  comments:
+                    - id: 1
+                      post_id: 1
+                      user_id: 1
+                      content: 癒される。
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      user:
+                        id: 1
+                        name: sample1
+                    - id: 2
+                      post_id: 1
+                      user_id: 2
+                      content: きれい。
+                      created_at: 2026-02-23T10:00:00Z
+                      updated_at: 2026-02-23T10:00:00Z
+                      user:
+                        id: 2
+                        name: sample2
+              schema:
+                $ref: "#/components/schemas/PostSingleResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "403":
+          description: 権限なし
+          content:
+            application/json:
+              example:
+                message: 投稿者本人の投稿データではないため、削除できません。
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/posts/search:
+    get:
+      tags: [Posts]
+      summary: 投稿検索
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content
+          in: query
+          required: true
+          schema:
+            type: string
+          example: クラゲ #海
+      responses:
+        "200":
+          description: 検索成功
+          content:
+            application/json:
+              example:
+                message: 検索条件に一致した投稿データを取得しました。
+                data:
+                  - id: 1
+                    user_id: 1
+                    content: クラゲですー
+                    image_mime: image/jpeg
+                    image_base64: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...
+                    created_at: 2026-02-23T10:00:00Z
+                    updated_at: 2026-02-23T10:00:00Z
+                    user:
+                      id: 1
+                      name: sample1
+                    tags:
+                      - id: 1
+                        name: 海
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        pivot:
+                          post_id: 1
+                          tag_id: 1
+                          created_at: 2026-02-23T10:00:00Z
+                          updated_at: 2026-02-23T10:00:00Z
+                      - id: 2
+                        name: クラゲ
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        pivot:
+                          post_id: 1
+                          tag_id: 2
+                          created_at: 2026-02-23T10:00:00Z
+                          updated_at: 2026-02-23T10:00:00Z
+                    comments:
+                      - id: 1
+                        post_id: 1
+                        user_id: 1
+                        content: 癒される。
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        user:
+                          id: 1
+                          name: sample1
+                      - id: 2
+                        post_id: 1
+                        user_id: 2
+                        content: きれい。
+                        created_at: 2026-02-23T10:00:00Z
+                        updated_at: 2026-02-23T10:00:00Z
+                        user:
+                          id: 2
+                          name: sample2
+              schema:
+                $ref: "#/components/schemas/PostListResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "422":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/posts/{post}/comments:
+    post:
+      tags: [Comments]
+      summary: コメント作成
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: post
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  maxLength: 500
+                  example: すごく参考になりました
+      responses:
+        "201":
+          description: 作成成功
+          content:
+            application/json:
+              example:
+                message: コメントを作成しました。
+                data:
+                  id: 1
+                  post_id: 1
+                  user_id: 1
+                  content: 癒される。
+                  created_at: 2026-02-23T10:00:00Z
+                  updated_at: 2026-02-23T10:00:00Z
+                  user:
+                    id: 1
+                    name: sample1
+              schema:
+                $ref: "#/components/schemas/CommentSingleResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "422":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/comments/{comment}:
+    delete:
+      tags: [Comments]
+      summary: コメント削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: comment
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 削除成功
+          content:
+            application/json:
+              example:
+                message: コメントを削除しました。
+                data:
+                  id: 1
+                  post_id: 1
+                  user_id: 1
+                  content: 癒される。
+                  created_at: 2026-02-23T10:00:00Z
+                  updated_at: 2026-02-23T10:00:00Z
+                  user:
+                    id: 1
+                    name: sample1
+              schema:
+                $ref: "#/components/schemas/CommentSingleResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "403":
+          description: 権限なし
+          content:
+            application/json:
+              example:
+                message: 投稿者本人のコメントではないため、削除できません。
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/health:
+    get:
+      tags: [Health]
+      summary: ヘルスチェック
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              example:
+                message: 正常に稼働しています。
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+  responses:
+    UnauthorizedToken:
+      description: 認証失敗（トークン無効または期限切れ）
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MessageResponse"
+          example:
+            message: 認証に失敗しました。トークンが無効または期限切れです。再度ログインしてください。
+    InternalServerError:
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MessageResponse"
+          example:
+            message: サーバー側でエラーが発生しました。
+  schemas:
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: サーバー側でエラーが発生しました。
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 入力内容に誤りがあります。
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          nullable: true
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        post_id:
+          type: integer
+        user_id:
+          type: integer
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/UserRef"
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        content:
+          type: string
+          nullable: true
+        image_mime:
+          type: string
+          nullable: true
+        image_base64:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/UserRef"
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+              updated_at:
+                type: string
+                format: date-time
+              pivot:
+                type: object
+                properties:
+                  post_id:
+                    type: integer
+                  tag_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+
+    PostListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+
+    PostSingleResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/Post"
+
+    CommentSingleResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/Comment"
