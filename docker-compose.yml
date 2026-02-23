@@ -24,19 +24,6 @@ services:
       - tecknical_stack_default
     profiles: ["dev"]
 
-    # Swagger UI（API仕様確認）
-  swagger-ui:
-    image: swaggerapi/swagger-ui:latest
-    ports:
-      - "8082:8080"
-    environment:
-      SWAGGER_JSON: /app/openapi.yaml
-    volumes:
-      - ./docs/openapi.yaml:/app/openapi.yaml:ro
-    networks:
-      - tecknical_stack_default
-    profiles: ["dev"]
-
   # Nginx（本番用Webサーバ）
   web-prod:
     build:
@@ -111,6 +98,18 @@ services:
       PMA_PORT: 3306
     depends_on:
       - db
+    networks:
+      - tecknical_stack_default
+
+  # Swagger UI（API仕様確認）
+  swagger-ui:
+    image: swaggerapi/swagger-ui:latest
+    ports:
+      - "8082:8080"
+    environment:
+      SWAGGER_JSON: /app/openapi.yaml
+    volumes:
+      - ./docs/openapi.yaml:/app/openapi.yaml:ro
     networks:
       - tecknical_stack_default
 
