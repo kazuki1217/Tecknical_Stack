@@ -95,21 +95,53 @@ class PostService
     }
 
     /**
-     * キーワードで投稿を検索する
+     * 投稿を検索する
      *
-     * @param string|null $keyword 検索キーワード
+     * @param string $content 検索キーワードやハッシュタグを含む文字列（例: "海 クラゲ #夜"）
      * @return Collection<int, Post> 検索結果
      */
-    public function search(?string $keyword): Collection
+    public function search(string $content): Collection
     {
-        if (! $keyword) {
+        // 空白（全角・半角・連続）を半角スペースに統一し、前後の空白を削除
+        $normalizedKeyword = trim((string) preg_replace('/(?:\x{3000}|[[:space:]])+/u', ' ', $content));
+        if ($normalizedKeyword === '') {
             return collect();
         }
 
-        return Post::with(['user', 'tags', 'comments.user']) // ユーザー・タグ・コメント情報を含める
-            ->orderByDesc('created_at') // 作成日が新しい順に並べ替え
-            ->where('content', 'LIKE', "%{$keyword}%") // 投稿データの本文に部分一致するデータを抽出
-            ->get(); // 一致データを取得
+        // 半角スペースで単語を分割し、重複を除外
+        $terms = array_values(array_unique(array_filter(explode(' ', $normalizedKeyword), fn($token) => $token !== '')));
+
+        $hashtagTerms = []; // ハッシュタグを格納する配列
+        $keywordTerms = []; // 検索キーワードを格納する配列
+        foreach ($terms as $term) {
+            // 先頭が # の場合はハッシュタグとして扱い、その他は検索キーワードとして扱う
+            if (str_starts_with($term, '#')) {
+                $tagName = ltrim($term, '#');
+                if ($tagName !== '') {
+                    $hashtagTerms[] = $tagName;
+                }
+                continue;
+            }
+            $keywordTerms[] = $term;
+        }
+
+        // クエリビルダを使用して、キーワードとタグの両方の条件を満たす投稿を検索
+        $query = Post::with(['user', 'tags', 'comments.user'])
+            ->orderByDesc('created_at');
+
+        // 検索キーワードが複数ある場合は全てを含む投稿を対象とする（AND条件）
+        foreach ($keywordTerms as $keywordTerm) {
+            $query->where('content', 'LIKE', "%{$keywordTerm}%");
+        }
+
+        // ハッシュタグが複数ある場合は全てを含む投稿を対象とする（AND条件）
+        foreach ($hashtagTerms as $hashtagTerm) {
+            $query->whereHas('tags', function ($tagQuery) use ($hashtagTerm) {
+                $tagQuery->where('name', 'LIKE', "%{$hashtagTerm}%");
+            });
+        }
+
+        return $query->get();
     }
 
     /**

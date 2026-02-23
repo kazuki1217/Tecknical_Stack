@@ -138,14 +138,18 @@ class PostController extends Controller
     {
         Log::info('[投稿検索] 処理を開始します。');
 
-        try {
-            $keyword = $request->query('keyword');
-            Log::debug('[投稿検索] 検索バーに入力した文字', ['キーワード' => $keyword]);
+        $validated = $request->validate([
+            'content' => 'required|string',
+        ]);
 
-            // 検索バーに入力した文字が存在した場合
-            $posts = $this->postService->search($keyword);
+        try {
+            $content = $validated['content'];
+            Log::debug('[投稿検索] 検索条件: ' . $content);
+
+            // 検索条件に一致した投稿データを取得
+            $posts = $this->postService->search($content);
             Log::info('[投稿検索] 一致したデータの取得に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
-            return response()->json(['message' => 'キーワード検索に一致した投稿データを取得しました。', 'data' => $posts], 200);
+            return response()->json(['message' => '検索条件に一致した投稿データを取得しました。', 'data' => $posts], 200);
         } catch (\Throwable $e) {
             Log::error('[投稿検索] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
