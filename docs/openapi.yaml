@@ -2,10 +2,9 @@ openapi: 3.0.3
 info:
   title: Tecknical Stack API
   version: 1.0.0
-  description: Tecknical Stack の既存 API 仕様
+  description: フロントエンド開発者が Laravel の API を利用することを想定し、作成いたしました。※本ドキュメントはポートフォリオ用途として公開しています。実運用においては、セキュリティ観点から公開範囲を制限する想定です。
 servers:
-  - url: http://localhost
-    description: Local
+  - url: https://tecknical-stack.com
 tags:
   - name: Auth
   - name: Posts
