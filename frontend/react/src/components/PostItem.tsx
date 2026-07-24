@@ -7,7 +7,7 @@ import "../styles/PostItem.css";
 
 interface PostItemProps {
   post: Post;
-  loggedInUserName: string | null;
+  loggedInUserId: number | null;
   onDelete: (id: number) => void;
   onUpdate: (id: number, content: string) => void;
   onRefresh: () => Promise<void>;
@@ -18,13 +18,13 @@ interface PostItemProps {
  * 投稿アイテムコンポーネント（投稿1件の表示および編集・削除・コメント操作）
  *
  * @param post - 表示対象の投稿データ
- * @param loggedInUserName - 現在ログイン中のユーザ名（投稿者と一致する場合、操作ボタンを表示）
+ * @param loggedInUserId - 現在ログイン中のユーザーID（投稿者と一致する場合、操作ボタンを表示）
  * @param onDelete - 投稿削除時に呼び出される関数（idを引数に取る）
  * @param onUpdate - 投稿更新時に呼び出される関数（idと更新後contentを引数に取る）
  * @param onRefresh - コメントの追加/削除後に再取得する関数
  * @returns JSX.Element
  */
-function PostItem({ post, loggedInUserName, onDelete, onUpdate, onRefresh }: PostItemProps) {
+function PostItem({ post, loggedInUserId, onDelete, onUpdate, onRefresh }: PostItemProps) {
   const [isEditing, setIsEditing] = useState(false); // 編集モードを管理
   const [editContent, setEditContent] = useState(post.content); // 編集中のテキスト情報を管理
   const [commentContent, setCommentContent] = useState(""); // 新規コメント入力
@@ -84,7 +84,7 @@ function PostItem({ post, loggedInUserName, onDelete, onUpdate, onRefresh }: Pos
           <strong>{post.user.name}</strong> ・ <span className="post-date">{formatPostDate(post.created_at)}</span>
         </span>
         {/* 投稿者が自分の場合のみ編集ボタン・削除ボタンを表示 */}
-        {post.user.name === loggedInUserName && (
+        {post.user.id === loggedInUserId && (
           <span className="post-actions">
             <button onClick={() => setIsEditing(true)} className="edit-button">
               編集
@@ -130,7 +130,7 @@ function PostItem({ post, loggedInUserName, onDelete, onUpdate, onRefresh }: Pos
                 <span>
                   <strong>{comment.user.name}</strong>: {comment.content}
                 </span>
-                {comment.user.name === loggedInUserName && (
+                {comment.user.id === loggedInUserId && (
                   <button className="comment-delete-button" onClick={() => handleCommentDelete(comment.id)}>
                     削除
                   </button>
