@@ -1,0 +1,1 @@
+../../../.agents/skills/bug-to-pr/SKILL.md
