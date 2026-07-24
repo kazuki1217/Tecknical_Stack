@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -82,16 +83,16 @@ class PostControllerTest extends TestCase
     /**
      * 投稿者以外が削除しようとすると拒否されることを確認する
      */
-    public function test_user_cannot_delete_others_post(): void
+    public function test_user_cannot_delete_same_named_users_post(): void
     {
         // 投稿者と別ユーザーを用意する
         $owner = User::create([
-            'name' => 'オーナー',
+            'name' => '同名ユーザー',
             'email' => 'owner_' . Str::random(10) . '@example.com',
             'password' => Hash::make('password'),
         ]);
         $other = User::create([
-            'name' => '他ユーザー',
+            'name' => '同名ユーザー',
             'email' => 'other_' . Str::random(10) . '@example.com',
             'password' => Hash::make('password'),
         ]);
@@ -107,5 +108,37 @@ class PostControllerTest extends TestCase
 
         // DBに期待通りのデータが保存されているか確認する
         $this->assertDatabaseHas('posts', ['id' => $post->id]);
+    }
+
+    /**
+     * 同名の別ユーザーが他人のコメントを削除できないことを確認する
+     */
+    public function test_user_cannot_delete_same_named_users_comment(): void
+    {
+        // 表示名が同じでもIDが異なる2ユーザーを用意する
+        $owner = User::create([
+            'name' => '同名ユーザー',
+            'email' => 'owner_' . Str::random(10) . '@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $other = User::create([
+            'name' => '同名ユーザー',
+            'email' => 'other_' . Str::random(10) . '@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $post = Post::create(['user_id' => $owner->id, 'content' => 'コメント対象']);
+        $comment = Comment::create([
+            'post_id' => $post->id,
+            'user_id' => $owner->id,
+            'content' => '削除できないコメント',
+        ]);
+        Sanctum::actingAs($other);
+
+        // 同名でもユーザーIDが異なるため削除を拒否する
+        $response = $this->deleteJson("/api/comments/{$comment->id}");
+
+        $response->assertStatus(403)
+            ->assertJson(['message' => '投稿者本人のコメントではないため、削除できません。']);
+        $this->assertDatabaseHas('comments', ['id' => $comment->id]);
     }
 }

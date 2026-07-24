@@ -10,10 +10,11 @@ import { Post } from "../types/post";
 /**
  * 投稿一覧画面コンポーネント
  *
+ * @param loggedInUserId - ログイン中のユーザーID
  * @param loggedInUserName - ログイン中のユーザ名
  * @returns JSX.Element
  */
-function PostList({ loggedInUserName }: { loggedInUserName: string | null }) {
+function PostList({ loggedInUserId, loggedInUserName }: { loggedInUserId: number | null; loggedInUserName: string | null }) {
   const [posts, setPosts] = useState<Post[]>([]); // 投稿一覧を管理
 
   useEffect(() => {
@@ -67,7 +68,7 @@ function PostList({ loggedInUserName }: { loggedInUserName: string | null }) {
       {/* 投稿一覧 */}
       <div>
         {posts.map((post) => (
-          <PostItem key={post.id} post={post} loggedInUserName={loggedInUserName} onDelete={deletePost} onUpdate={updatePost} onRefresh={fetchPosts} />
+          <PostItem key={post.id} post={post} loggedInUserId={loggedInUserId} onDelete={deletePost} onUpdate={updatePost} onRefresh={fetchPosts} />
         ))}
       </div>
     </SidebarLayout>

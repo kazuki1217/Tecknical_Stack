@@ -88,6 +88,7 @@ paths:
                 message: ログイン認証が正常に完了しました。
                 data:
                   token: 1|example-token
+                  id: 1
                   name: sample1
               schema:
                 type: object
@@ -99,6 +100,8 @@ paths:
                     properties:
                       token:
                         type: string
+                      id:
+                        type: integer
                       name:
                         type: string
         "401":
@@ -140,6 +143,7 @@ paths:
               example:
                 message: ログイン状態のユーザー情報を取得しました。
                 data:
+                  id: 1
                   name: sample1
               schema:
                 type: object
@@ -149,6 +153,8 @@ paths:
                   data:
                     type: object
                     properties:
+                      id:
+                        type: integer
                       name:
                         type: string
                         nullable: true

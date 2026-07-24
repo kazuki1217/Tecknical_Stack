@@ -6,6 +6,7 @@ import "../styles/Login.css";
 
 interface LoginProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean | null>>;
+  setLoggedInUserId: React.Dispatch<React.SetStateAction<number | null>>;
   setLoggedInUserName: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
@@ -13,10 +14,11 @@ interface LoginProps {
  * ログイン画面コンポーネント
  *
  * @param setIsLoggedIn - ログイン状態を更新する関数
+ * @param setLoggedInUserId - ログインしたユーザーIDを更新する関数
  * @param setLoggedInUserName - ログインしたユーザ名を更新する関数
  * @returns JSX.Element
  */
-function Login({ setIsLoggedIn, setLoggedInUserName }: LoginProps) {
+function Login({ setIsLoggedIn, setLoggedInUserId, setLoggedInUserName }: LoginProps) {
   const navigate = useNavigate();
   const [email, setEmail] = useState(""); // メールアドレスを管理
   const [password, setPassword] = useState(""); // パスワードを管理
@@ -33,6 +35,7 @@ function Login({ setIsLoggedIn, setLoggedInUserName }: LoginProps) {
       
       localStorage.setItem("token", res.data.data.token); // トークンをローカルストレージに保存（次回以降のリクエストに使用）
       setIsLoggedIn(true);
+      setLoggedInUserId(res.data.data.id);
       setLoggedInUserName(res.data.data.name);
       navigate("/posts");
     } catch (error: any) {
