@@ -10,7 +10,7 @@ default_permissions = "project-guard"
 
 [permissions.project-guard.filesystem.":workspace_roots"]
 "." = "write"
-"./.env" = "deny"
-"./backend/laravel/.env" = "deny"
-"./frontend/react/.env.pro" = "deny"
-"./frontend/react/.env.dev" = "deny"
+".env" = "deny"
+"backend/laravel/.env" = "deny"
+"frontend/react/.env.pro" = "deny"
+"frontend/react/.env.dev" = "deny"
