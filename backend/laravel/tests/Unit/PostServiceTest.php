@@ -26,10 +26,10 @@ class PostServiceTest extends TestCase
         // 投稿者を用意する
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
-        $service = new PostService();
+        $service = new PostService;
 
         // 画像付き投稿を作成する
         $image = UploadedFile::fake()->create('post.png', 10, 'image/png');
@@ -49,7 +49,7 @@ class PostServiceTest extends TestCase
     public function test_search_returns_empty_collection_when_keyword_is_empty_string(): void
     {
         // 検索キーワードが空文字のケースを想定する
-        $service = new PostService();
+        $service = new PostService;
 
         // 空のコレクションが返ることを確認する
         $this->assertTrue($service->search('')->isEmpty());
@@ -63,13 +63,13 @@ class PostServiceTest extends TestCase
         // 投稿データを用意する
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         Post::create(['user_id' => $user->id, 'content' => '数学を勉強中']);
         Post::create(['user_id' => $user->id, 'content' => '英語を勉強中']);
 
-        $service = new PostService();
+        $service = new PostService;
 
         // 検索結果が一致するものだけになることを確認する
         $results = $service->search('数学');
@@ -85,12 +85,12 @@ class PostServiceTest extends TestCase
         // 更新対象の投稿を用意する
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         $post = Post::create(['user_id' => $user->id, 'content' => '更新前の本文']);
 
-        $service = new PostService();
+        $service = new PostService;
         $updated = $service->update($post, ['content' => '更新後の本文']);
 
         // 更新結果が反映され、ユーザー情報も読み込まれることを確認する
@@ -107,12 +107,12 @@ class PostServiceTest extends TestCase
         // 削除対象の投稿を用意する
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         $post = Post::create(['user_id' => $user->id, 'content' => '削除対象']);
 
-        $service = new PostService();
+        $service = new PostService;
         $deleted = $service->delete($post);
 
         // 削除後にDBから消えていることを確認する

@@ -26,8 +26,9 @@ class Post extends Model
     public function getImageBase64Attribute()
     {
         if ($this->image_data && $this->image_mime) {
-            return 'data:' . $this->image_mime . ';base64,' . base64_encode($this->image_data);
+            return 'data:'.$this->image_mime.';base64,'.base64_encode($this->image_data);
         }
+
         return null;
     }
 
