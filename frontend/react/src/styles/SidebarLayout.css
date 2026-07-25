@@ -5,6 +5,7 @@
   position: fixed;
   padding-top: 30px;
   padding-left: 20px;
+  box-sizing: border-box;
 }
 
 /* サイドバーのユーザ名 */
@@ -44,4 +45,67 @@
   width: 45%;
   margin-left: 220px;
   box-sizing: border-box;
+}
+
+/* サイドバー開閉ボタン（スマホ・タブレット幅でのみ表示するため、PC幅では非表示） */
+.sidebar-toggle-button {
+  display: none;
+}
+
+/* サイドバーを開いたときの背景オーバーレイ（PC幅では未使用） */
+.sidebar-overlay {
+  display: none;
+}
+
+/* タブレット・スマホ幅（768px以下）ではサイドバーを畳んで開閉式にする */
+@media (max-width: 768px) {
+  /* サイドバー開閉ボタンを画面左上に固定表示 */
+  .sidebar-toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1da1f2;
+    color: #fff;
+    font-size: 18px;
+    z-index: 20;
+  }
+
+  /* 通常は画面外に隠しておき、開いたときだけスライドインさせる */
+  .sidebar {
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding-top: 70px;
+    background-color: #181818;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease-in-out;
+    z-index: 15;
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  /* サイドバーの背後を暗くして、外側クリックで閉じられるようにする */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+  }
+
+  /* サイドバー分の余白をなくし、画面幅いっぱいを使う */
+  .main-content {
+    width: 100%;
+    margin-left: 0;
+    padding: 70px 16px 16px;
+  }
 }

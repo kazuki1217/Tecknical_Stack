@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaList, FaSearch, FaSignOutAlt } from "react-icons/fa";
+import { FaList, FaSearch, FaSignOutAlt, FaBars, FaTimes } from "react-icons/fa";
 
 import "../styles/SidebarLayout.css";
 
@@ -19,6 +19,7 @@ interface SidebarLayoutProps {
  */
 function SidebarLayout({ loggedInUserName, children }: SidebarLayoutProps) {
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // スマホ・タブレット幅でのサイドバー開閉状態を管理
 
   /** ログアウト処理 */
   const handleLogout = () => {
@@ -27,13 +28,27 @@ function SidebarLayout({ loggedInUserName, children }: SidebarLayoutProps) {
     window.location.reload(); // App.tsx を再評価させて状態をリセット
   };
 
+  /** サイドバーの項目クリック時の共通処理（画面遷移後、狭い画面で開いていたサイドバーを閉じる） */
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setIsSidebarOpen(false);
+  };
+
   return (
     <div>
+      {/* サイドバー開閉ボタン（PC幅では非表示、スマホ・タブレット幅でのみ表示） */}
+      <button className="sidebar-toggle-button" onClick={() => setIsSidebarOpen((prev) => !prev)} aria-label="メニューを開閉">
+        {isSidebarOpen ? <FaTimes /> : <FaBars />}
+      </button>
+
+      {/* サイドバーを開いたときの背景オーバーレイ（クリックで閉じる） */}
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
+
       {/* サイドバー */}
-      <div className="sidebar">
+      <div className={`sidebar${isSidebarOpen ? " sidebar--open" : ""}`}>
         <div className="sidebar-username">{loggedInUserName} さん</div>
-        <SidebarItem icon={<FaList />} label="投稿一覧" onClick={() => navigate("/posts")} />
-        <SidebarItem icon={<FaSearch />} label="検索" onClick={() => navigate("/search")} />
+        <SidebarItem icon={<FaList />} label="投稿一覧" onClick={() => handleNavigate("/posts")} />
+        <SidebarItem icon={<FaSearch />} label="検索" onClick={() => handleNavigate("/search")} />
         <SidebarItem icon={<FaSignOutAlt />} label="ログアウト" onClick={() => handleLogout()} />
       </div>
 
