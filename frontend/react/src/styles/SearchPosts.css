@@ -38,3 +38,10 @@
 .search-box button:hover {
   background-color: #0d8ddb;
 }
+
+/* タブレット・スマホ幅（768px以下）では検索バーの左右余白を縮める */
+@media (max-width: 768px) {
+  .search-box {
+    padding: 20px 0;
+  }
+}
