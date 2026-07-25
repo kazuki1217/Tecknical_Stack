@@ -45,7 +45,7 @@ class AuthController extends Controller
      * ログイン認証処理
      *
      * @param LoginRequest $request ログイン情報（メールアドレス・パスワード）を含むリクエスト
-     * @return \Illuminate\Http\JsonResponse 成功時はトークンを返し、失敗時は失敗メッセージを返す
+     * @return \Illuminate\Http\JsonResponse 成功時はトークンとユーザー情報を返し、失敗時は失敗メッセージを返す
      */
     public function login(LoginRequest $request)
     {
@@ -68,7 +68,7 @@ class AuthController extends Controller
             $plainTextToken = $result['plainTextToken'];
             Log::debug('[ログイン] メールアドレスに一致したデータ', ['ユーザーID' => $user?->id, 'ユーザー名' => $user?->name]);
             Log::info('[ログイン] 認証に成功しました。', ['ユーザーID' => $user?->id, 'ユーザー名' => $user?->name]);
-            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'data' => ['token' => $plainTextToken, 'name' => $user->name]], 200);
+            return response()->json(['message' => 'ログイン認証が正常に完了しました。', 'data' => ['token' => $plainTextToken, 'id' => $user->id, 'name' => $user->name]], 200);
         } catch (\Throwable $e) {
             RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
             Log::error('[ログイン] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
@@ -80,7 +80,7 @@ class AuthController extends Controller
     /**
      * ログイン状態のユーザー情報を取得
      *
-     * @return \Illuminate\Http\JsonResponse 成功時はユーザー名を返し、失敗時は失敗メッセージを返す
+     * @return \Illuminate\Http\JsonResponse 成功時はユーザーIDとユーザー名を返し、失敗時は失敗メッセージを返す
      */
     public function loginSuccess()
     {
@@ -90,7 +90,7 @@ class AuthController extends Controller
             // トークン認証されたユーザー情報を取得
             $user = Auth::user();
             Log::info('[ログインユーザー] ユーザー名の取得に成功しました。', ['実行したユーザーID' => $user?->id]);
-            return response()->json(['message' => 'ログイン状態のユーザー情報を取得しました。', 'data' => ['name' => $user?->name]], 200);
+            return response()->json(['message' => 'ログイン状態のユーザー情報を取得しました。', 'data' => ['id' => $user?->id, 'name' => $user?->name]], 200);
         } catch (\Throwable $e) {
             Log::error('[ログインユーザー] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
