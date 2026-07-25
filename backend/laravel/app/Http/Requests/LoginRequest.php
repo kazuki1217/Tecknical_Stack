@@ -20,6 +20,7 @@ class LoginRequest extends FormRequest
     public function authorize(): bool
     {
         $this->ensureIsNotRateLimited();
+
         return true;
     }
 
@@ -42,7 +43,7 @@ class LoginRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         // バリデーション失敗もログイン試行としてカウント
-        $throttleKey = 'login:' . Str::lower($this->ip());
+        $throttleKey = 'login:'.Str::lower($this->ip());
         RateLimiter::hit($throttleKey, 60); // 失敗した回数を +1 加算
 
         Log::info('[ログイン] 入力内容に不備があったため、認証に失敗しました。');
@@ -61,7 +62,7 @@ class LoginRequest extends FormRequest
     protected function ensureIsNotRateLimited(): void
     {
         // リクエスト元の IPアドレスを取得
-        $throttleKey = 'login:' . Str::lower($this->ip());
+        $throttleKey = 'login:'.Str::lower($this->ip());
 
         // 直近60秒間で5回以上ログインに失敗した場合
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
@@ -72,7 +73,7 @@ class LoginRequest extends FormRequest
             Log::warning('[ログイン] 直近60秒での失敗回数が上限に達したため、試行を制限しました。', ['リクエスト元のIPアドレス' => $this->ip(), '制限した時間' => $seconds]);
             throw new HttpResponseException(
                 response()->json(
-                    ["message" => "短時間でのログイン試行回数が多すぎます。{$seconds}秒後に再試行してください。"],
+                    ['message' => "短時間でのログイン試行回数が多すぎます。{$seconds}秒後に再試行してください。"],
                     429
                 )
             );

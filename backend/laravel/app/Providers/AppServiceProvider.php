@@ -2,22 +2,21 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Monolog\Logger;
+use Illuminate\Support\ServiceProvider;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 use Monolog\LogRecord;
 
 class AppServiceProvider extends ServiceProvider
 {
-
     public function register(): void {}
 
     public function boot(): void
     {
-        Log::getLogger()->pushHandler(new class extends AbstractProcessingHandler {
-
+        Log::getLogger()->pushHandler(new class extends AbstractProcessingHandler
+        {
             // ログに出力するたびに、呼び出されるメソッド
             // $record にはログに出力された情報（発生時刻、レベル、メッセージなど）を含む
             protected function write(LogRecord $record): void
@@ -29,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
                         // ログに出力した内容を取得
                         $fullText = $record->formatted ?? sprintf(
-                            "[%s] %s.%s: %s %s",
+                            '[%s] %s.%s: %s %s',
                             now(),
                             app()->environment(),
                             $record->level->getName(),
@@ -37,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
                             $record->context ? json_encode($record->context, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : ''
                         );
 
-                        $body = "▼laravel.log ファイルに出力された内容\n\n" . $fullText;
+                        $body = "▼laravel.log ファイルに出力された内容\n\n".$fullText;
 
                         // Gmail（.envで設定したSMTP）を使ってメール送信
                         Mail::raw($body, function ($message) use ($subject) {
@@ -46,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
                         });
                     } catch (\Exception $e) {
                         // メール送信に失敗した場合、エラーログを出力
-                        Log::channel('single')->error('システムエラーの通知に失敗しました。: ' . $e->getMessage());
+                        Log::channel('single')->error('システムエラーの通知に失敗しました。: '.$e->getMessage());
                     }
                 }
             }

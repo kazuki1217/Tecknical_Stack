@@ -26,7 +26,7 @@ class PostControllerTest extends TestCase
         // 認証済みユーザーを用意する
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         Sanctum::actingAs($user);
@@ -57,7 +57,7 @@ class PostControllerTest extends TestCase
         // 既存投稿を準備する
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         $post = Post::create(['user_id' => $user->id, 'content' => '更新前']);
@@ -88,12 +88,12 @@ class PostControllerTest extends TestCase
         // 投稿者と別ユーザーを用意する
         $owner = User::create([
             'name' => '同名ユーザー',
-            'email' => 'owner_' . Str::random(10) . '@example.com',
+            'email' => 'owner_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         $other = User::create([
             'name' => '同名ユーザー',
-            'email' => 'other_' . Str::random(10) . '@example.com',
+            'email' => 'other_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         $post = Post::create(['user_id' => $owner->id, 'content' => '他人の投稿']);
@@ -118,12 +118,12 @@ class PostControllerTest extends TestCase
         // 表示名が同じでもIDが異なる2ユーザーを用意する
         $owner = User::create([
             'name' => '同名ユーザー',
-            'email' => 'owner_' . Str::random(10) . '@example.com',
+            'email' => 'owner_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         $other = User::create([
             'name' => '同名ユーザー',
-            'email' => 'other_' . Str::random(10) . '@example.com',
+            'email' => 'other_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
         $post = Post::create(['user_id' => $owner->id, 'content' => 'コメント対象']);

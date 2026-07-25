@@ -24,7 +24,7 @@ class AuthControllerTest extends TestCase
         // 登録リクエストを作成する
         $payload = [
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
         ];
@@ -45,7 +45,7 @@ class AuthControllerTest extends TestCase
     public function test_login_returns_token_on_success(): void
     {
         // 事前にユーザーを作成する
-        $email = 'user_' . Str::random(10) . '@example.com';
+        $email = 'user_'.Str::random(10).'@example.com';
         $user = User::create([
             'name' => 'テストユーザー',
             'email' => $email,
@@ -73,7 +73,7 @@ class AuthControllerTest extends TestCase
     public function test_login_returns_401_on_failure(): void
     {
         // 事前にユーザーを作成する
-        $email = 'user_' . Str::random(10) . '@example.com';
+        $email = 'user_'.Str::random(10).'@example.com';
         User::create([
             'name' => 'テストユーザー',
             'email' => $email,
@@ -99,7 +99,7 @@ class AuthControllerTest extends TestCase
         // 認証済みユーザーを用意する
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => Hash::make('password'),
         ]);
 

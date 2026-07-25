@@ -17,13 +17,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'created_at'
+        'created_at',
     ];
 
     // アカウント登録時、パスワードをハッシュ化して保存するように設定
     protected function casts(): array
     {
-        return ['password' => 'hashed',];
+        return ['password' => 'hashed'];
     }
 
     // APIレスポンス時に隠すカラムを設定
