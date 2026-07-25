@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Edit(./.env)",
+      "Bash(cat ./.env)",
+      "Bash(less ./.env)",
+      "Bash(head ./.env)",
+      "Bash(tail ./.env)",
+      "Read(./backend/laravel/.env)",
+      "Edit(./backend/laravel/.env)",
+      "Bash(cat ./backend/laravel/.env)",
+      "Bash(less ./backend/laravel/.env)",
+      "Bash(head ./backend/laravel/.env)",
+      "Bash(tail ./backend/laravel/.env)",
+      "Read(./frontend/react/.env.pro)",
+      "Edit(./frontend/react/.env.pro)",
+      "Bash(cat ./frontend/react/.env.pro)",
+      "Bash(less ./frontend/react/.env.pro)",
+      "Bash(head ./frontend/react/.env.pro)",
+      "Bash(tail ./frontend/react/.env.pro)",
+      "Read(./frontend/react/.env.dev)",
+      "Edit(./frontend/react/.env.dev)",
+      "Bash(cat ./frontend/react/.env.dev)",
+      "Bash(less ./frontend/react/.env.dev)",
+      "Bash(head ./frontend/react/.env.dev)",
+      "Bash(tail ./frontend/react/.env.dev)"
+    ]
+  }
+}

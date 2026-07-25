@@ -1,0 +1,16 @@
+# .env系ファイルの読み書きを禁止する設定
+# Claude Code側の .claude/settings.json (permissions.deny) も、
+# ここで指定した対象ファイルと同じものを禁止するように合わせてある。
+#
+# 注意: この設定は、プロジェクトを一度 "trusted" にしないと読み込まれない。
+default_permissions = "project-guard"
+
+[permissions.project-guard.filesystem]
+":minimal" = "read"
+
+[permissions.project-guard.filesystem.":workspace_roots"]
+"." = "write"
+"./.env" = "deny"
+"./backend/laravel/.env" = "deny"
+"./frontend/react/.env.pro" = "deny"
+"./frontend/react/.env.dev" = "deny"
