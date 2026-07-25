@@ -55,6 +55,7 @@ class CustomLineFormatter
 
         // リクエストIDを新規作成して返す
         $requestId = Str::lower(Str::random(8));
+
         return $requestId;
     }
 }

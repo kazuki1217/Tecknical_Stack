@@ -28,8 +28,8 @@ class PostService
     /**
      * 投稿を作成する
      *
-     * @param User $user 投稿者
-     * @param array<string, mixed> $validated バリデーション済み入力
+     * @param  User  $user  投稿者
+     * @param  array<string, mixed>  $validated  バリデーション済み入力
      * @return Post 作成された投稿
      */
     public function create(User $user, array $validated): Post
@@ -63,7 +63,7 @@ class PostService
     /**
      * 投稿を削除する
      *
-     * @param Post $post 対象の投稿
+     * @param  Post  $post  対象の投稿
      * @return Post 削除された投稿（ユーザー情報込み）
      */
     public function delete(Post $post): Post
@@ -77,8 +77,8 @@ class PostService
     /**
      * 投稿を更新する
      *
-     * @param Post $post 対象の投稿
-     * @param array<string, string> $validated バリデーション済み入力
+     * @param  Post  $post  対象の投稿
+     * @param  array<string, string>  $validated  バリデーション済み入力
      * @return Post 更新された投稿（ユーザー情報込み）
      */
     public function update(Post $post, array $validated): Post
@@ -97,7 +97,7 @@ class PostService
     /**
      * 投稿を検索する
      *
-     * @param string $content 検索キーワードやハッシュタグを含む文字列（例: "海 クラゲ #夜"）
+     * @param  string  $content  検索キーワードやハッシュタグを含む文字列（例: "海 クラゲ #夜"）
      * @return Collection<int, Post> 検索結果
      */
     public function search(string $content): Collection
@@ -109,7 +109,7 @@ class PostService
         }
 
         // 半角スペースで単語を分割し、重複を除外
-        $terms = array_values(array_unique(array_filter(explode(' ', $normalizedKeyword), fn($token) => $token !== '')));
+        $terms = array_values(array_unique(array_filter(explode(' ', $normalizedKeyword), fn ($token) => $token !== '')));
 
         $hashtagTerms = []; // ハッシュタグを格納する配列
         $keywordTerms = []; // 検索キーワードを格納する配列
@@ -120,6 +120,7 @@ class PostService
                 if ($tagName !== '') {
                     $hashtagTerms[] = $tagName;
                 }
+
                 continue;
             }
             $keywordTerms[] = $term;
@@ -147,9 +148,9 @@ class PostService
     /**
      * コメントを作成する
      *
-     * @param Post $post 対象の投稿
-     * @param User $user コメント投稿者
-     * @param string $content コメント本文
+     * @param  Post  $post  対象の投稿
+     * @param  User  $user  コメント投稿者
+     * @param  string  $content  コメント本文
      * @return Comment 作成されたコメント
      */
     public function createComment(Post $post, User $user, string $content): Comment
@@ -165,7 +166,7 @@ class PostService
     /**
      * コメントを削除する
      *
-     * @param Comment $comment 対象コメント
+     * @param  Comment  $comment  対象コメント
      * @return Comment 削除されたコメント
      */
     public function deleteComment(Comment $comment): Comment
@@ -179,7 +180,7 @@ class PostService
     /**
      * カンマ区切りのタグ文字列を tag_id 配列に変換する
      *
-     * @param string|null $rawTags 例: "Laravel,React,API"
+     * @param  string|null  $rawTags  例: "Laravel,React,API"
      * @return array<int, int> tag_id の配列
      */
     private function resolveTagIds(?string $rawTags): array
@@ -189,7 +190,7 @@ class PostService
         }
 
         $tagNames = collect(explode(',', $rawTags))
-            ->map(fn($name) => trim($name))
+            ->map(fn ($name) => trim($name))
             ->filter() // 空文字を除外
             ->unique() // 重複を除外
             ->take(10) // 最大10件までに制限

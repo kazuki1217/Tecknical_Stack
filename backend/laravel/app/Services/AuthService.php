@@ -13,7 +13,7 @@ class AuthService
     /**
      * ユーザー登録を行う
      *
-     * @param array<string, string> $validated 登録済みバリデーション済み入力
+     * @param  array<string, string>  $validated  登録済みバリデーション済み入力
      * @return User 作成されたユーザー
      */
     public function register(array $validated): User
@@ -29,8 +29,8 @@ class AuthService
     /**
      * ログイン認証を試み、成功時はユーザーとトークンを返す
      *
-     * @param string $email メールアドレス
-     * @param string $password パスワード
+     * @param  string  $email  メールアドレス
+     * @param  string  $password  パスワード
      * @return array{user: User, plainTextToken: string}|null 認証成功時のユーザーとトークン
      */
     public function attemptLogin(string $email, string $password): ?array

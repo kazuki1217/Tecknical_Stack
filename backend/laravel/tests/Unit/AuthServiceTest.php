@@ -22,10 +22,10 @@ class AuthServiceTest extends TestCase
     public function test_register_creates_user_with_hashed_password(): void
     {
         // 登録情報を用意する
-        $service = new AuthService();
+        $service = new AuthService;
         $payload = [
             'name' => 'テストユーザー',
-            'email' => 'user_' . Str::random(10) . '@example.com',
+            'email' => 'user_'.Str::random(10).'@example.com',
             'password' => 'password',
         ];
 
@@ -43,14 +43,14 @@ class AuthServiceTest extends TestCase
     public function test_attempt_login_returns_user_and_token_on_success(): void
     {
         // 事前にユーザーを作成する
-        $email = 'user_' . Str::random(10) . '@example.com';
+        $email = 'user_'.Str::random(10).'@example.com';
         $user = User::create([
             'name' => 'テストユーザー',
             'email' => $email,
             'password' => Hash::make('password'),
         ]);
 
-        $service = new AuthService();
+        $service = new AuthService;
 
         // ログイン認証を実行する
         $result = $service->attemptLogin($email, 'password');
@@ -70,19 +70,19 @@ class AuthServiceTest extends TestCase
     public function test_attempt_login_returns_null_on_failure(): void
     {
         // ユーザーを作成する
-        $email = 'user_' . Str::random(10) . '@example.com';
+        $email = 'user_'.Str::random(10).'@example.com';
         User::create([
             'name' => 'テストユーザー',
             'email' => $email,
             'password' => Hash::make('password'),
         ]);
 
-        $service = new AuthService();
+        $service = new AuthService;
 
         // パスワード不一致のケース
         $this->assertNull($service->attemptLogin($email, 'wrong-password'));
 
         // 存在しないメールアドレスのケース
-        $this->assertNull($service->attemptLogin('missing_' . Str::random(10) . '@example.com', 'password'));
+        $this->assertNull($service->attemptLogin('missing_'.Str::random(10).'@example.com', 'password'));
     }
 }
