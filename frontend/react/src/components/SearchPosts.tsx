@@ -11,10 +11,11 @@ import { Post } from "../types/post";
 /**
  * 投稿検索画面コンポーネント。
  *
+ * @param loggedInUserId - ログイン中のユーザーID
  * @param loggedInUserName - ログイン中のユーザ名
  * @returns JSX.Element
  */
-function SearchPosts({ loggedInUserName }: { loggedInUserName: string | null }) {
+function SearchPosts({ loggedInUserId, loggedInUserName }: { loggedInUserId: number | null; loggedInUserName: string | null }) {
   const [content, setContent] = useState<string>(""); // 検索キーワードやハッシュタグを管理
   const [results, setResults] = useState<Post[]>([]); // 検索にヒットした投稿一覧を管理
   const [isComposing, setIsComposing] = useState(false); // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
@@ -61,7 +62,7 @@ function SearchPosts({ loggedInUserName }: { loggedInUserName: string | null }) 
       {/* 検索結果の表示 */}
       <div>
         {results.map((post) => (
-          <PostItem key={post.id} post={post} loggedInUserName={loggedInUserName} onDelete={deletePost} onUpdate={updatePost} onRefresh={handleSearch} />
+          <PostItem key={post.id} post={post} loggedInUserId={loggedInUserId} onDelete={deletePost} onUpdate={updatePost} onRefresh={handleSearch} />
         ))}
       </div>
     </SidebarLayout>

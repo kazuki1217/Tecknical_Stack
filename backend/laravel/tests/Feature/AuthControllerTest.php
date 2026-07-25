@@ -46,7 +46,7 @@ class AuthControllerTest extends TestCase
     {
         // 事前にユーザーを作成する
         $email = 'user_' . Str::random(10) . '@example.com';
-        User::create([
+        $user = User::create([
             'name' => 'テストユーザー',
             'email' => $email,
             'password' => Hash::make('password'),
@@ -60,6 +60,7 @@ class AuthControllerTest extends TestCase
 
         // 成功レスポンスとトークン返却を確認する
         $response->assertStatus(200)
+            ->assertJsonPath('data.id', $user->id)
             ->assertJsonPath('data.name', 'テストユーザー')
             ->assertJsonPath('message', 'ログイン認証が正常に完了しました。');
 
@@ -93,7 +94,7 @@ class AuthControllerTest extends TestCase
     /**
      * ログイン中ユーザーの情報を取得できることを確認する
      */
-    public function test_login_success_returns_user_name(): void
+    public function test_login_success_returns_user_information(): void
     {
         // 認証済みユーザーを用意する
         $user = User::create([
@@ -107,8 +108,9 @@ class AuthControllerTest extends TestCase
         // ログインユーザー取得APIを呼び出す
         $response = $this->getJson('/api/user');
 
-        // 成功レスポンスとユーザー名を確認する
+        // 成功レスポンスとユーザーID・ユーザー名を確認する
         $response->assertStatus(200)
+            ->assertJsonPath('data.id', $user->id)
             ->assertJsonPath('data.name', 'テストユーザー')
             ->assertJsonPath('message', 'ログイン状態のユーザー情報を取得しました。');
     }
