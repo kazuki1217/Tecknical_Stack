@@ -18,12 +18,13 @@ class Authenticate implements AuthenticatesRequests
 
     public static function using($guard, ...$others)
     {
-        return static::class . ':' . implode(',', [$guard, ...$others]);
+        return static::class.':'.implode(',', [$guard, ...$others]);
     }
 
     public function handle($request, Closure $next, ...$guards)
     {
         $this->authenticate($request, $guards);
+
         return $next($request);
     }
 
@@ -41,9 +42,9 @@ class Authenticate implements AuthenticatesRequests
 
         // API認証エラーが発生した際、laravel のデフォルトの動作は "login" ルートへリダイレクトする仕組みになっている。
         // 今回は web.php を使用せず、すべてのリクエストを API 経由で処理するため、リダイレクト処理を無効化して例外を直接投げるよう修正
-        // 
+        //
         // 関連ファイル
-        // ・vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php 
+        // ・vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php
         // ・vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php
         throw new AuthenticationException('Unauthenticated.', $guards, null);
     }

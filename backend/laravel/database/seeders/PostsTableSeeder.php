@@ -18,7 +18,7 @@ class PostsTableSeeder extends Seeder
         $data = [];
 
         foreach ($images as $userId => $post) {
-            $imagePath = storage_path('app/public/' . $post['file']);
+            $imagePath = storage_path('app/public/'.$post['file']);
 
             if (file_exists($imagePath)) {
                 $imageData = file_get_contents($imagePath);
@@ -29,8 +29,8 @@ class PostsTableSeeder extends Seeder
             }
 
             $data[] = [
-                'user_id'    => $userId,
-                'content'    => $post['content'],
+                'user_id' => $userId,
+                'content' => $post['content'],
                 'image_mime' => $mimeType,
                 'image_data' => $imageData,
                 'created_at' => now(),
