@@ -4,7 +4,7 @@
 <table>
   <tr>
     <td>目的</td>
-    <td>Web開発の全体像を実践的に理解するために制作</td>
+    <td>Web開発の全体像を実践的に理解することを目的に制作。現在も学習の一環として、新しい開発手法の導入や運用環境の改善を不定期に実施。</td>
   </tr>
   <tr>
     <td>サービスのURL</td>
@@ -23,7 +23,7 @@
 | 分類 | 技術スタック |
 |-|-|
 | フロントエンド |  Node.js, Vite, TypeScript, React, HTML, CSS |
-| バックエンド | PHP-FPM, PHP, Larave, RESTful API, APIトークン認証 |
+| バックエンド | PHP-FPM, PHP, Laravel, RESTful API, APIトークン認証 |
 | データベース | MySQL, phpMyAdmin |
 | インフラ | AWS Lightsail, Route 53, Linux, Docker（マルチコンテナ構成）, Nginx (HTTPS対応), Mailpit, Swagger UI|
 | その他 | Windows 11, macOS（M1）, VSCode, Codex|
@@ -36,15 +36,15 @@
 <table>
   <tr>
     <td>API仕様書</td>
-    <td>https://tecknical-stack.com/swagger/</td>
+    <td><a href="https://tecknical-stack.com/swagger/">https://tecknical-stack.com/swagger/</a></td>
   </tr>
   <tr>
     <td>ER図</td>
-    <td>https://drive.google.com/file/d/15Kd0Uj8qotax89-T8h6T86mNoCkUcNbO/view?usp=drive_link</td>
+    <td><a href="https://drive.google.com/file/d/15Kd0Uj8qotax89-T8h6T86mNoCkUcNbO/view?usp=drive_link">https://drive.google.com/file/d/15Kd0Uj8qotax89-T8h6T86mNoCkUcNbO/view?usp=drive_link</a></td>
   </tr>
   <tr>
     <td>テーブル定義書</td>
-    <td>https://docs.google.com/spreadsheets/d/1ZPOSIcpXlJsZoPeQGQVwp6CLlsZXchHMbivNd0aBBik/edit?gid=0#gid=0</td>
+    <td><a href="https://docs.google.com/spreadsheets/d/1ZPOSIcpXlJsZoPeQGQVwp6CLlsZXchHMbivNd0aBBik/edit?gid=0#gid=0">https://docs.google.com/spreadsheets/d/1ZPOSIcpXlJsZoPeQGQVwp6CLlsZXchHMbivNd0aBBik/edit?gid=0#gid=0</a></td>
   </tr>
 </table>
 
@@ -69,7 +69,7 @@
 
 ## 環境構築の手順書
 
-### 0.　環境の前提条件
+### 0. 環境の前提条件
 
 以下の環境を満たしていることを確認してください。
 
@@ -77,7 +77,7 @@
 - 本リポジトリをローカルにクローン済みであること
 - プロジェクトのルートディレクトリに移動していること
 
-### 1.　Taskをインストール
+### 1. Taskをインストール
 
 以下のコマンドを実行し、「Task」をインストールします。<br>
 
@@ -92,7 +92,7 @@ task --version
 ```
 
 
-### 2. 　Nginx・React・Laravel等のイメージを作成
+### 2. Nginx・React・Laravel等のイメージを作成
 
 以下のコマンドを実行し、すべての環境を一括で構築します。
 
@@ -101,7 +101,7 @@ task setup
 ```
 
 
-### 3.　 .envの作成
+### 3. .envの作成
 
 以下のコマンドを実行し、`backend/laravel/.env.example` から `.env` を作成します。
 
@@ -143,7 +143,7 @@ MYSQL_PASSWORD=secret
 </details>
 
 
-### 4. 　Laravelのストレージ配下に画像を保存
+### 4. Laravelのストレージ配下に画像を保存
 
 以下の画像をダウンロードし、Tecknical_Stack/backend/laravel/storage/app/public 配下に保存します。
 
@@ -153,11 +153,11 @@ MYSQL_PASSWORD=secret
 
 <details>
 <summary>適切な保存状態</summary>
-<img width="311" height="413" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/6ce58cda-0bc0-4cc2-94e6-5055f94120c3" />
+<img width="311" height="413" alt="画像ファイルの正しい保存先ディレクトリ構成" src="https://github.com/user-attachments/assets/6ce58cda-0bc0-4cc2-94e6-5055f94120c3" />
 </details>
 
 
-### 5.　 DBの初期化
+### 5. DBの初期化
 
 以下のコマンドを実行し、DB に必要なテーブルやサンプルデータ等を作成します。
 
@@ -166,7 +166,7 @@ docker compose exec backend php artisan migrate:fresh --seed
 ```
 
 
-### 6. 　動作確認
+### 6. 動作確認
 
 以下のコマンドを実行し、Vite を開発モードで起動します。
 
@@ -183,10 +183,10 @@ docker compose exec frontend npm run dev
 
 <details>
 <summary>ログイン画面</summary>
-<img width="1919" height="824" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/42870286-e9be-4aa8-95d3-a49dc6a5c66a" />
+<img width="1919" height="824" alt="ログイン画面の表示例" src="https://github.com/user-attachments/assets/42870286-e9be-4aa8-95d3-a49dc6a5c66a" />
 </details>
 
 <details>
 <summary>投稿一覧画面</summary>
-<img width="1914" height="2472" alt="画像の表示に失敗しました。" src="https://github.com/user-attachments/assets/3253110a-6f42-49bf-aace-51eddaa110ff" />
+<img width="1914" height="2472" alt="投稿一覧画面の表示例" src="https://github.com/user-attachments/assets/3253110a-6f42-49bf-aace-51eddaa110ff" />
 </details>
