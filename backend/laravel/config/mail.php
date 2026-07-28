@@ -115,4 +115,5 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'alert_to_address' => env('MAIL_ALERT_TO_ADDRESS'),
 ];

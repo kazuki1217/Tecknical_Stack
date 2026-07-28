@@ -52,10 +52,10 @@ class AuthController extends Controller
     {
         Log::info('[ログイン] 処理を開始します。');
 
-        try {
-            // リクエスト元の IPアドレスを取得
-            $throttleKey = 'login:'.Str::lower($request->ip());
+        // リクエスト元の IPアドレスを取得
+        $throttleKey = 'login:'.Str::lower($request->ip());
 
+        try {
             $request->validated();
 
             $result = $this->authService->attemptLogin($request->email, $request->password);
