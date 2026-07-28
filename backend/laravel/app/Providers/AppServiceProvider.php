@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
 
                         // Gmail（.envで設定したSMTP）を使ってメール送信
                         Mail::raw($body, function ($message) use ($subject) {
-                            $message->to(env('MAIL_ALERT_TO_ADDRESS'))
+                            $message->to(config('mail.alert_to_address'))
                                 ->subject($subject);
                         });
                     } catch (\Exception $e) {
