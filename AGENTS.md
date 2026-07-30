@@ -22,16 +22,8 @@
 - 秘密情報や生成された環境設定ファイルをコミットしないこと。`.env*`はローカル専用として扱うこと。
 - 振る舞いを変更する場合は、可能な限りテストを追加または更新すること。
 
-## 検証
 
-変更した領域に応じて、次の確認を実行してください。
 
-- フロントエンドのLint: `docker compose exec frontend npm run lint`
-- フロントエンドのビルド: `docker compose exec frontend npm run build`
-- バックエンドのテスト: `docker compose exec backend php artisan test`
-- バックエンドのフォーマット確認: `docker compose exec backend ./vendor/bin/pint --test`
-
-コンテナを利用できない場合は、実行できなかった確認項目と理由を報告してください。
 
 ## GitHub Issue
 
