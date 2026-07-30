@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +18,64 @@ use Tests\TestCase;
 class PostControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * 投稿一覧が新着順で20件ずつ取得でき、関連情報とページ情報を返すことを確認する
+     */
+    public function test_index_returns_paginated_posts_with_relations(): void
+    {
+        // 認証済みユーザーと投稿に紐づく関連データを用意する
+        $user = User::create([
+            'name' => 'テストユーザー',
+            'email' => 'user_'.Str::random(10).'@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $tag = Tag::create(['name' => 'Laravel']);
+
+        $posts = collect();
+        for ($i = 1; $i <= 25; $i++) {
+            // 作成日時をずらして、新着順の並びをテストしやすくする
+            $post = Post::create([
+                'user_id' => $user->id,
+                'content' => "投稿{$i}",
+                'created_at' => now()->addSeconds($i),
+                'updated_at' => now()->addSeconds($i),
+            ]);
+            $post->tags()->attach($tag->id);
+            $posts->push($post);
+        }
+        Comment::create([
+            'post_id' => $posts->last()->id,
+            'user_id' => $user->id,
+            'content' => '最新投稿へのコメント',
+        ]);
+        Sanctum::actingAs($user);
+
+        // 1ページ目は新しい投稿から20件だけ返ることを確認する
+        $firstPageResponse = $this->getJson('/api/posts');
+
+        $firstPageResponse->assertStatus(200)
+            ->assertJsonCount(20, 'data')
+            ->assertJsonPath('data.0.content', '投稿25')
+            ->assertJsonPath('data.0.user.id', $user->id)
+            ->assertJsonPath('data.0.tags.0.name', 'Laravel')
+            ->assertJsonPath('data.0.comments.0.content', '最新投稿へのコメント')
+            ->assertJsonPath('data.0.comments.0.user.id', $user->id)
+            ->assertJsonPath('meta.current_page', 1)
+            ->assertJsonPath('meta.last_page', 2)
+            ->assertJsonPath('meta.per_page', 20)
+            ->assertJsonPath('meta.total', 25)
+            ->assertJsonPath('meta.has_more_pages', true);
+
+        // 2ページ目は残り5件を返すことを確認する
+        $secondPageResponse = $this->getJson('/api/posts?page=2');
+
+        $secondPageResponse->assertStatus(200)
+            ->assertJsonCount(5, 'data')
+            ->assertJsonPath('data.0.content', '投稿5')
+            ->assertJsonPath('meta.current_page', 2)
+            ->assertJsonPath('meta.has_more_pages', false);
+    }
 
     /**
      * 認証済みユーザーが投稿を作成できることを確認する
