@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -14,15 +15,17 @@ use Illuminate\Support\Collection;
 class PostService
 {
     /**
-     * 投稿一覧を取得する
+     * 投稿一覧をページ単位で取得する
      *
-     * @return Collection<int, Post> 投稿一覧
+     * @param  int  $perPage  1ページあたりの取得件数
+     * @return LengthAwarePaginator<Post> 投稿一覧
      */
-    public function getAll(): Collection
+    public function getAll(int $perPage = 20): LengthAwarePaginator
     {
         return Post::with(['user', 'tags', 'comments.user']) // ユーザー・タグ・コメント情報を含める
             ->orderByDesc('created_at') // 作成日が新しい順番に並び替え
-            ->get(); // 全件取得
+            ->orderByDesc('id') // 同時刻投稿でもページをまたいだ順序が安定するようにする
+            ->paginate($perPage); // Laravelがリクエストのpageクエリを自動で読み、指定ページの一定件数だけ取得する
     }
 
     /**
