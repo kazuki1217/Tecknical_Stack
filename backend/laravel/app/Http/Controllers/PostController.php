@@ -20,24 +20,43 @@ class PostController extends Controller
     public function __construct(private PostService $postService) {}
 
     /**
-     * 全ての投稿データを取得
+     * 投稿データをページ単位で取得
      *
+     * @param  \Illuminate\Http\Request  $request  ページ番号を含むリクエスト
      * @return \Illuminate\Http\JsonResponse 成功時は投稿一覧を返し、失敗時は失敗メッセージを返す
      */
-    public function index()
+    public function index(Request $request)
     {
         Log::info('[投稿一覧] 処理を開始します。');
 
         try {
-            // 全ての投稿データを取得
-            $posts = $this->postService->getAll();
+            // 投稿一覧は固定件数で取得し、レスポンス肥大化を防ぐ
+            $posts = $this->postService->getAll(20);
 
-            Log::debug('[投稿一覧] 取得したデータ', $posts->toArray());
+            Log::debug('[投稿一覧] 取得結果', [
+                '実行したユーザーID' => Auth::user()->id,
+                'リクエストページ' => $request->query('page', 1),
+                '現在ページ' => $posts->currentPage(),
+                '取得件数' => $posts->count(),
+                '総件数' => $posts->total(),
+            ]);
             Log::info('[投稿一覧] データの取得に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
 
-            return response()->json(['message' => '全ての投稿データを取得しました。', 'data' => $posts], 200);
+            return response()->json([
+                'message' => '投稿データを取得しました。',
+                'data' => $posts->items(),
+                'meta' => [
+                    'current_page' => $posts->currentPage(),
+                    'last_page' => $posts->lastPage(),
+                    'per_page' => $posts->perPage(),
+                    'total' => $posts->total(),
+                    'from' => $posts->firstItem(),
+                    'to' => $posts->lastItem(),
+                    'has_more_pages' => $posts->hasMorePages(),
+                ],
+            ], 200);
         } catch (\Throwable $e) {
-            Log::error('[投稿一覧] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            Log::error('[投稿一覧] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine(), 'リクエストページ' => $request->query('page')]);
 
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }
