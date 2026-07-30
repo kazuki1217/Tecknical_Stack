@@ -43,9 +43,15 @@ function PostList({ loggedInUserId, loggedInUserName }: { loggedInUserId: number
     try {
       // multipart/form-data 形式に格納
       const formData = new FormData();
-      content && formData.append("content", content);
-      imageFile && formData.append("image", imageFile);
-      tags.trim() && formData.append("tags", tags.trim());
+      if (content) {
+        formData.append("content", content);
+      }
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+      if (tags.trim()) {
+        formData.append("tags", tags.trim());
+      }
 
       const token = localStorage.getItem("token");
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/posts`, formData, {

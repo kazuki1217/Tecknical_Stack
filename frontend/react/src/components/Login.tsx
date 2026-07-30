@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import "../styles/Login.css";
 
@@ -38,9 +38,10 @@ function Login({ setIsLoggedIn, setLoggedInUserId, setLoggedInUserName }: LoginP
       setLoggedInUserId(res.data.data.id);
       setLoggedInUserName(res.data.data.name);
       navigate("/posts");
-    } catch (error: any) {
-      if (error.response && error.response.status === 429) {
-        setErrorMsg(error.response.data.message);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        const response = error.response as AxiosError<{ message: string }>["response"];
+        setErrorMsg(response?.data.message ?? "ログインに失敗しました。");
       } else {
         console.log("ログインに失敗しました:", error);
         setErrorMsg("ログインに失敗しました。");
