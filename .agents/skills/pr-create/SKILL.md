@@ -21,6 +21,7 @@ description: 実装済みの変更を確認し、コミット、push、Draft PR�
 ## 確認結果
 
 ## 補足
+- 必要に応じて記載
 
 Closes #Issue番号
 ```
