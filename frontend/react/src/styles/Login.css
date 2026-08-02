@@ -9,6 +9,12 @@
   text-align: center;
 }
 
+/* ポートフォリオ閲覧者向けのサンプルアカウント案内 */
+.login-container .login-sample-account {
+  color: #aaa;
+  font-size: 13px;
+}
+
 /* 名前・メールアドレス・パスワードの入力部分 */
 .login-form input {
   width: 90%;
