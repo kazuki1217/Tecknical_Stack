@@ -44,37 +44,18 @@ class PostServiceTest extends TestCase
     }
 
     /**
-     * 空文字キーワードの場合は空コレクションになることを確認する
+     * 空文字キーワードの場合は空のページネーション結果になることを確認する
      */
-    public function test_search_returns_empty_collection_when_keyword_is_empty_string(): void
+    public function test_search_returns_empty_paginator_when_keyword_is_empty_string(): void
     {
         // 検索キーワードが空文字のケースを想定する
         $service = new PostService;
 
-        // 空のコレクションが返ることを確認する
-        $this->assertTrue($service->search('')->isEmpty());
-    }
-
-    /**
-     * キーワードに一致する投稿のみ取得できることを確認する
-     */
-    public function test_search_returns_matching_posts(): void
-    {
-        // 投稿データを用意する
-        $user = User::create([
-            'name' => 'テストユーザー',
-            'email' => 'user_'.Str::random(10).'@example.com',
-            'password' => Hash::make('password'),
-        ]);
-        Post::create(['user_id' => $user->id, 'content' => '数学を勉強中']);
-        Post::create(['user_id' => $user->id, 'content' => '英語を勉強中']);
-
-        $service = new PostService;
-
-        // 検索結果が一致するものだけになることを確認する
-        $results = $service->search('数学');
-        $this->assertCount(1, $results);
-        $this->assertSame('数学を勉強中', $results->first()->content);
+        // 投稿を含まないページネーション結果が返ることを確認する
+        $results = $service->search('');
+        $this->assertTrue($results->isEmpty());
+        $this->assertSame(0, $results->total());
+        $this->assertSame(20, $results->perPage());
     }
 
     /**

@@ -1,12 +1,23 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import axios from 'axios'
-import { FaSearch } from 'react-icons/fa'
+import { FaChevronLeft, FaChevronRight, FaSearch } from 'react-icons/fa'
 
 import SidebarLayout from './SidebarLayout'
 import PostItem from './PostItem'
 import '../styles/SearchPosts.css'
+import '../styles/PostList.css'
 import { createPostActions } from '../utils/createPostActions'
-import { Post } from '../types/post'
+import { PaginationMeta, Post } from '../types/post'
+
+const INITIAL_PAGINATION_META: PaginationMeta = {
+  current_page: 1,
+  last_page: 1,
+  per_page: 20,
+  total: 0,
+  from: null,
+  to: null,
+  has_more_pages: false,
+}
 
 /**
  * 投稿検索画面コンポーネント。
@@ -24,28 +35,60 @@ function SearchPosts({
 }) {
   const [content, setContent] = useState<string>('') // 検索キーワードやハッシュタグを管理
   const [results, setResults] = useState<Post[]>([]) // 検索にヒットした投稿一覧を管理
+  const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>(
+    INITIAL_PAGINATION_META,
+  ) // 検索結果のページ情報を管理
   const [isComposing, setIsComposing] = useState(false) // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
+  const searchedContentRef = useRef('') // ページ移動や投稿更新時も最後に実行した検索条件を維持（例：入力欄の編集中でも、表示中の検索条件で次ページを取得する）
 
-  /** キーワード検索やハッシュタグ検索にヒットした投稿一覧を取得 */
-  const handleSearch = async () => {
+  /** 指定した検索条件とページに一致する投稿一覧を取得 */
+  const fetchSearchResults = async (searchContent: string, page: number) => {
     try {
       const token = localStorage.getItem('token')
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/api/posts/search`,
         {
-          params: { content: content },
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          params: {
+            content: searchContent,
+            page,
+          },
         },
       )
+
       setResults(res.data.data)
+      setPaginationMeta(res.data.meta ?? INITIAL_PAGINATION_META)
     } catch (error) {
       console.error('検索処理に失敗しました:', error)
     }
   }
 
-  const { deletePost, updatePost } = createPostActions(handleSearch)
+  /** 入力中の検索条件を確定し、1ページ目から検索する */
+  const handleSearch = async () => {
+    searchedContentRef.current = content
+    await fetchSearchResults(content, 1)
+  }
+
+  /** 最後に実行した検索条件と現在ページを再取得する */
+  const refreshSearchResults = async () => {
+    await fetchSearchResults(
+      searchedContentRef.current,
+      paginationMeta.current_page,
+    )
+  }
+
+  const { deletePost, updatePost } = createPostActions(refreshSearchResults)
+
+  /** 前後ページへ移動 */
+  const movePage = async (page: number) => {
+    if (page < 1 || page > paginationMeta.last_page) {
+      return
+    }
+
+    await fetchSearchResults(searchedContentRef.current, page)
+  }
 
   return (
     <SidebarLayout loggedInUserName={loggedInUserName}>
@@ -77,9 +120,39 @@ function SearchPosts({
             loggedInUserId={loggedInUserId}
             onDelete={deletePost}
             onUpdate={updatePost}
-            onRefresh={handleSearch}
+            onRefresh={refreshSearchResults}
           />
         ))}
+      </div>
+
+      {/* ページ送り */}
+      <div className="post-pagination" aria-label="検索結果のページ送り">
+        <button
+          className="post-pagination-button"
+          type="button"
+          onClick={() => movePage(paginationMeta.current_page - 1)}
+          disabled={paginationMeta.current_page <= 1}
+          aria-label="前のページ"
+        >
+          <FaChevronLeft />
+        </button>
+        <span className="post-pagination-status">
+          {paginationMeta.total === 0
+            ? '0件'
+            : `${paginationMeta.from}-${paginationMeta.to} / ${paginationMeta.total}件`}
+          <span className="post-pagination-page">
+            ページ {paginationMeta.current_page} / {paginationMeta.last_page}
+          </span>
+        </span>
+        <button
+          className="post-pagination-button"
+          type="button"
+          onClick={() => movePage(paginationMeta.current_page + 1)}
+          disabled={!paginationMeta.has_more_pages}
+          aria-label="次のページ"
+        >
+          <FaChevronRight />
+        </button>
       </div>
     </SidebarLayout>
   )

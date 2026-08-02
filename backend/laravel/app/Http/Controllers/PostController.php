@@ -173,12 +173,32 @@ class PostController extends Controller
             Log::debug('[投稿検索] 検索条件: '.$content);
 
             // 検索条件に一致した投稿データを取得
-            $posts = $this->postService->search($content);
+            $posts = $this->postService->search($content, 20);
+            Log::debug('[投稿検索] 取得結果', [
+                '実行したユーザーID' => Auth::user()->id,
+                '検索条件' => $content,
+                'リクエストページ' => $request->query('page', 1),
+                '現在ページ' => $posts->currentPage(),
+                '取得件数' => $posts->count(),
+                '総件数' => $posts->total(),
+            ]);
             Log::info('[投稿検索] 一致したデータの取得に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
 
-            return response()->json(['message' => '検索条件に一致した投稿データを取得しました。', 'data' => $posts], 200);
+            return response()->json([
+                'message' => '検索条件に一致した投稿データを取得しました。',
+                'data' => $posts->items(),
+                'meta' => [
+                    'current_page' => $posts->currentPage(),
+                    'last_page' => $posts->lastPage(),
+                    'per_page' => $posts->perPage(),
+                    'total' => $posts->total(),
+                    'from' => $posts->firstItem(),
+                    'to' => $posts->lastItem(),
+                    'has_more_pages' => $posts->hasMorePages(),
+                ],
+            ], 200);
         } catch (\Throwable $e) {
-            Log::error('[投稿検索] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
+            Log::error('[投稿検索] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine(), '検索条件' => $validated['content'] ?? null, 'リクエストページ' => $request->query('page')]);
 
             return response()->json(['message' => 'サーバー側でエラーが発生しました。'], 500);
         }

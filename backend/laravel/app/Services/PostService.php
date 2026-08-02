@@ -7,7 +7,6 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 /**
  * 投稿に関するビジネスロジックを担当するサービス
@@ -101,14 +100,16 @@ class PostService
      * 投稿を検索する
      *
      * @param  string  $content  検索キーワードやハッシュタグを含む文字列（例: "海 クラゲ #夜"）
-     * @return Collection<int, Post> 検索結果
+     * @param  int  $perPage  1ページあたりの取得件数
+     * @return LengthAwarePaginator<Post> 検索結果
      */
-    public function search(string $content): Collection
+    public function search(string $content, int $perPage = 20): LengthAwarePaginator
     {
         // 空白（全角・半角・連続）を半角スペースに統一し、前後の空白を削除
         $normalizedKeyword = trim((string) preg_replace('/(?:\x{3000}|[[:space:]])+/u', ' ', $content));
         if ($normalizedKeyword === '') {
-            return collect();
+            // 空文字では投稿を取得せず、通常の検索結果と同じページ情報を返す。
+            return Post::query()->whereRaw('1 = 0')->paginate($perPage);
         }
 
         // 半角スペースで単語を分割し、重複を除外
@@ -131,11 +132,24 @@ class PostService
 
         // クエリビルダを使用して、キーワードとタグの両方の条件を満たす投稿を検索
         $query = Post::with(['user', 'tags', 'comments.user'])
-            ->orderByDesc('created_at');
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
 
-        // 検索キーワードが複数ある場合は全てを含む投稿を対象とする（AND条件）
-        foreach ($keywordTerms as $keywordTerm) {
-            $query->where('content', 'LIKE', "%{$keywordTerm}%");
+        if ($keywordTerms !== []) {
+            // 各キーワードを必須のフレーズにして、ngramで日本語を検索しつつ複数語のAND条件を維持する。
+
+            // 例: ['データベース', '勉強'] を +"データベース" +"勉強" に変換する。
+            $booleanQuery = implode(' ', array_map(
+                static fn (string $term): string => '+"'.str_replace(['\\', '"'], ['\\\\', '\\"'], $term).'"',
+                $keywordTerms
+            ));
+
+            // BOOLEAN MODEを使用し、ngramトークンの部分一致ではなく、検索語全体が本文内で一致する投稿を検索する。
+            // 例: 「データベース」が保存されている状態で「データベースあ」と検索した場合、「スあ」トークンが含まれないため一致しない。
+            $query->whereRaw(
+                'MATCH(content) AGAINST (? IN BOOLEAN MODE)',
+                [$booleanQuery]
+            );
         }
 
         // ハッシュタグが複数ある場合は全てを含む投稿を対象とする（AND条件）
@@ -145,7 +159,8 @@ class PostService
             });
         }
 
-        return $query->get();
+        // 大量ヒット時もレスポンスとメモリ使用量が肥大化しないよう、指定件数だけ取得する。
+        return $query->paginate($perPage);
     }
 
     /**
