@@ -44,15 +44,18 @@ class PostServiceTest extends TestCase
     }
 
     /**
-     * 空文字キーワードの場合は空コレクションになることを確認する
+     * 空文字キーワードの場合は空のページネーション結果になることを確認する
      */
-    public function test_search_returns_empty_collection_when_keyword_is_empty_string(): void
+    public function test_search_returns_empty_paginator_when_keyword_is_empty_string(): void
     {
         // 検索キーワードが空文字のケースを想定する
         $service = new PostService;
 
-        // 空のコレクションが返ることを確認する
-        $this->assertTrue($service->search('')->isEmpty());
+        // 投稿を含まないページネーション結果が返ることを確認する
+        $results = $service->search('');
+        $this->assertTrue($results->isEmpty());
+        $this->assertSame(0, $results->total());
+        $this->assertSame(20, $results->perPage());
     }
 
     /**
