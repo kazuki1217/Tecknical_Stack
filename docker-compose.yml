@@ -75,6 +75,8 @@ services:
   # MySQL
   db:
     image: mysql:8.0
+    # 日本語FULLTEXT検索のインデックスと検索語を2文字単位で分割する
+    command: --ngram_token_size=2
     ports:
       - "3306:3306"
     environment:

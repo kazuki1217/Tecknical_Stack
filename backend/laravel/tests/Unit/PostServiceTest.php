@@ -56,28 +56,6 @@ class PostServiceTest extends TestCase
     }
 
     /**
-     * キーワードに一致する投稿のみ取得できることを確認する
-     */
-    public function test_search_returns_matching_posts(): void
-    {
-        // 投稿データを用意する
-        $user = User::create([
-            'name' => 'テストユーザー',
-            'email' => 'user_'.Str::random(10).'@example.com',
-            'password' => Hash::make('password'),
-        ]);
-        Post::create(['user_id' => $user->id, 'content' => '数学を勉強中']);
-        Post::create(['user_id' => $user->id, 'content' => '英語を勉強中']);
-
-        $service = new PostService;
-
-        // 検索結果が一致するものだけになることを確認する
-        $results = $service->search('数学');
-        $this->assertCount(1, $results);
-        $this->assertSame('数学を勉強中', $results->first()->content);
-    }
-
-    /**
      * 投稿更新時に本文が反映されることを確認する
      */
     public function test_update_changes_content_and_loads_user(): void

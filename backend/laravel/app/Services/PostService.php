@@ -133,9 +133,21 @@ class PostService
         $query = Post::with(['user', 'tags', 'comments.user'])
             ->orderByDesc('created_at');
 
-        // 検索キーワードが複数ある場合は全てを含む投稿を対象とする（AND条件）
-        foreach ($keywordTerms as $keywordTerm) {
-            $query->where('content', 'LIKE', "%{$keywordTerm}%");
+        if ($keywordTerms !== []) {
+            // 各キーワードを必須のフレーズにして、ngramで日本語を検索しつつ複数語のAND条件を維持する。
+
+            // 例: ['データベース', '勉強'] を +"データベース" +"勉強" に変換する。
+            $booleanQuery = implode(' ', array_map(
+                static fn (string $term): string => '+"'.str_replace(['\\', '"'], ['\\\\', '\\"'], $term).'"',
+                $keywordTerms
+            ));
+
+            // BOOLEAN MODEを使用し、ngramトークンの部分一致ではなく、検索語全体が本文内で一致する投稿を検索する。
+            // 例: 「データベース」が保存されている状態で「データベースあ」と検索した場合、「スあ」トークンが含まれないため一致しない。
+            $query->whereRaw(
+                'MATCH(content) AGAINST (? IN BOOLEAN MODE)',
+                [$booleanQuery]
+            );
         }
 
         // ハッシュタグが複数ある場合は全てを含む投稿を対象とする（AND条件）
