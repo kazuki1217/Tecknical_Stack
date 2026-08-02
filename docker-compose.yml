@@ -80,6 +80,9 @@ services:
     ports:
       - "3306:3306"
     environment:
+      # MySQLクライアントの対話入力で日本語を扱えるよう、コンテナのロケールをUTF-8にする
+      LANG: C.utf8
+      LC_ALL: C.utf8
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
