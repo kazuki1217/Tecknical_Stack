@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import axios from 'axios'
 
-import Register from "./components/Register";
-import Login from "./components/Login";
-import PostList from "./components/PostList";
-import SearchPosts from "./components/SearchPosts";
-import NotFound from "./components/NotFound";
+import Register from './components/Register'
+import Login from './components/Login'
+import PostList from './components/PostList'
+import SearchPosts from './components/SearchPosts'
+import NotFound from './components/NotFound'
 
 /**
  * ルートコンポーネント
@@ -14,56 +14,96 @@ import NotFound from "./components/NotFound";
  * @returns JSX.Element
  */
 function App() {
-  const [isLoggedIn, setIsLggedIn] = useState<boolean | null>(null); // ログイン状態の有無を管理
-  const [loggedInUserId, setLoggedInUserId] = useState<number | null>(null); // ログイン状態のユーザーIDを管理
-  const [loggedInUserName, setLoggedInUserName] = useState<string | null>(null); // ログイン状態のユーザ名を管理
-  
+  const [isLoggedIn, setIsLggedIn] = useState<boolean | null>(null) // ログイン状態の有無を管理
+  const [loggedInUserId, setLoggedInUserId] = useState<number | null>(null) // ログイン状態のユーザーIDを管理
+  const [loggedInUserName, setLoggedInUserName] = useState<string | null>(null) // ログイン状態のユーザ名を管理
+
   useEffect(() => {
-    checkAuth();
-  }, []);
+    checkAuth()
+  }, [])
 
   /** ログイン認証チェック（トークン有無で画面遷移を制御） */
   const checkAuth = async () => {
     // ローカルストレージからトークンを取得
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token')
     if (!token) {
-      setIsLggedIn(false);
-      return;
+      setIsLggedIn(false)
+      return
     }
 
     try {
       // トークンが有効である場合 → ログイン状態にする
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/user`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
 
-      console.log("ステータスコード:", res.status);
+      console.log('ステータスコード:', res.status)
       if (res.status === 200) {
-        setIsLggedIn(true);
-        setLoggedInUserId(res.data.data.id);
-        setLoggedInUserName(res.data.data.name);
+        setIsLggedIn(true)
+        setLoggedInUserId(res.data.data.id)
+        setLoggedInUserName(res.data.data.name)
       }
     } catch (error) {
-      console.log("APIエラー:", error);
-      setIsLggedIn(false);
+      console.log('APIエラー:', error)
+      setIsLggedIn(false)
     }
-  };
+  }
 
   // チェック中なら何も表示しない
-  if (isLoggedIn === null) return null;
+  if (isLoggedIn === null) return null
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={isLoggedIn ? <Navigate to="/posts" /> : <Login setIsLoggedIn={setIsLggedIn} setLoggedInUserId={setLoggedInUserId} setLoggedInUserName={setLoggedInUserName} />} />
+        <Route
+          path="/"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/posts" />
+            ) : (
+              <Login
+                setIsLoggedIn={setIsLggedIn}
+                setLoggedInUserId={setLoggedInUserId}
+                setLoggedInUserName={setLoggedInUserName}
+              />
+            )
+          }
+        />
         <Route path="/account" element={<Register />} />
-        <Route path="/posts" element={isLoggedIn ? <PostList loggedInUserId={loggedInUserId} loggedInUserName={loggedInUserName} /> : <Navigate to="/" />} />
-        <Route path="/search" element={isLoggedIn ? <SearchPosts loggedInUserId={loggedInUserId} loggedInUserName={loggedInUserName} /> : <Navigate to="/" />} />
+        <Route
+          path="/posts"
+          element={
+            isLoggedIn ? (
+              <PostList
+                loggedInUserId={loggedInUserId}
+                loggedInUserName={loggedInUserName}
+              />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            isLoggedIn ? (
+              <SearchPosts
+                loggedInUserId={loggedInUserId}
+                loggedInUserName={loggedInUserName}
+              />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
         {/* どのパスにも一致しなかった場合 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App

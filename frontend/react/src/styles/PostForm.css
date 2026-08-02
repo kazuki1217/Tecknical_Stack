@@ -23,7 +23,7 @@
 }
 
 /* 投稿フォーム内のタグ入力欄 */
-.post-form input[type="text"] {
+.post-form input[type='text'] {
   background: #111;
   color: #e6e6e6;
   border: 1px solid #444;
@@ -33,7 +33,7 @@
 }
 
 /* 投稿フォーム内の画像ファイル入力欄 */
-.post-form input[type="file"] {
+.post-form input[type='file'] {
   margin: 6px 0 10px;
 }
 
@@ -48,7 +48,6 @@
   font-size: 18px;
   margin-left: auto;
 }
-
 
 .post-form button:hover {
   background-color: #0d8ddb;

@@ -6,11 +6,11 @@
 // ここで定義した変数だけが `import.meta.env` 経由で使えるようになる。
 interface ImportMetaEnv {
   // .envファイルで定義した VITE_API_BASE_URL を読み込めるようにする。
-  readonly VITE_API_BASE_URL: string;
+  readonly VITE_API_BASE_URL: string
 }
 
 // `import.meta` という特殊なオブジェクトの型定義。
 // `env` プロパティの中に、上で定義した ImportMetaEnv が入ることを示す。
 interface ImportMeta {
-  readonly env: ImportMetaEnv;
+  readonly env: ImportMetaEnv
 }

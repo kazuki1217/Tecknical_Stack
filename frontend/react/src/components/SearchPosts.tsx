@@ -1,12 +1,12 @@
-import { useState } from "react";
-import axios from "axios";
-import { FaSearch } from "react-icons/fa";
+import { useState } from 'react'
+import axios from 'axios'
+import { FaSearch } from 'react-icons/fa'
 
-import SidebarLayout from "./SidebarLayout";
-import PostItem from "./PostItem";
-import "../styles/SearchPosts.css";
-import { createPostActions } from "../utils/createPostActions";
-import { Post } from "../types/post";
+import SidebarLayout from './SidebarLayout'
+import PostItem from './PostItem'
+import '../styles/SearchPosts.css'
+import { createPostActions } from '../utils/createPostActions'
+import { Post } from '../types/post'
 
 /**
  * 投稿検索画面コンポーネント。
@@ -15,28 +15,37 @@ import { Post } from "../types/post";
  * @param loggedInUserName - ログイン中のユーザ名
  * @returns JSX.Element
  */
-function SearchPosts({ loggedInUserId, loggedInUserName }: { loggedInUserId: number | null; loggedInUserName: string | null }) {
-  const [content, setContent] = useState<string>(""); // 検索キーワードやハッシュタグを管理
-  const [results, setResults] = useState<Post[]>([]); // 検索にヒットした投稿一覧を管理
-  const [isComposing, setIsComposing] = useState(false); // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
+function SearchPosts({
+  loggedInUserId,
+  loggedInUserName,
+}: {
+  loggedInUserId: number | null
+  loggedInUserName: string | null
+}) {
+  const [content, setContent] = useState<string>('') // 検索キーワードやハッシュタグを管理
+  const [results, setResults] = useState<Post[]>([]) // 検索にヒットした投稿一覧を管理
+  const [isComposing, setIsComposing] = useState(false) // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
 
   /** キーワード検索やハッシュタグ検索にヒットした投稿一覧を取得 */
   const handleSearch = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/posts/search`, {
-        params: { content: content },
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const token = localStorage.getItem('token')
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/posts/search`,
+        {
+          params: { content: content },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
-      setResults(res.data.data);
+      )
+      setResults(res.data.data)
     } catch (error) {
-      console.error("検索処理に失敗しました:", error);
+      console.error('検索処理に失敗しました:', error)
     }
-  };
+  }
 
-  const { deletePost, updatePost } = createPostActions(handleSearch);
+  const { deletePost, updatePost } = createPostActions(handleSearch)
 
   return (
     <SidebarLayout loggedInUserName={loggedInUserName}>
@@ -49,8 +58,8 @@ function SearchPosts({ loggedInUserId, loggedInUserName }: { loggedInUserId: num
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && !isComposing) {
-              handleSearch();
+            if (e.key === 'Enter' && !isComposing) {
+              handleSearch()
             }
           }}
         />
@@ -62,11 +71,18 @@ function SearchPosts({ loggedInUserId, loggedInUserName }: { loggedInUserId: num
       {/* 検索結果の表示 */}
       <div>
         {results.map((post) => (
-          <PostItem key={post.id} post={post} loggedInUserId={loggedInUserId} onDelete={deletePost} onUpdate={updatePost} onRefresh={handleSearch} />
+          <PostItem
+            key={post.id}
+            post={post}
+            loggedInUserId={loggedInUserId}
+            onDelete={deletePost}
+            onUpdate={updatePost}
+            onRefresh={handleSearch}
+          />
         ))}
       </div>
     </SidebarLayout>
-  );
+  )
 }
 
-export default SearchPosts;
+export default SearchPosts
