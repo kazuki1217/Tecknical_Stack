@@ -9,6 +9,9 @@ import '../styles/PostList.css'
 import { createPostActions } from '../utils/createPostActions'
 import { PaginationMeta, Post } from '../types/post'
 
+/** 検索の実行状態（未検索 / 検索中 / 成功 / 失敗） */
+type SearchStatus = 'idle' | 'running' | 'success' | 'error'
+
 const INITIAL_PAGINATION_META: PaginationMeta = {
   current_page: 1,
   last_page: 1,
@@ -39,10 +42,25 @@ function SearchPosts({
     INITIAL_PAGINATION_META,
   ) // 検索結果のページ情報を管理
   const [isComposing, setIsComposing] = useState(false) // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
-  const searchedContentRef = useRef('') // ページ移動や投稿更新時も最後に実行した検索条件を維持（例：入力欄の編集中でも、表示中の検索条件で次ページを取得する）
+  const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle') // 検索の実行状況を管理
+  const [searchErrorMessage, setSearchErrorMessage] = useState<string | null>(
+    null,
+  ) // 検索失敗時に画面へ表示する文言を管理
+  const lastSearchRef = useRef({ content: '', page: 1 }) // ページ移動・投稿更新・再試行に備えて、最後に実行した検索条件とページを維持（例：入力欄の編集中でも、表示中の検索条件で次ページを取得する）
 
-  /** 指定した検索条件とページに一致する投稿一覧を取得 */
+  /**
+   * 指定した検索条件とページに一致する投稿一覧を取得する
+   *
+   * @param searchContent - 検索キーワードまたはハッシュタグ
+   * @param page - 取得するページ番号
+   */
   const fetchSearchResults = async (searchContent: string, page: number) => {
+    // 失敗しても同じ条件で再試行できるよう、通信の前に検索条件を記録する
+    lastSearchRef.current = { content: searchContent, page }
+
+    setSearchStatus('running')
+    setSearchErrorMessage(null)
+
     try {
       const token = localStorage.getItem('token')
       const res = await axios.get(
@@ -58,24 +76,41 @@ function SearchPosts({
         },
       )
 
+      // 取得結果を反映してから success にする（順序が逆だと、反映前の空配列で「条件に一致する投稿はありませんでした。」が一瞬表示されるため）
       setResults(res.data.data)
       setPaginationMeta(res.data.meta ?? INITIAL_PAGINATION_META)
+      setSearchStatus('success')
     } catch (error) {
       console.error('検索処理に失敗しました:', error)
+
+      // APIが返す message は 4xx（検索条件の誤りなど利用者側で対処できるもの）のみ採用する。
+      // 5xx や通信断はサーバー内部の事情であり利用者が対処できないため、固定の文言に統一する。
+      const status = axios.isAxiosError(error)
+        ? error.response?.status
+        : undefined
+      const apiMessage = axios.isAxiosError(error)
+        ? (error.response?.data as { message?: string } | undefined)?.message
+        : undefined
+      const isClientError =
+        status !== undefined && status >= 400 && status < 500
+
+      setSearchErrorMessage(
+        isClientError && apiMessage ? apiMessage : '検索に失敗しました。',
+      )
+      setSearchStatus('error')
     }
   }
 
   /** 入力中の検索条件を確定し、1ページ目から検索する */
   const handleSearch = async () => {
-    searchedContentRef.current = content
     await fetchSearchResults(content, 1)
   }
 
   /** 最後に実行した検索条件と現在ページを再取得する */
   const refreshSearchResults = async () => {
     await fetchSearchResults(
-      searchedContentRef.current,
-      paginationMeta.current_page,
+      lastSearchRef.current.content,
+      lastSearchRef.current.page,
     )
   }
 
@@ -87,7 +122,62 @@ function SearchPosts({
       return
     }
 
-    await fetchSearchResults(searchedContentRef.current, page)
+    await fetchSearchResults(lastSearchRef.current.content, page)
+  }
+
+  const hasResults = searchStatus === 'success' && results.length > 0
+
+  /** 通信状態に応じて「未検索」「検索中」「エラー」「0件」「検索結果」を出し分ける */
+  const renderResults = () => {
+    // 一度も検索していない状態と、検索して0件だった状態は意味が異なるため文言を分ける
+    if (searchStatus === 'idle') {
+      return (
+        <p className="post-status">
+          キーワードまたはタグを入力して検索してください。
+        </p>
+      )
+    }
+
+    if (searchStatus === 'running') {
+      return <p className="post-status">検索中です…</p>
+    }
+
+    if (searchStatus === 'error') {
+      return (
+        <div className="post-status post-status-error">
+          <p>{searchErrorMessage}</p>
+          <button
+            type="button"
+            className="post-retry-button"
+            onClick={refreshSearchResults}
+          >
+            再試行
+          </button>
+        </div>
+      )
+    }
+
+    // 0件は通信の失敗ではなく検索が成功した結果のため、エラーとは別の文言で伝える
+    if (results.length === 0) {
+      return (
+        <p className="post-status">条件に一致する投稿はありませんでした。</p>
+      )
+    }
+
+    return (
+      <div>
+        {results.map((post) => (
+          <PostItem
+            key={post.id}
+            post={post}
+            loggedInUserId={loggedInUserId}
+            onDelete={deletePost}
+            onUpdate={updatePost}
+            onRefresh={refreshSearchResults}
+          />
+        ))}
+      </div>
+    )
   }
 
   return (
@@ -101,59 +191,53 @@ function SearchPosts({
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !isComposing) {
+            if (
+              e.key === 'Enter' &&
+              !isComposing &&
+              searchStatus !== 'running'
+            ) {
               handleSearch()
             }
           }}
         />
-        <button onClick={handleSearch}>
+        {/* 検索中は再実行させない（後から返った古い結果で新しい結果が上書きされるのを防ぐため） */}
+        <button onClick={handleSearch} disabled={searchStatus === 'running'}>
           <FaSearch />
         </button>
       </div>
 
       {/* 検索結果の表示 */}
-      <div>
-        {results.map((post) => (
-          <PostItem
-            key={post.id}
-            post={post}
-            loggedInUserId={loggedInUserId}
-            onDelete={deletePost}
-            onUpdate={updatePost}
-            onRefresh={refreshSearchResults}
-          />
-        ))}
-      </div>
+      {renderResults()}
 
-      {/* ページ送り */}
-      <div className="post-pagination" aria-label="検索結果のページ送り">
-        <button
-          className="post-pagination-button"
-          type="button"
-          onClick={() => movePage(paginationMeta.current_page - 1)}
-          disabled={paginationMeta.current_page <= 1}
-          aria-label="前のページ"
-        >
-          <FaChevronLeft />
-        </button>
-        <span className="post-pagination-status">
-          {paginationMeta.total === 0
-            ? '0件'
-            : `${paginationMeta.from}-${paginationMeta.to} / ${paginationMeta.total}件`}
-          <span className="post-pagination-page">
-            ページ {paginationMeta.current_page} / {paginationMeta.last_page}
+      {/* ページ送り（検索結果を表示できているときだけ出し、検索中やエラー時に古い件数を見せない） */}
+      {hasResults && (
+        <div className="post-pagination" aria-label="検索結果のページ送り">
+          <button
+            className="post-pagination-button"
+            type="button"
+            onClick={() => movePage(paginationMeta.current_page - 1)}
+            disabled={paginationMeta.current_page <= 1}
+            aria-label="前のページ"
+          >
+            <FaChevronLeft />
+          </button>
+          <span className="post-pagination-status">
+            {`${paginationMeta.from}-${paginationMeta.to} / ${paginationMeta.total}件`}
+            <span className="post-pagination-page">
+              ページ {paginationMeta.current_page} / {paginationMeta.last_page}
+            </span>
           </span>
-        </span>
-        <button
-          className="post-pagination-button"
-          type="button"
-          onClick={() => movePage(paginationMeta.current_page + 1)}
-          disabled={!paginationMeta.has_more_pages}
-          aria-label="次のページ"
-        >
-          <FaChevronRight />
-        </button>
-      </div>
+          <button
+            className="post-pagination-button"
+            type="button"
+            onClick={() => movePage(paginationMeta.current_page + 1)}
+            disabled={!paginationMeta.has_more_pages}
+            aria-label="次のページ"
+          >
+            <FaChevronRight />
+          </button>
+        </div>
+      )}
     </SidebarLayout>
   )
 }

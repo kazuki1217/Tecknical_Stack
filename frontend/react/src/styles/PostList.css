@@ -1,3 +1,32 @@
+/* 通信状態（読み込み中・エラー・0件）を伝えるメッセージ。投稿一覧と検索結果で共用する */
+.post-status {
+  padding: 40px 10px;
+  text-align: center;
+  font-size: 15px;
+  color: #9f9f9f;
+}
+
+/* 取得に失敗した状態。0件と取り違えられないよう文字色で区別する */
+.post-status-error {
+  color: #ff6b6b;
+}
+
+/* エラー時に同じ条件でやり直すためのボタン */
+.post-retry-button {
+  margin-top: 12px;
+  padding: 6px 18px;
+  color: #fff;
+  background: #2d6f91;
+  border: 1px solid #3482aa;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.post-retry-button:hover {
+  background: #3482aa;
+}
+
 /* 投稿一覧のページ送り */
 .post-pagination {
   display: flex;

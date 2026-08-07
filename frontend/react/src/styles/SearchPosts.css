@@ -38,6 +38,12 @@
   background-color: #0d8ddb;
 }
 
+/* 検索中は押せないことが分かるよう、色を落として表示する */
+.search-box button:disabled {
+  background-color: #2b5a74;
+  cursor: not-allowed;
+}
+
 /* タブレット・スマホ幅（768px以下）では検索バーの左右余白を縮める */
 @media (max-width: 768px) {
   .search-box {
