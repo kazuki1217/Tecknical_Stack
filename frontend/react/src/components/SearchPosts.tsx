@@ -6,7 +6,6 @@ import SidebarLayout from './SidebarLayout'
 import PostItem from './PostItem'
 import '../styles/SearchPosts.css'
 import '../styles/PostList.css'
-import { createPostActions } from '../utils/createPostActions'
 import { buildApiErrorMessage } from '../utils/apiErrorMessage'
 import { PaginationMeta, Post } from '../types/post'
 
@@ -101,8 +100,6 @@ function SearchPosts({
     )
   }
 
-  const { deletePost, updatePost } = createPostActions(refreshSearchResults)
-
   /** 前後ページへ移動 */
   const movePage = async (page: number) => {
     if (page < 1 || page > paginationMeta.last_page) {
@@ -158,8 +155,6 @@ function SearchPosts({
             key={post.id}
             post={post}
             loggedInUserId={loggedInUserId}
-            onDelete={deletePost}
-            onUpdate={updatePost}
             onRefresh={refreshSearchResults}
           />
         ))}

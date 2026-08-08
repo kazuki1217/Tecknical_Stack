@@ -9,29 +9,21 @@ import '../styles/PostItem.css'
 interface PostItemProps {
   post: Post
   loggedInUserId: number | null
-  onDelete: (id: number) => Promise<void>
-  onUpdate: (id: number, content: string) => Promise<void>
   onRefresh: () => Promise<void>
-  onEditStart?: () => void
 }
 
 /**
  * 投稿アイテムコンポーネント（投稿1件の表示および編集・削除・コメント操作）
  *
+ * 投稿とコメントの書き込み処理はいずれもこのコンポーネント内で実行し、反映は onRefresh に任せる
+ * （操作の実体と、無効化・失敗表示を行うボタンを同じファイルで追えるようにするため）。
+ *
  * @param post - 表示対象の投稿データ
  * @param loggedInUserId - 現在ログイン中のユーザーID（投稿者と一致する場合、操作ボタンを表示）
- * @param onDelete - 投稿削除時に呼び出される関数（idを引数に取る。失敗時は例外を投げる）
- * @param onUpdate - 投稿更新時に呼び出される関数（idと更新後contentを引数に取る。失敗時は例外を投げる）
- * @param onRefresh - コメントの追加/削除後に再取得する関数
+ * @param onRefresh - 投稿の更新・削除、コメントの追加・削除の後に一覧を再取得する関数
  * @returns JSX.Element
  */
-function PostItem({
-  post,
-  loggedInUserId,
-  onDelete,
-  onUpdate,
-  onRefresh,
-}: PostItemProps) {
+function PostItem({ post, loggedInUserId, onRefresh }: PostItemProps) {
   const [isEditing, setIsEditing] = useState(false) // 編集モードを管理
   const [editContent, setEditContent] = useState(post.content) // 編集中のテキスト情報を管理
   const [commentContent, setCommentContent] = useState('') // 新規コメント入力
@@ -44,9 +36,21 @@ function PostItem({
 
   /** 投稿内容を更新し、編集モードを終了 */
   const handleUpdate = async () => {
-    const isSucceeded = await updateAction.run(() =>
-      onUpdate(post.id, editContent),
-    )
+    const isSucceeded = await updateAction.run(async () => {
+      const token = localStorage.getItem('token')
+      await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/posts/${post.id}`,
+        { content: editContent },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+
+      await onRefresh()
+    })
+
     // 失敗時は編集内容を残したまま編集モードを維持し、そのまま再実行できるようにする
     if (isSucceeded) {
       setIsEditing(false)
@@ -55,7 +59,19 @@ function PostItem({
 
   /** 投稿を削除 */
   const handleDelete = async () => {
-    await deleteAction.run(() => onDelete(post.id))
+    await deleteAction.run(async () => {
+      const token = localStorage.getItem('token')
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/api/posts/${post.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+
+      await onRefresh()
+    })
   }
 
   /** コメントを追加 */
