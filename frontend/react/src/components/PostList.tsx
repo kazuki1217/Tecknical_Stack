@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { api } from '../lib/api'
 import SidebarLayout from './SidebarLayout'
@@ -41,7 +41,7 @@ function PostList({
    *
    * @param page - 取得するページ番号。省略時は現在表示中のページを取り直す
    */
-  const fetchPosts = useCallback(async (page = currentPageRef.current) => {
+  const fetchPosts = async (page = currentPageRef.current) => {
     setFetchStatus('running')
     setFetchErrorMessage(null)
 
@@ -74,11 +74,13 @@ function PostList({
       )
       setFetchStatus('error')
     }
-  }, [])
+  }
 
+  // 初回表示時に1ページ目を取得する
+  // fetchPosts は state を参照せず（refとsetStateのみ）毎回同じ動きをするため、依存に含めず初回だけ実行する
   useEffect(() => {
     fetchPosts(1)
-  }, [fetchPosts])
+  }, [])
 
   /**
    * 新規投稿を作成する
