@@ -48,3 +48,14 @@ export interface PaginationMeta {
   to: number | null
   has_more_pages: boolean
 }
+
+/** ページ情報の初期値。取得前の状態と、レスポンスに meta が含まれない場合の既定値に使う */
+export const INITIAL_PAGINATION_META: PaginationMeta = {
+  current_page: 1,
+  last_page: 1,
+  per_page: 20,
+  total: 0,
+  from: null,
+  to: null,
+  has_more_pages: false,
+}
