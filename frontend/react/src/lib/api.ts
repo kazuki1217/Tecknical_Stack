@@ -19,3 +19,20 @@ api.interceptors.request.use((config) => {
 
   return config
 })
+
+// レスポンス時、トークンを付けて送ったうえで401が返った場合、そのトークンは失効しているため破棄する
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.status === 401 &&
+      error.config?.headers.Authorization
+    ) {
+      localStorage.removeItem('token')
+    }
+
+    // 失敗として呼び出し元へ渡し直す（失敗時の表示は各画面のcatchで行うため）
+    return Promise.reject(error)
+  },
+)
