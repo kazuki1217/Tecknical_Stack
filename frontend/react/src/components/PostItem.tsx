@@ -10,7 +10,6 @@ interface PostItemProps {
   post: Post
   loggedInUserId: number | null
   onRefresh: () => Promise<void>
-  onEditStart?: () => void
 }
 
 /**
