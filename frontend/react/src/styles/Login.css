@@ -32,8 +32,44 @@
   outline: none;
 }
 
+/* パスワードの表示切り替えボタンを入力欄の右端に配置 */
+.login-password-field {
+  position: relative;
+  width: calc(90% + 12px);
+  margin: 0 auto;
+}
+
+.login-password-field input {
+  box-sizing: border-box;
+  width: 100%;
+  padding-right: 38px;
+}
+
+.login-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: flex;
+  padding: 4px;
+  color: #aaa;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.login-password-toggle:hover,
+.login-password-toggle:focus-visible {
+  color: #fff;
+}
+
+.login-password-toggle:focus-visible {
+  outline: 2px solid #1da1f2;
+  border-radius: 3px;
+}
+
 /* ログインボタン */
-.login-form button {
+.login-submit-button {
   width: 50%;
   margin-top: 12px;
   padding: 5px;
@@ -47,12 +83,12 @@
   transition: background-color 0.3s;
 }
 
-.login-form button:hover {
+.login-submit-button:hover {
   background-color: #0d8ddb;
 }
 
 /* 送信中のログインボタン（押せないことが分かるよう配色を変える） */
-.login-form button:disabled {
+.login-submit-button:disabled {
   color: #999;
   background-color: #2a4f66;
   cursor: not-allowed;

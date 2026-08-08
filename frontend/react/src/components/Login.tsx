@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios, { AxiosError } from 'axios'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
 import '../styles/Login.css'
 
@@ -26,6 +27,7 @@ function Login({
   const navigate = useNavigate()
   const [email, setEmail] = useState('') // メールアドレスを管理
   const [password, setPassword] = useState('') // パスワードを管理
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false) // パスワードの表示状態を管理
   const [errorMsg, setErrorMsg] = useState('') // エラーメッセージを管理
   const [isSubmitting, setIsSubmitting] = useState(false) // 送信中か否かを管理（連打による重複リクエストを防ぐため）
 
@@ -74,13 +76,30 @@ function Login({
           onChange={(e) => setEmail(e.target.value)}
           placeholder="メールアドレス"
         />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="パスワード"
-        />
-        <button type="submit" disabled={isSubmitting}>
+        <div className="login-password-field">
+          <input
+            type={isPasswordVisible ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="パスワード"
+          />
+          <button
+            type="button"
+            className="login-password-toggle"
+            onClick={() => setIsPasswordVisible((isVisible) => !isVisible)}
+            aria-label={
+              isPasswordVisible ? 'パスワードを非表示' : 'パスワードを表示'
+            }
+            aria-pressed={isPasswordVisible}
+          >
+            {isPasswordVisible ? <FaEye /> : <FaEyeSlash />}
+          </button>
+        </div>
+        <button
+          type="submit"
+          className="login-submit-button"
+          disabled={isSubmitting}
+        >
           ログイン
         </button>
       </form>
