@@ -53,16 +53,30 @@ function SearchPosts({
     setSearchErrorMessage(null)
 
     try {
-      const res = await api.get('/api/posts/search', {
-        params: {
-          content: searchContent,
-          page,
-        },
-      })
+      const requestPage = (targetPage: number) =>
+        api.get('/api/posts/search', {
+          params: {
+            content: searchContent,
+            page: targetPage,
+          },
+        })
+
+      let res = await requestPage(page)
+      let nextMeta = res.data.meta ?? INITIAL_PAGINATION_META
+      if (nextMeta.total > 0 && nextMeta.current_page > nextMeta.last_page) {
+        // 削除で最終ページが減った場合は、空ページを表示せず最後のページを取り直す
+        res = await requestPage(nextMeta.last_page)
+        nextMeta = res.data.meta ?? INITIAL_PAGINATION_META
+      }
 
       // 取得結果を反映してから success にする（順序が逆だと、反映前の空配列で「条件に一致する投稿はありませんでした。」が一瞬表示されるため）
       setResults(res.data.data)
-      setPaginationMeta(res.data.meta ?? INITIAL_PAGINATION_META)
+      // 取り直した場合に備え、以降の再取得が実際に表示しているページを対象にするよう記録し直す
+      lastSearchRef.current = {
+        content: searchContent,
+        page: nextMeta.current_page,
+      }
+      setPaginationMeta(nextMeta)
       setSearchStatus('success')
     } catch (error) {
       console.error('検索処理に失敗しました:', error)
