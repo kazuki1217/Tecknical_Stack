@@ -1,26 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { useEffect, useRef, useState } from 'react'
 
 import { api } from '../lib/api'
 import SidebarLayout from './SidebarLayout'
 import PostForm from './PostForm'
 import PostItem from './PostItem'
+import Pagination from './Pagination'
 import { buildApiErrorMessage } from '../utils/apiErrorMessage'
-import { PaginationMeta, Post } from '../types/post'
+import { INITIAL_PAGINATION_META, PaginationMeta, Post } from '../types/post'
 import '../styles/PostList.css'
 
 /** 投稿一覧取得の実行状態（未実行 / 実行中 / 成功 / 失敗） */
 type FetchStatus = 'idle' | 'running' | 'success' | 'error'
-
-const INITIAL_PAGINATION_META: PaginationMeta = {
-  current_page: 1,
-  last_page: 1,
-  per_page: 20,
-  total: 0,
-  from: null,
-  to: null,
-  has_more_pages: false,
-}
 
 /**
  * 投稿一覧画面コンポーネント
@@ -51,7 +41,7 @@ function PostList({
    *
    * @param page - 取得するページ番号。省略時は現在表示中のページを取り直す
    */
-  const fetchPosts = useCallback(async (page = currentPageRef.current) => {
+  const fetchPosts = async (page = currentPageRef.current) => {
     setFetchStatus('running')
     setFetchErrorMessage(null)
 
@@ -84,11 +74,13 @@ function PostList({
       )
       setFetchStatus('error')
     }
-  }, [])
+  }
 
+  // 初回表示時に1ページ目を取得する
+  // fetchPosts は state を参照せず（refとsetStateのみ）毎回同じ動きをするため、依存に含めず初回だけ実行する
   useEffect(() => {
     fetchPosts(1)
-  }, [fetchPosts])
+  }, [])
 
   /**
    * 新規投稿を作成する
@@ -116,15 +108,6 @@ function PostList({
     await api.post('/api/posts', formData)
     // 新規投稿は新着順の先頭に表示されるため、1ページ目を再取得する
     await fetchPosts(1)
-  }
-
-  /** 前後ページへ移動 */
-  const movePage = async (page: number) => {
-    if (page < 1 || page > paginationMeta.last_page) {
-      return
-    }
-
-    await fetchPosts(page)
   }
 
   // 初回描画時（idle）は取得が始まる直前のため、読み込み中と同じ扱いにする
@@ -180,34 +163,7 @@ function PostList({
       {renderPosts()}
 
       {/* ページ送り（投稿を表示できているときだけ出し、読み込み中やエラー時に古い件数を見せない） */}
-      {hasPosts && (
-        <div className="post-pagination" aria-label="投稿一覧のページ送り">
-          <button
-            className="post-pagination-button"
-            type="button"
-            onClick={() => movePage(paginationMeta.current_page - 1)}
-            disabled={paginationMeta.current_page <= 1}
-            aria-label="前のページ"
-          >
-            <FaChevronLeft />
-          </button>
-          <span className="post-pagination-status">
-            {`${paginationMeta.from}-${paginationMeta.to} / ${paginationMeta.total}件`}
-            <span className="post-pagination-page">
-              ページ {paginationMeta.current_page} / {paginationMeta.last_page}
-            </span>
-          </span>
-          <button
-            className="post-pagination-button"
-            type="button"
-            onClick={() => movePage(paginationMeta.current_page + 1)}
-            disabled={!paginationMeta.has_more_pages}
-            aria-label="次のページ"
-          >
-            <FaChevronRight />
-          </button>
-        </div>
-      )}
+      {hasPosts && <Pagination meta={paginationMeta} onMovePage={fetchPosts} />}
     </SidebarLayout>
   )
 }

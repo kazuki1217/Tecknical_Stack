@@ -1,26 +1,17 @@
 import { useRef, useState } from 'react'
-import { FaChevronLeft, FaChevronRight, FaSearch } from 'react-icons/fa'
+import { FaSearch } from 'react-icons/fa'
 
 import { api } from '../lib/api'
 import SidebarLayout from './SidebarLayout'
 import PostItem from './PostItem'
+import Pagination from './Pagination'
 import '../styles/SearchPosts.css'
 import '../styles/PostList.css'
 import { buildApiErrorMessage } from '../utils/apiErrorMessage'
-import { PaginationMeta, Post } from '../types/post'
+import { INITIAL_PAGINATION_META, PaginationMeta, Post } from '../types/post'
 
 /** 検索の実行状態（未検索 / 検索中 / 成功 / 失敗） */
 type SearchStatus = 'idle' | 'running' | 'success' | 'error'
-
-const INITIAL_PAGINATION_META: PaginationMeta = {
-  current_page: 1,
-  last_page: 1,
-  per_page: 20,
-  total: 0,
-  from: null,
-  to: null,
-  has_more_pages: false,
-}
 
 /**
  * 投稿検索画面コンポーネント。
@@ -62,16 +53,30 @@ function SearchPosts({
     setSearchErrorMessage(null)
 
     try {
-      const res = await api.get('/api/posts/search', {
-        params: {
-          content: searchContent,
-          page,
-        },
-      })
+      const requestPage = (targetPage: number) =>
+        api.get('/api/posts/search', {
+          params: {
+            content: searchContent,
+            page: targetPage,
+          },
+        })
+
+      let res = await requestPage(page)
+      let nextMeta = res.data.meta ?? INITIAL_PAGINATION_META
+      if (nextMeta.total > 0 && nextMeta.current_page > nextMeta.last_page) {
+        // 削除で最終ページが減った場合は、空ページを表示せず最後のページを取り直す
+        res = await requestPage(nextMeta.last_page)
+        nextMeta = res.data.meta ?? INITIAL_PAGINATION_META
+      }
 
       // 取得結果を反映してから success にする（順序が逆だと、反映前の空配列で「条件に一致する投稿はありませんでした。」が一瞬表示されるため）
       setResults(res.data.data)
-      setPaginationMeta(res.data.meta ?? INITIAL_PAGINATION_META)
+      // 取り直した場合に備え、以降の再取得が実際に表示しているページを対象にするよう記録し直す
+      lastSearchRef.current = {
+        content: searchContent,
+        page: nextMeta.current_page,
+      }
+      setPaginationMeta(nextMeta)
       setSearchStatus('success')
     } catch (error) {
       console.error('検索処理に失敗しました:', error)
@@ -91,15 +96,6 @@ function SearchPosts({
       lastSearchRef.current.content,
       lastSearchRef.current.page,
     )
-  }
-
-  /** 前後ページへ移動 */
-  const movePage = async (page: number) => {
-    if (page < 1 || page > paginationMeta.last_page) {
-      return
-    }
-
-    await fetchSearchResults(lastSearchRef.current.content, page)
   }
 
   const hasResults = searchStatus === 'success' && results.length > 0
@@ -186,32 +182,12 @@ function SearchPosts({
 
       {/* ページ送り（検索結果を表示できているときだけ出し、検索中やエラー時に古い件数を見せない） */}
       {hasResults && (
-        <div className="post-pagination" aria-label="検索結果のページ送り">
-          <button
-            className="post-pagination-button"
-            type="button"
-            onClick={() => movePage(paginationMeta.current_page - 1)}
-            disabled={paginationMeta.current_page <= 1}
-            aria-label="前のページ"
-          >
-            <FaChevronLeft />
-          </button>
-          <span className="post-pagination-status">
-            {`${paginationMeta.from}-${paginationMeta.to} / ${paginationMeta.total}件`}
-            <span className="post-pagination-page">
-              ページ {paginationMeta.current_page} / {paginationMeta.last_page}
-            </span>
-          </span>
-          <button
-            className="post-pagination-button"
-            type="button"
-            onClick={() => movePage(paginationMeta.current_page + 1)}
-            disabled={!paginationMeta.has_more_pages}
-            aria-label="次のページ"
-          >
-            <FaChevronRight />
-          </button>
-        </div>
+        <Pagination
+          meta={paginationMeta}
+          onMovePage={(page) =>
+            fetchSearchResults(lastSearchRef.current.content, page)
+          }
+        />
       )}
     </SidebarLayout>
   )
