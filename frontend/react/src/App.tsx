@@ -67,7 +67,10 @@ function App() {
             )
           }
         />
-        <Route path="/account" element={<Register />} />
+        <Route
+          path="/account"
+          element={isLoggedIn ? <Navigate to="/posts" /> : <Register />}
+        />
         <Route
           path="/posts"
           element={
