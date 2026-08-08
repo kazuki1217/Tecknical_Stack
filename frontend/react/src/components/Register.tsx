@@ -18,6 +18,7 @@ function Register() {
     password: '',
     password_confirmation: '',
   }) // 入力フォームの情報を管理
+  const [isSubmitting, setIsSubmitting] = useState(false) // 送信中か否かを管理（連打による重複登録を防ぐため）
   const navigate = useNavigate()
 
   /* 入力フォームの状態を管理 */
@@ -28,6 +29,7 @@ function Register() {
   /* 新規アカウントの登録処理 */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
 
     try {
       const res = await axios.post(
@@ -41,6 +43,8 @@ function Register() {
       console.log('登録に失敗しました:', error)
       setMessage('登録に失敗しました。')
       setSuccess(false)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -67,7 +71,9 @@ function Register() {
           placeholder="パスワード確認"
           onChange={handleChange}
         />
-        <button type="submit">登録</button>
+        <button type="submit" disabled={isSubmitting}>
+          登録
+        </button>
       </form>
       {/* アカウント登録に失敗したか否かを表示 */}
       {message && (

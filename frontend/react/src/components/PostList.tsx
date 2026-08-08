@@ -6,6 +6,7 @@ import SidebarLayout from './SidebarLayout'
 import PostForm from './PostForm'
 import PostItem from './PostItem'
 import { createPostActions } from '../utils/createPostActions'
+import { buildApiErrorMessage } from '../utils/apiErrorMessage'
 import { PaginationMeta, Post } from '../types/post'
 import '../styles/PostList.css'
 
@@ -83,22 +84,8 @@ function PostList({
       setFetchStatus('success')
     } catch (error) {
       console.error('投稿一覧の取得に失敗しました:', error)
-
-      // APIが返す message は 4xx（レート制限など利用者側で対処できるもの）のみ採用する。
-      // 5xx や通信断はサーバー内部の事情であり利用者が対処できないため、固定の文言に統一する。
-      const status = axios.isAxiosError(error)
-        ? error.response?.status
-        : undefined
-      const apiMessage = axios.isAxiosError(error)
-        ? (error.response?.data as { message?: string } | undefined)?.message
-        : undefined
-      const isClientError =
-        status !== undefined && status >= 400 && status < 500
-
       setFetchErrorMessage(
-        isClientError && apiMessage
-          ? apiMessage
-          : '投稿一覧の取得に失敗しました。',
+        buildApiErrorMessage(error, '投稿一覧の取得に失敗しました。'),
       )
       setFetchStatus('error')
     }
@@ -110,40 +97,41 @@ function PostList({
 
   const { deletePost, updatePost } = createPostActions(fetchPosts)
 
-  /** 新規投稿を作成 */
+  /**
+   * 新規投稿を作成する
+   *
+   * 通信に失敗した場合は例外をそのまま呼び出し元へ伝える（失敗の表示と送信中の管理は、
+   * 送信ボタンを持つ PostForm 側で行うため）。
+   */
   const submitPost = async (
     content: string,
     imageFile: File | null,
     tags: string,
   ) => {
-    try {
-      // multipart/form-data 形式に格納
-      const formData = new FormData()
-      if (content) {
-        formData.append('content', content)
-      }
-      if (imageFile) {
-        formData.append('image', imageFile)
-      }
-      if (tags.trim()) {
-        formData.append('tags', tags.trim())
-      }
-
-      const token = localStorage.getItem('token')
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/posts`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      // 新規投稿は新着順の先頭に表示されるため、1ページ目を再取得する
-      await fetchPosts(1)
-    } catch (error) {
-      console.error('新規投稿の作成に失敗しました:', error)
+    // multipart/form-data 形式に格納
+    const formData = new FormData()
+    if (content) {
+      formData.append('content', content)
     }
+    if (imageFile) {
+      formData.append('image', imageFile)
+    }
+    if (tags.trim()) {
+      formData.append('tags', tags.trim())
+    }
+
+    const token = localStorage.getItem('token')
+    await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/posts`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+    // 新規投稿は新着順の先頭に表示されるため、1ページ目を再取得する
+    await fetchPosts(1)
   }
 
   /** 前後ページへ移動 */

@@ -45,6 +45,13 @@
   background-color: #0d8ddb;
 }
 
+/* 送信中の登録ボタン（押せないことが分かるよう配色を変える） */
+.register-form button:disabled {
+  color: #999;
+  background-color: #2a4f66;
+  cursor: not-allowed;
+}
+
 /* リンクボタン */
 .register-link-button {
   background: transparent;

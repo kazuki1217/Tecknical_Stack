@@ -7,6 +7,7 @@ import PostItem from './PostItem'
 import '../styles/SearchPosts.css'
 import '../styles/PostList.css'
 import { createPostActions } from '../utils/createPostActions'
+import { buildApiErrorMessage } from '../utils/apiErrorMessage'
 import { PaginationMeta, Post } from '../types/post'
 
 /** 検索の実行状態（未検索 / 検索中 / 成功 / 失敗） */
@@ -82,21 +83,7 @@ function SearchPosts({
       setSearchStatus('success')
     } catch (error) {
       console.error('検索処理に失敗しました:', error)
-
-      // APIが返す message は 4xx（検索条件の誤りなど利用者側で対処できるもの）のみ採用する。
-      // 5xx や通信断はサーバー内部の事情であり利用者が対処できないため、固定の文言に統一する。
-      const status = axios.isAxiosError(error)
-        ? error.response?.status
-        : undefined
-      const apiMessage = axios.isAxiosError(error)
-        ? (error.response?.data as { message?: string } | undefined)?.message
-        : undefined
-      const isClientError =
-        status !== undefined && status >= 400 && status < 500
-
-      setSearchErrorMessage(
-        isClientError && apiMessage ? apiMessage : '検索に失敗しました。',
-      )
+      setSearchErrorMessage(buildApiErrorMessage(error, '検索に失敗しました。'))
       setSearchStatus('error')
     }
   }

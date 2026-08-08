@@ -173,3 +173,18 @@
   border-radius: 8px;
   padding: 6px 12px;
 }
+
+/* 実行中で押せない状態のボタン（投稿カード内の各操作で共用する） */
+.post-card button:disabled {
+  color: #999;
+  background-color: #3a3a3a;
+  border-color: #3a3a3a;
+  cursor: not-allowed;
+}
+
+/* 投稿の更新・削除、コメントの追加・削除に失敗したときのメッセージ */
+.post-action-error {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #ff6b6b;
+}

@@ -51,6 +51,13 @@
   background-color: #0d8ddb;
 }
 
+/* 送信中のログインボタン（押せないことが分かるよう配色を変える） */
+.login-form button:disabled {
+  color: #999;
+  background-color: #2a4f66;
+  cursor: not-allowed;
+}
+
 /* 文字「アカウントをお持ちでない方はこちら」 */
 .login-container p {
   padding-top: 20px;
