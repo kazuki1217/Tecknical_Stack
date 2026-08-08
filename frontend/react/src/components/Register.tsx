@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 
+import { api } from '../lib/api'
 import '../styles/Register.css'
 
 /**
@@ -32,10 +32,7 @@ function Register() {
     setIsSubmitting(true)
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/register`,
-        form,
-      )
+      const res = await api.post('/api/register', form)
       console.log('ステータス:', res.status)
       setMessage('登録が完了しました。')
       setSuccess(true)

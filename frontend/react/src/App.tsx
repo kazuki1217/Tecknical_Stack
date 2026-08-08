@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import axios from 'axios'
 
+import { api } from './lib/api'
 import Register from './components/Register'
 import Login from './components/Login'
 import PostList from './components/PostList'
@@ -33,12 +33,7 @@ function App() {
 
     try {
       // トークンが有効である場合 → ログイン状態にする
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/user`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
+      const res = await api.get('/api/user')
 
       console.log('ステータスコード:', res.status)
       if (res.status === 200) {
@@ -72,7 +67,10 @@ function App() {
             )
           }
         />
-        <Route path="/account" element={<Register />} />
+        <Route
+          path="/account"
+          element={isLoggedIn ? <Navigate to="/posts" /> : <Register />}
+        />
         <Route
           path="/posts"
           element={
