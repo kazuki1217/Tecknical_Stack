@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
-import axios from 'axios'
 import { FaChevronLeft, FaChevronRight, FaSearch } from 'react-icons/fa'
 
+import { api } from '../lib/api'
 import SidebarLayout from './SidebarLayout'
 import PostItem from './PostItem'
 import '../styles/SearchPosts.css'
@@ -62,19 +62,12 @@ function SearchPosts({
     setSearchErrorMessage(null)
 
     try {
-      const token = localStorage.getItem('token')
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/posts/search`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            content: searchContent,
-            page,
-          },
+      const res = await api.get('/api/posts/search', {
+        params: {
+          content: searchContent,
+          page,
         },
-      )
+      })
 
       // 取得結果を反映してから success にする（順序が逆だと、反映前の空配列で「条件に一致する投稿はありませんでした。」が一瞬表示されるため）
       setResults(res.data.data)

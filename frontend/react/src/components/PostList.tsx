@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import axios from 'axios'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
+import { api } from '../lib/api'
 import SidebarLayout from './SidebarLayout'
 import PostForm from './PostForm'
 import PostItem from './PostItem'
@@ -56,12 +56,8 @@ function PostList({
     setFetchErrorMessage(null)
 
     try {
-      const token = localStorage.getItem('token')
       const requestPage = (targetPage: number) =>
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/posts`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        api.get('/api/posts', {
           params: {
             page: targetPage,
           },
@@ -117,16 +113,7 @@ function PostList({
       formData.append('tags', tags.trim())
     }
 
-    const token = localStorage.getItem('token')
-    await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/api/posts`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    )
+    await api.post('/api/posts', formData)
     // 新規投稿は新着順の先頭に表示されるため、1ページ目を再取得する
     await fetchPosts(1)
   }

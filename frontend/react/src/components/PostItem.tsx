@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+import { api } from '../lib/api'
 import { formatPostDate } from '../utils/date'
 import { useAsyncAction } from '../hooks/useAsyncAction'
 import { Post } from '../types/post'
@@ -37,16 +37,7 @@ function PostItem({ post, loggedInUserId, onRefresh }: PostItemProps) {
   /** 投稿内容を更新し、編集モードを終了 */
   const handleUpdate = async () => {
     const isSucceeded = await updateAction.run(async () => {
-      const token = localStorage.getItem('token')
-      await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/posts/${post.id}`,
-        { content: editContent },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      await api.patch(`/api/posts/${post.id}`, { content: editContent })
 
       await onRefresh()
     })
@@ -60,15 +51,7 @@ function PostItem({ post, loggedInUserId, onRefresh }: PostItemProps) {
   /** 投稿を削除 */
   const handleDelete = async () => {
     await deleteAction.run(async () => {
-      const token = localStorage.getItem('token')
-      await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/api/posts/${post.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      await api.delete(`/api/posts/${post.id}`)
 
       await onRefresh()
     })
@@ -82,16 +65,7 @@ function PostItem({ post, loggedInUserId, onRefresh }: PostItemProps) {
     }
 
     const isSucceeded = await commentSubmitAction.run(async () => {
-      const token = localStorage.getItem('token')
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/posts/${post.id}/comments`,
-        { content },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      await api.post(`/api/posts/${post.id}/comments`, { content })
 
       await onRefresh()
     })
@@ -105,15 +79,7 @@ function PostItem({ post, loggedInUserId, onRefresh }: PostItemProps) {
   /** コメントを削除 */
   const handleCommentDelete = async (commentId: number) => {
     await commentDeleteAction.run(async () => {
-      const token = localStorage.getItem('token')
-      await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/api/comments/${commentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      await api.delete(`/api/comments/${commentId}`)
       await onRefresh()
     })
   }

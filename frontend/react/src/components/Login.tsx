@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios, { AxiosError } from 'axios'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
+import { api } from '../lib/api'
 import '../styles/Login.css'
 
 interface LoginProps {
@@ -38,10 +39,7 @@ function Login({
     setIsSubmitting(true)
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/login`,
-        { email, password },
-      )
+      const res = await api.post('/api/login', { email, password })
 
       localStorage.setItem('token', res.data.data.token) // トークンをローカルストレージに保存（次回以降のリクエストに使用）
       setIsLoggedIn(true)
