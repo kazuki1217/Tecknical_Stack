@@ -39,13 +39,27 @@ export interface Post {
   comments: Comment[]
 }
 
+/** 一覧のページ情報 */
 export interface PaginationMeta {
+  /** 現在のページ番号。リクエストで渡したpageがそのまま返すため、last_pageを超える値になることがある */
   current_page: number
+
+  /** 最終ページの番号（＝総ページ数）。例: 103件を20件ずつなら6 */
   last_page: number
+
+  /** 1ページあたりの件数 */
   per_page: number
+
+  /** 全体の件数 */
   total: number
+
+  /** 現在のページの先頭が全体の何件目か。該当する投稿が無い場合はnull */
   from: number | null
+
+  /** 現在のページの末尾が全体の何件目か。該当する投稿が無い場合はnull */
   to: number | null
+
+  /** 次のページがあるか */
   has_more_pages: boolean
 }
 
