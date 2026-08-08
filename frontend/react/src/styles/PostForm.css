@@ -52,3 +52,18 @@
 .post-form button:hover {
   background-color: #0d8ddb;
 }
+
+/* 送信中の投稿ボタン（押せないことが分かるよう配色を変える） */
+.post-form button:disabled {
+  color: #999;
+  background-color: #2a4f66;
+  border-color: #2a4f66;
+  cursor: not-allowed;
+}
+
+/* 投稿の作成に失敗したときのメッセージ */
+.post-form-error {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #ff6b6b;
+}

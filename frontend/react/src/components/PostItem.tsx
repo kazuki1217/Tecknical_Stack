@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import axios from 'axios'
 import { formatPostDate } from '../utils/date'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { Post } from '../types/post'
 
 import '../styles/PostItem.css'
@@ -8,8 +9,8 @@ import '../styles/PostItem.css'
 interface PostItemProps {
   post: Post
   loggedInUserId: number | null
-  onDelete: (id: number) => void
-  onUpdate: (id: number, content: string) => void
+  onDelete: (id: number) => Promise<void>
+  onUpdate: (id: number, content: string) => Promise<void>
   onRefresh: () => Promise<void>
   onEditStart?: () => void
 }
@@ -19,8 +20,8 @@ interface PostItemProps {
  *
  * @param post - 表示対象の投稿データ
  * @param loggedInUserId - 現在ログイン中のユーザーID（投稿者と一致する場合、操作ボタンを表示）
- * @param onDelete - 投稿削除時に呼び出される関数（idを引数に取る）
- * @param onUpdate - 投稿更新時に呼び出される関数（idと更新後contentを引数に取る）
+ * @param onDelete - 投稿削除時に呼び出される関数（idを引数に取る。失敗時は例外を投げる）
+ * @param onUpdate - 投稿更新時に呼び出される関数（idと更新後contentを引数に取る。失敗時は例外を投げる）
  * @param onRefresh - コメントの追加/削除後に再取得する関数
  * @returns JSX.Element
  */
@@ -35,10 +36,26 @@ function PostItem({
   const [editContent, setEditContent] = useState(post.content) // 編集中のテキスト情報を管理
   const [commentContent, setCommentContent] = useState('') // 新規コメント入力
 
+  // 書き込み処理ごとに実行状態を持つ（例: コメント送信中でも投稿の編集は操作できるようにするため）
+  const updateAction = useAsyncAction('投稿の更新に失敗しました。')
+  const deleteAction = useAsyncAction('投稿の削除に失敗しました。')
+  const commentSubmitAction = useAsyncAction('コメントの追加に失敗しました。')
+  const commentDeleteAction = useAsyncAction('コメントの削除に失敗しました。')
+
   /** 投稿内容を更新し、編集モードを終了 */
   const handleUpdate = async () => {
-    await onUpdate(post.id, editContent)
-    setIsEditing(false)
+    const isSucceeded = await updateAction.run(() =>
+      onUpdate(post.id, editContent),
+    )
+    // 失敗時は編集内容を残したまま編集モードを維持し、そのまま再実行できるようにする
+    if (isSucceeded) {
+      setIsEditing(false)
+    }
+  }
+
+  /** 投稿を削除 */
+  const handleDelete = async () => {
+    await deleteAction.run(() => onDelete(post.id))
   }
 
   /** コメントを追加 */
@@ -48,7 +65,7 @@ function PostItem({
       return
     }
 
-    try {
+    const isSucceeded = await commentSubmitAction.run(async () => {
       const token = localStorage.getItem('token')
       await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/posts/${post.id}/comments`,
@@ -60,16 +77,18 @@ function PostItem({
         },
       )
 
-      setCommentContent('')
       await onRefresh()
-    } catch (error) {
-      console.error('コメントの追加に失敗しました:', error)
+    })
+
+    // 失敗時は入力内容を残し、そのまま再送信できるようにする
+    if (isSucceeded) {
+      setCommentContent('')
     }
   }
 
   /** コメントを削除 */
   const handleCommentDelete = async (commentId: number) => {
-    try {
+    await commentDeleteAction.run(async () => {
       const token = localStorage.getItem('token')
       await axios.delete(
         `${import.meta.env.VITE_API_BASE_URL}/api/comments/${commentId}`,
@@ -80,9 +99,7 @@ function PostItem({
         },
       )
       await onRefresh()
-    } catch (error) {
-      console.error('コメントの削除に失敗しました:', error)
-    }
+    })
   }
 
   return (
@@ -96,15 +113,26 @@ function PostItem({
         {/* 投稿者が自分の場合のみ編集ボタン・削除ボタンを表示 */}
         {post.user.id === loggedInUserId && (
           <span className="post-actions">
-            <button onClick={() => setIsEditing(true)} className="edit-button">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="edit-button"
+              disabled={deleteAction.isRunning}
+            >
               編集
             </button>
-            <button onClick={() => onDelete(post.id)} className="delete-button">
+            <button
+              onClick={handleDelete}
+              className="delete-button"
+              disabled={deleteAction.isRunning}
+            >
               削除
             </button>
           </span>
         )}
       </p>
+      {deleteAction.errorMessage && (
+        <p className="post-action-error">{deleteAction.errorMessage}</p>
+      )}
       {/* 編集モードの投稿は、テキスト入力フィールド・キャンセルボタン・更新するボタンを表示 */}
       {isEditing ? (
         <>
@@ -119,12 +147,20 @@ function PostItem({
           <button
             className="edit-cancel-button"
             onClick={() => setIsEditing(false)}
+            disabled={updateAction.isRunning}
           >
             キャンセル
           </button>
-          <button className="edit-update-button" onClick={handleUpdate}>
+          <button
+            className="edit-update-button"
+            onClick={handleUpdate}
+            disabled={updateAction.isRunning}
+          >
             更新する
           </button>
+          {updateAction.errorMessage && (
+            <p className="post-action-error">{updateAction.errorMessage}</p>
+          )}
         </>
       ) : (
         <>
@@ -157,12 +193,20 @@ function PostItem({
                   <button
                     className="comment-delete-button"
                     onClick={() => handleCommentDelete(comment.id)}
+                    // 削除中はどのコメントの削除も受け付けない（実行状態はコメント単位ではなく投稿単位で持つため）
+                    disabled={commentDeleteAction.isRunning}
                   >
                     削除
                   </button>
                 )}
               </div>
             ))}
+
+            {commentDeleteAction.errorMessage && (
+              <p className="post-action-error">
+                {commentDeleteAction.errorMessage}
+              </p>
+            )}
 
             <div className="post-comment-form">
               <input
@@ -171,13 +215,24 @@ function PostItem({
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  // 送信中はEnterでも再送信させない（ボタン以外の経路で二重に登録されるのを防ぐため）
+                  if (e.key === 'Enter' && !commentSubmitAction.isRunning) {
                     handleCommentSubmit()
                   }
                 }}
               />
-              <button onClick={handleCommentSubmit}>送信</button>
+              <button
+                onClick={handleCommentSubmit}
+                disabled={commentSubmitAction.isRunning}
+              >
+                送信
+              </button>
             </div>
+            {commentSubmitAction.errorMessage && (
+              <p className="post-action-error">
+                {commentSubmitAction.errorMessage}
+              </p>
+            )}
           </div>
         </>
       )}

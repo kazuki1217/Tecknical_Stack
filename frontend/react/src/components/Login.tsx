@@ -27,11 +27,13 @@ function Login({
   const [email, setEmail] = useState('') // メールアドレスを管理
   const [password, setPassword] = useState('') // パスワードを管理
   const [errorMsg, setErrorMsg] = useState('') // エラーメッセージを管理
+  const [isSubmitting, setIsSubmitting] = useState(false) // 送信中か否かを管理（連打による重複リクエストを防ぐため）
 
   /* ログイン認証チェック */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMsg('')
+    setIsSubmitting(true)
 
     try {
       const res = await axios.post(
@@ -54,6 +56,8 @@ function Login({
         console.log('ログインに失敗しました:', error)
         setErrorMsg('ログインに失敗しました。')
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -76,7 +80,9 @@ function Login({
           onChange={(e) => setPassword(e.target.value)}
           placeholder="パスワード"
         />
-        <button type="submit">ログイン</button>
+        <button type="submit" disabled={isSubmitting}>
+          ログイン
+        </button>
       </form>
       {/* エラーメッセージを表示 */}
       {errorMsg && <p className="login-error-message">{errorMsg}</p>}
