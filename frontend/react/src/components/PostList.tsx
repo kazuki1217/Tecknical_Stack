@@ -5,7 +5,6 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import SidebarLayout from './SidebarLayout'
 import PostForm from './PostForm'
 import PostItem from './PostItem'
-import { createPostActions } from '../utils/createPostActions'
 import { buildApiErrorMessage } from '../utils/apiErrorMessage'
 import { PaginationMeta, Post } from '../types/post'
 import '../styles/PostList.css'
@@ -95,8 +94,6 @@ function PostList({
     fetchPosts(1)
   }, [fetchPosts])
 
-  const { deletePost, updatePost } = createPostActions(fetchPosts)
-
   /**
    * 新規投稿を作成する
    *
@@ -180,8 +177,6 @@ function PostList({
             key={post.id}
             post={post}
             loggedInUserId={loggedInUserId}
-            onDelete={deletePost}
-            onUpdate={updatePost}
             onRefresh={fetchPosts}
           />
         ))}
