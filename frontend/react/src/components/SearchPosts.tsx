@@ -27,17 +27,17 @@ function SearchPosts({
   loggedInUserId: number | null
   loggedInUserName: string | null
 }) {
-  const [content, setContent] = useState<string>('') // 検索キーワードやハッシュタグを管理
+  const [content, setContent] = useState<string>('') // 検索ボックスに入力された文字を管理
+  const [isComposing, setIsComposing] = useState(false) // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
+  const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle') // 検索の実行状況を管理
   const [results, setResults] = useState<Post[]>([]) // 検索にヒットした投稿一覧を管理
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>(
     INITIAL_PAGINATION_META,
   ) // 検索結果のページ情報を管理
-  const [isComposing, setIsComposing] = useState(false) // IME入力が確定したか否かを管理（日本語入力などで入力を確定したタイミングで検索処理が実行されることを防ぐため）
-  const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle') // 検索の実行状況を管理
   const [searchErrorMessage, setSearchErrorMessage] = useState<string | null>(
     null,
   ) // 検索失敗時に画面へ表示する文言を管理
-  const lastSearchRef = useRef({ content: '', page: 1 }) // ページ移動・投稿更新・再試行に備えて、最後に実行した検索条件とページを維持（例：入力欄の編集中でも、表示中の検索条件で次ページを取得する）
+  const lastSearchRef = useRef({ content: '', page: 1 }) // 最後に実行した検索条件とページを維持（例：入力欄の編集中でも、表示中の検索条件で次ページを取得する）
 
   /**
    * 指定した検索条件とページに一致する投稿一覧を取得する
@@ -46,9 +46,6 @@ function SearchPosts({
    * @param page - 取得するページ番号
    */
   const fetchSearchResults = async (searchContent: string, page: number) => {
-    // 失敗しても同じ条件で再試行できるよう、通信の前に検索条件を記録する
-    lastSearchRef.current = { content: searchContent, page }
-
     setSearchStatus('running')
     setSearchErrorMessage(null)
 
@@ -71,7 +68,7 @@ function SearchPosts({
 
       // 取得結果を反映してから success にする（順序が逆だと、反映前の空配列で「条件に一致する投稿はありませんでした。」が一瞬表示されるため）
       setResults(res.data.data)
-      // 取り直した場合に備え、以降の再取得が実際に表示しているページを対象にするよう記録し直す
+      // 以降の再取得が実際に表示しているページを対象にするよう、取り直しの結果を反映した条件を記録する
       lastSearchRef.current = {
         content: searchContent,
         page: nextMeta.current_page,
@@ -79,23 +76,12 @@ function SearchPosts({
       setPaginationMeta(nextMeta)
       setSearchStatus('success')
     } catch (error) {
+      // 同じ条件で再試行できるよう、失敗した検索条件を記録する
+      lastSearchRef.current = { content: searchContent, page }
       console.error('検索処理に失敗しました:', error)
       setSearchErrorMessage(buildApiErrorMessage(error, '検索に失敗しました。'))
       setSearchStatus('error')
     }
-  }
-
-  /** 入力中の検索条件を確定し、1ページ目から検索する */
-  const handleSearch = async () => {
-    await fetchSearchResults(content, 1)
-  }
-
-  /** 最後に実行した検索条件と現在ページを再取得する */
-  const refreshSearchResults = async () => {
-    await fetchSearchResults(
-      lastSearchRef.current.content,
-      lastSearchRef.current.page,
-    )
   }
 
   const hasResults = searchStatus === 'success' && results.length > 0
@@ -122,7 +108,13 @@ function SearchPosts({
           <button
             type="button"
             className="post-retry-button"
-            onClick={refreshSearchResults}
+            /** 最後に実行した検索条件と現在ページを再取得する */
+            onClick={() =>
+              fetchSearchResults(
+                lastSearchRef.current.content,
+                lastSearchRef.current.page,
+              )
+            }
           >
             再試行
           </button>
@@ -144,7 +136,13 @@ function SearchPosts({
             key={post.id}
             post={post}
             loggedInUserId={loggedInUserId}
-            onRefresh={refreshSearchResults}
+            /** 最後に実行した検索条件と現在ページを再取得する */
+            onRefresh={() =>
+              fetchSearchResults(
+                lastSearchRef.current.content,
+                lastSearchRef.current.page,
+              )
+            }
           />
         ))}
       </div>
@@ -167,12 +165,17 @@ function SearchPosts({
               !isComposing &&
               searchStatus !== 'running'
             ) {
-              handleSearch()
+              /** 入力中の検索条件を確定し、1ページ目から検索する */
+              fetchSearchResults(content, 1)
             }
           }}
         />
         {/* 検索中は再実行させない（後から返った古い結果で新しい結果が上書きされるのを防ぐため） */}
-        <button onClick={handleSearch} disabled={searchStatus === 'running'}>
+        <button
+          /** 入力中の検索条件を確定し、1ページ目から検索する */
+          onClick={() => fetchSearchResults(content, 1)}
+          disabled={searchStatus === 'running'}
+        >
           <FaSearch />
         </button>
       </div>
