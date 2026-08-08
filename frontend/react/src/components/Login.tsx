@@ -65,7 +65,7 @@ function Login({
     <div className="login-container">
       <h2>ログイン</h2>
       <p className="login-sample-account">
-        sample1@example.com / sample1pass で閲覧できます
+        デモ用アカウント：user1@example.com / user1pass
       </p>
       <form onSubmit={handleLogin} className="login-form">
         <input

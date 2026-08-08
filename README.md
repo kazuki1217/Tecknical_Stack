@@ -55,7 +55,7 @@
 |ログイン画面|新規登録画面|
 |-|-|
 | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 23 30 47" src="https://github.com/user-attachments/assets/4b0b17e8-2bcc-4969-84e8-edd96e163ed9" />           | <img width="1280" height="658" alt="スクリーンショット 2025-08-06 22 21 19" src="https://github.com/user-attachments/assets/e701cb6b-f21f-4b75-9e15-3638453c82d5" />  |
-|ログイン認証機能を実装しました。短時間に複数回失敗すると一定期間ログインができなくなります。　　　　　　　　　　　　　|アカウント登録機能を実装しました。登録処理を行いたくない場合、ログイン画面で「メールアドレス: sample1@example.com, パスワード: sample1pass」を入力するとログインできるように設定されています。|
+|ログイン認証機能を実装しました。短時間に複数回失敗すると一定期間ログインができなくなります。　　　　　　　　　　　　　|アカウント登録機能を実装しました。登録処理を行いたくない場合、ログイン画面で「メールアドレス: user1@example.com, パスワード: user1pass」を入力するとログインできるように設定されています。|
 
 
 |投稿一覧画面|検索画面|
@@ -190,7 +190,7 @@ docker compose exec frontend npm run dev
 
 - http://localhost:5173/
 
-メールアドレスに「sample1@example.com」パスワードに「sample1pass」を入力し、ボタン名「ログイン」を押下します。
+メールアドレスに「user1@example.com」パスワードに「user1pass」を入力し、ボタン名「ログイン」を押下します。
 投稿一覧画面が表示されれば、環境構築は成功です。
 
 <details>

@@ -14,9 +14,9 @@ class UsersTableSeeder extends Seeder
 
         for ($i = 1; $i <= 3; $i++) {
             $users[] = [
-                'name' => "sample{$i}",
-                'email' => "sample{$i}@example.com",
-                'password' => Hash::make("sample{$i}pass"),
+                'name' => "user{$i}",
+                'email' => "user{$i}@example.com",
+                'password' => Hash::make("user{$i}pass"),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

@@ -43,7 +43,7 @@ class PostsTableSeeder extends Seeder
             // ページネーション確認用に、画像なしの軽い投稿データを十分な件数用意する
             $data[] = [
                 'user_id' => (($i - 1) % 3) + 1,
-                'content' => "ページネーション確認用のサンプル投稿 {$i}",
+                'content' => "投稿内容 {$i}",
                 'image_mime' => null,
                 'image_data' => null,
                 'created_at' => $now->copy()->subMinutes($i),
