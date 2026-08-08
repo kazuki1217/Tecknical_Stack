@@ -19,21 +19,12 @@ function Pagination({
   meta: PaginationMeta
   onMovePage: (page: number) => void
 }) {
-  /** 前後ページへ移動（ボタンの disabled をすり抜けた場合に備え、範囲外は呼び出し元へ通知しない） */
-  const movePage = (page: number) => {
-    if (page < 1 || page > meta.last_page) {
-      return
-    }
-
-    onMovePage(page)
-  }
-
   return (
     <div className="post-pagination">
       <button
         className="post-pagination-button"
         type="button"
-        onClick={() => movePage(meta.current_page - 1)}
+        onClick={() => onMovePage(meta.current_page - 1)}
         disabled={meta.current_page <= 1}
         aria-label="前のページ"
       >
@@ -48,7 +39,7 @@ function Pagination({
       <button
         className="post-pagination-button"
         type="button"
-        onClick={() => movePage(meta.current_page + 1)}
+        onClick={() => onMovePage(meta.current_page + 1)}
         disabled={!meta.has_more_pages}
         aria-label="次のページ"
       >
