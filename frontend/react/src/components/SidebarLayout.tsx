@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { FaList, FaSearch, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa'
 
 import '../styles/SidebarLayout.css'
@@ -19,6 +19,7 @@ interface SidebarLayoutProps {
  */
 function SidebarLayout({ loggedInUserName, children }: SidebarLayoutProps) {
   const navigate = useNavigate()
+  const { pathname } = useLocation() // 現在表示中の画面をサイドバー上で強調するために参照する
   const [isSidebarOpen, setIsSidebarOpen] = useState(false) // スマホ・タブレット幅でのサイドバー開閉状態を管理
 
   /** ログアウト処理 */
@@ -60,11 +61,13 @@ function SidebarLayout({ loggedInUserName, children }: SidebarLayoutProps) {
           icon={<FaList />}
           label="投稿一覧"
           onClick={() => handleNavigate('/posts')}
+          isActive={pathname === '/posts'}
         />
         <SidebarItem
           icon={<FaSearch />}
           label="検索"
           onClick={() => handleNavigate('/search')}
+          isActive={pathname === '/search'}
         />
         <SidebarItem
           icon={<FaSignOutAlt />}
@@ -85,6 +88,7 @@ interface SidebarItemProps {
   icon: ReactNode
   label: string
   onClick: () => void
+  isActive?: boolean
 }
 
 /**
@@ -93,12 +97,16 @@ interface SidebarItemProps {
  * @param icon - 表示するアイコン（ReactNode）
  * @param label - 項目のラベル文字列
  * @param onClick - クリック時に呼び出す処理
+ * @param isActive - 現在表示中の画面に対応する項目かどうか（ログアウトなど画面を持たない項目では省略する）
  * @returns JSX.Element
 
  */
-function SidebarItem({ icon, label, onClick }: SidebarItemProps) {
+function SidebarItem({ icon, label, onClick, isActive }: SidebarItemProps) {
   return (
-    <div onClick={onClick} className="sidebar-item">
+    <div
+      onClick={onClick}
+      className={`sidebar-item${isActive ? ' sidebar-item--active' : ''}`}
+    >
       <div className="sidebar-item__icon">{icon}</div>
       <span className="sidebar-item__label">{label}</span>
     </div>

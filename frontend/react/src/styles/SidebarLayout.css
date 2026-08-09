@@ -23,20 +23,54 @@
   display: flex;
   align-items: center;
   margin-top: 10px;
+  padding: 8px 12px;
+  /* 現在地を示す左端のバーの幅を常に確保し、状態が切り替わってもラベル位置がずれないようにする */
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+}
+
+.sidebar-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 現在表示中の画面に対応するアイテム（左端のバー・背景・文字色で強調する） */
+.sidebar-item--active {
+  background-color: rgba(29, 161, 242, 0.15);
+  border-left-color: #1da1f2;
+}
+
+/* アクティブな項目のホバー（.sidebar-item:hover と詳細度が同じため、必ずその後ろに置く） */
+.sidebar-item--active:hover {
+  background-color: rgba(29, 161, 242, 0.22);
+}
+
+/* アクティブな項目のアイコン・ラベルの色を変える */
+.sidebar-item--active .sidebar-item__icon,
+.sidebar-item--active .sidebar-item__label {
+  color: #1da1f2;
+}
+
+/* アクティブな項目のラベルを太字にする */
+.sidebar-item--active .sidebar-item__label {
+  font-weight: bold;
 }
 
 /* サイドバーの各アイテム内のアイコン */
 .sidebar-item__icon {
   font-size: 20px;
   color: #fff;
+  display: flex;
+  /* アイコン下の余白をなくし、ラベルと縦位置を揃える */
 }
 
 /* サイドバーの各アイテム内のラベル */
 .sidebar-item__label {
-  margin-left: 25px;
+  margin-left: 20px;
   color: #fff;
   font-size: 18px;
-  padding-bottom: 8px;
 }
 
 /* メインコンテンツ全般の設定 */
