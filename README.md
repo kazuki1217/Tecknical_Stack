@@ -40,7 +40,7 @@
   </tr>
   <tr>
     <td>ER図</td>
-    <td><a href="https://drive.google.com/file/d/15Kd0Uj8qotax89-T8h6T86mNoCkUcNbO/view?usp=drive_link">https://drive.google.com/file/d/15Kd0Uj8qotax89-T8h6T86mNoCkUcNbO/view?usp=drive_link</a></td>
+    <td><a href="https://drive.google.com/file/d/19D4zKKEAjVosSeLyk2D1SeP57QBWkqvq/view?usp=sharing">https://drive.google.com/file/d/19D4zKKEAjVosSeLyk2D1SeP57QBWkqvq/view?usp=sharing</a></td>
   </tr>
   <tr>
     <td>テーブル定義書</td>
