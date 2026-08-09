@@ -615,6 +615,11 @@ paths:
           description: バリデーションエラー
           content:
             application/json:
+              example:
+                message: 検索キーワードを入力してください。
+                errors:
+                  content:
+                    - 検索キーワードを入力してください。
               schema:
                 $ref: "#/components/schemas/ValidationErrorResponse"
         "500":

@@ -164,8 +164,12 @@ class PostController extends Controller
     {
         Log::info('[投稿検索] 処理を開始します。');
 
+        // 標準のバリデーションメッセージは英語のため、画面に表示する日本語のメッセージを指定する
         $validated = $request->validate([
-            'content' => 'required|string',
+            'content' => 'required|string', // 入力必須 | 文字列であること
+        ], [
+            'content.required' => '検索キーワードを入力してください。',
+            'content.string' => '検索キーワードは文字列で入力してください。',
         ]);
 
         try {
