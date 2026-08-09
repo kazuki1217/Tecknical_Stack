@@ -723,19 +723,43 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /api/health:
+  /api/health/live:
     get:
       tags: [Health]
-      summary: ヘルスチェック
+      summary: Livenessチェック
+      description: LaravelアプリケーションがHTTPリクエストへ応答できることを確認します。外部の依存先は確認しません。
       responses:
         "200":
-          description: OK
+          description: アプリケーション応答可能
           content:
             application/json:
               example:
-                message: 正常に稼働しています。
+                status: ok
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/HealthResponse"
+
+  /api/health/ready:
+    get:
+      tags: [Health]
+      summary: Readinessチェック
+      description: MySQLへの接続を含め、アプリケーションがリクエストを処理できることを確認します。
+      responses:
+        "200":
+          description: リクエスト受付可能
+          content:
+            application/json:
+              example:
+                status: ok
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: 依存先の異常によりリクエスト受付不可
+          content:
+            application/json:
+              example:
+                status: unavailable
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
 
 components:
   securitySchemes:
@@ -761,6 +785,15 @@ components:
           example:
             message: サーバー側でエラーが発生しました。
   schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, unavailable]
+          example: ok
+
     MessageResponse:
       type: object
       properties:

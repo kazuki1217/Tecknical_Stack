@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +23,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/comments/{comment}', [PostController::class, 'destroyComment']); // コメントを削除
 });
 
-// 死活監視（UptimeRobot を活用し、5分おきにチェック）
-Route::get('/health', function () {
-    return response()->json(['message' => '正常に稼働しています。'], 200);
-});
+// LaravelとMySQLの稼働状態を個別に確認
+Route::get('/health/live', [HealthController::class, 'live']);
+Route::get('/health/ready', [HealthController::class, 'ready']);
