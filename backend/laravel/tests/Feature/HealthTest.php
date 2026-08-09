@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -44,6 +45,11 @@ class HealthTest extends TestCase
             ->once()
             ->with('SELECT 1 AS health_check')
             ->andThrow(new RuntimeException('Database connection failed.'));
+        Log::shouldReceive('error')
+            ->once()
+            ->withArgs(fn (string $message, array $context): bool => $message === '[Readinessチェック] データベースへの接続確認に失敗しました。'
+                && $context['接続名'] === 'sqlite'
+                && $context['エラー内容'] === 'Database connection failed.');
 
         $this->getJson('/api/health/ready')
             ->assertStatus(503)
