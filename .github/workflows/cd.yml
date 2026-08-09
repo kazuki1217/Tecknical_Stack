@@ -73,13 +73,15 @@ jobs:
           # 1) アプリディレクトリへ移動
           # 2) main ブランチへ移動（なければ作成）
           # 3) origin/main の最新状態を取得して強制同期
-          # 4) frontend/react に差分があったときだけ task frontend-build を実行
+          # 4) Swagger UI を再起動してAPI仕様書の更新を反映
+          # 5) frontend/react に差分があったときだけ task frontend-build を実行
           ssh "${PROD_USER}@${PROD_HOST}" "\
             set -euo pipefail; \
             cd '${APP_DIR}'; \
             git fetch origin main; \
             git checkout main || git checkout -b main; \
             git reset --hard origin/main; \
+            sudo docker compose restart swagger-ui; \
             if [ '${FRONTEND_CHANGED}' = 'true' ]; then \
               task frontend-build; \
             else \
