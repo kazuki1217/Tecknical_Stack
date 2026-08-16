@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -111,6 +112,10 @@ class PostService
         try {
             // トランザクションを使用する（途中で失敗して「本文だけ更新されてタグが消えた投稿」が残らないようにするため）
             DB::transaction(function () use ($post, $validated) {
+                // 対象行を排他ロックで取得する（更新の途中で別のリクエストの削除が割り込まないようにするため。ロックが目的のためidだけを取得する）
+                // ロックを取得した時点で行が無ければ既に削除済みのため、本文更新もタグ登録も行わず中断する
+                Post::whereKey($post->getKey())->select('id')->lockForUpdate()->firstOrFail();
+
                 // 投稿データを更新
                 $post->content = $validated['content'];
                 $post->save();
@@ -119,6 +124,9 @@ class PostService
                     $post->tags()->sync($this->resolveTagIds($validated['tags']));
                 }
             });
+        } catch (ModelNotFoundException $e) {
+            // 削除済みは保存失敗ではなく「対象なし」のため、RuntimeException に包み直さず呼び出し元へそのまま返す
+            throw $e;
         } catch (\Throwable $e) {
             // 扱っていたデータを例外メッセージに詰め直す（ロールバック後もモデルには更新後の値が残り、DBの状態と区別が付かないため）
             throw new RuntimeException(sprintf(
