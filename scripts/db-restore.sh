@@ -14,11 +14,8 @@ set -euo pipefail
 # リポジトリルートへ移動する
 cd "$(dirname "$0")/.."
 
-# .env には task up が追記する UID が含まれ、これは bash の読み取り専用変数のため、
-# そのまま source するとエラーになる。必要な変数だけを抽出して読み込む
-set -a
-source <(grep -E '^(MYSQL_ROOT_PASSWORD|MYSQL_DATABASE)=' .env)
-set +a
+# DB 名を取得する。
+MYSQL_DATABASE="$(docker compose exec -T db printenv MYSQL_DATABASE | tr -d '\r')"
 
 BACKUP_FILE="${1:-}"
 
@@ -32,7 +29,8 @@ fi
 # 削除前に展開できることを確認する
 gzip -t "$BACKUP_FILE"
 
-MYSQL_EXEC=(docker compose exec -T -e MYSQL_PWD="$MYSQL_ROOT_PASSWORD" db mysql -u root)
+# コンテナ内で mysql を実行する共通コマンドを設定する
+MYSQL_EXEC=(docker compose exec -T db sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysql -u root "$@"' sh)
 
 # 文字セットは config/database.php の設定値に合わせる。
 # 各テーブルの文字セットはダンプ内の CREATE TABLE に含まれるため、

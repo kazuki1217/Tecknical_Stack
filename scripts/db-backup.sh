@@ -26,11 +26,8 @@ set -euo pipefail
 # リポジトリルートへ移動する
 cd "$(dirname "$0")/.."
 
-# .env には task up が追記する UID が含まれ、これは bash の読み取り専用変数のため、
-# そのまま source するとエラーになる。必要な変数だけを抽出して読み込む
-set -a
-source <(grep -E '^(MYSQL_ROOT_PASSWORD|MYSQL_DATABASE)=' .env)
-set +a
+# DB 名を取得する。
+MYSQL_DATABASE="$(docker compose exec -T db printenv MYSQL_DATABASE | tr -d '\r')"
 
 # 日数ではなく世代数で管理する。cronの実行が飛んだ日があっても、
 # 常に指定した数のバックアップが残るようにするため
@@ -46,9 +43,9 @@ mkdir -p backup
 # 不完全なファイルがバックアップとして残らないようにする
 trap 'rm -f "${DEST}.tmp"' EXIT
 
-# --single-transaction: InnoDBをロックせずに一貫したスナップショットを取得する
-docker compose exec -T -e MYSQL_PWD="$MYSQL_ROOT_PASSWORD" db \
-    mysqldump -u root --single-transaction --no-tablespaces "$MYSQL_DATABASE" \
+# コンテナ内で mysqldump を実行し、出力をホスト側で gzip 圧縮して一時ファイルに書き出す。
+docker compose exec -T db sh -c \
+    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -u root --single-transaction --no-tablespaces "$MYSQL_DATABASE"' \
     | gzip >"${DEST}.tmp"
 
 mv "${DEST}.tmp" "$DEST"
