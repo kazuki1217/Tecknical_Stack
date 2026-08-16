@@ -43,13 +43,8 @@ class AuthService
             return null;
         }
 
-        // トークンを作成
-        $tokenResult = $user->createToken('user_login');
-        $token = $tokenResult->accessToken;
-
-        // トークンの有効期限を「10分間」に設定
-        $token->expires_at = now()->addSeconds(600);
-        $token->save();
+        // 有効期限「10分間」が設定された personal_access_tokens を作成する。
+        $tokenResult = $user->createToken('user_login', ['*'], now()->addSeconds(600));
 
         return [
             'user' => $user,

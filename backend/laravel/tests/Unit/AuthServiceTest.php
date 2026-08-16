@@ -65,6 +65,32 @@ class AuthServiceTest extends TestCase
     }
 
     /**
+     * 発行されたトークンに有効期限が設定されていることを確認する
+     */
+    public function test_attempt_login_stores_token_with_expiration(): void
+    {
+        // 有効期限を厳密に比較するため、テスト中の現在時刻を固定する
+        $this->freezeTime();
+
+        // 事前にユーザーを作成する
+        $email = 'user_'.Str::random(10).'@example.com';
+        $user = User::create([
+            'name' => 'テストユーザー',
+            'email' => $email,
+            'password' => Hash::make('password'),
+        ]);
+
+        $service = new AuthService;
+        $service->attemptLogin($email, 'password');
+
+        // 期限なしトークンが保存されず、10分後の期限が付いていることを確認する
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'tokenable_id' => $user->id,
+            'expires_at' => now()->addSeconds(600),
+        ]);
+    }
+
+    /**
      * 認証失敗時に null が返ることを確認する
      */
     public function test_attempt_login_returns_null_on_failure(): void
