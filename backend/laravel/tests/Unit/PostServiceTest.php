@@ -3,12 +3,15 @@
 namespace Tests\Unit;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use App\Services\PostService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Tests\TestCase;
 
 /**
@@ -41,6 +44,42 @@ class PostServiceTest extends TestCase
         // 画像情報が保存されていることを確認する
         $this->assertNotNull($post->image_data);
         $this->assertSame($image->getMimeType(), $post->image_mime);
+    }
+
+    /**
+     * タグ登録が失敗した場合、投稿ごとロールバックされることを確認する
+     */
+    public function test_create_rolls_back_post_when_tag_registration_fails(): void
+    {
+        // 投稿者を用意する
+        $user = User::create([
+            'name' => 'テストユーザー',
+            'email' => 'user_'.Str::random(10).'@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $service = new PostService;
+
+        // 投稿のINSERT後・タグのINSERT時に失敗する状況を再現する
+        Tag::creating(function (): void {
+            throw new RuntimeException('タグ登録に失敗しました。');
+        });
+
+        try {
+            // 失敗が呼び出し元まで伝わり、扱っていたデータが例外メッセージに含まれることを確認する
+            $this->assertThrows(
+                fn () => $service->create($user, ['content' => 'ロールバック対象の投稿', 'tags' => '新規タグ']),
+                RuntimeException::class,
+                '投稿とタグの登録に失敗しました。',
+            );
+        } finally {
+            // 登録したリスナーが後続のテストへ残らないようにする
+            Tag::flushEventListeners();
+        }
+
+        // 投稿・タグ・中間テーブルのいずれにもデータが残っていないことを確認する
+        $this->assertDatabaseMissing('posts', ['content' => 'ロールバック対象の投稿']);
+        $this->assertDatabaseMissing('tags', ['name' => '新規タグ']);
+        $this->assertSame(0, DB::table('post_tag')->count());
     }
 
     /**
@@ -78,6 +117,46 @@ class PostServiceTest extends TestCase
         $this->assertSame('更新後の本文', $updated->content);
         $this->assertTrue($updated->relationLoaded('user'));
         $this->assertSame($user->id, $updated->user->id);
+    }
+
+    /**
+     * タグ登録が失敗した場合、本文とタグの紐付けが更新前のまま残ることを確認する
+     */
+    public function test_update_rolls_back_content_and_tags_when_tag_registration_fails(): void
+    {
+        // 本文とタグを持つ更新対象の投稿を用意する
+        $user = User::create([
+            'name' => 'テストユーザー',
+            'email' => 'user_'.Str::random(10).'@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $post = Post::create(['user_id' => $user->id, 'content' => '更新前の本文']);
+        $existingTag = Tag::create(['name' => '既存タグ']);
+        $post->tags()->attach($existingTag->id);
+
+        $service = new PostService;
+
+        // 本文のUPDATE後・タグのINSERT時に失敗する状況を再現する
+        Tag::creating(function (): void {
+            throw new RuntimeException('タグ登録に失敗しました。');
+        });
+
+        try {
+            // 失敗が呼び出し元まで伝わり、扱っていたデータが例外メッセージに含まれることを確認する
+            $this->assertThrows(
+                fn () => $service->update($post, ['content' => '更新後の本文', 'tags' => '新規タグ']),
+                RuntimeException::class,
+                '本文とタグの更新に失敗しました。',
+            );
+        } finally {
+            // 登録したリスナーが後続のテストへ残らないようにする
+            Tag::flushEventListeners();
+        }
+
+        // 本文が戻り、sync()のDELETEで外れかけた既存タグの紐付けも残っていることを確認する
+        $this->assertDatabaseHas('posts', ['id' => $post->id, 'content' => '更新前の本文']);
+        $this->assertDatabaseHas('post_tag', ['post_id' => $post->id, 'tag_id' => $existingTag->id]);
+        $this->assertDatabaseMissing('tags', ['name' => '新規タグ']);
     }
 
     /**

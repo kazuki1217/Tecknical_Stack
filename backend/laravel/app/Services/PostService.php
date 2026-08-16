@@ -7,6 +7,8 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 /**
  * 投稿に関するビジネスロジックを担当するサービス
@@ -33,6 +35,8 @@ class PostService
      * @param  User  $user  投稿者
      * @param  array<string, mixed>  $validated  バリデーション済み入力
      * @return Post 作成された投稿
+     *
+     * @throws RuntimeException 保存に失敗した場合（投稿・タグともに保存されない）
      */
     public function create(User $user, array $validated): Post
     {
@@ -48,16 +52,33 @@ class PostService
             $imageMime = $validated['image']->getMimeType();
         }
 
-        // フォームに投稿した情報を DB に保存
-        $post = Post::create([
-            'user_id' => $user->id,
-            'content' => $validated['content'] ?? null,
-            'image_data' => $imageData,
-            'image_mime' => $imageMime,
-        ]);
+        try {
+            // トランザクションを使用する（途中で失敗して「タグが付いていない投稿」だけが残らないようにするため）
+            $post = DB::transaction(function () use ($user, $validated, $imageData, $imageMime) {
+                // フォームに投稿した情報を DB に保存
+                $post = Post::create([
+                    'user_id' => $user->id,
+                    'content' => $validated['content'] ?? null,
+                    'image_data' => $imageData,
+                    'image_mime' => $imageMime,
+                ]);
 
-        // タグの紐付け
-        $post->tags()->sync($this->resolveTagIds($validated['tags'] ?? null));
+                // タグの紐付け
+                $post->tags()->sync($this->resolveTagIds($validated['tags'] ?? null));
+
+                return $post;
+            });
+        } catch (\Throwable $e) {
+            // 扱っていたデータを例外メッセージに詰め直す（ロールバックで投稿がDBに残らず、呼び出し元のログからのみ追跡できるため）
+            throw new RuntimeException(sprintf(
+                '投稿とタグの登録に失敗しました。実行したユーザーID: %d, タグ: %s, 発生箇所: %s:%d, エラー内容: %s',
+                $user->id,
+                $validated['tags'] ?? 'なし',
+                $e->getFile(),
+                $e->getLine(),
+                $e->getMessage(),
+            ), previous: $e);
+        }
 
         return $post->load(['user', 'tags']);
     }
@@ -82,15 +103,32 @@ class PostService
      * @param  Post  $post  対象の投稿
      * @param  array<string, string>  $validated  バリデーション済み入力
      * @return Post 更新された投稿（ユーザー情報込み）
+     *
+     * @throws RuntimeException 保存に失敗した場合（本文・タグともに更新されない）
      */
     public function update(Post $post, array $validated): Post
     {
-        // 投稿データを更新
-        $post->content = $validated['content'];
-        $post->save();
+        try {
+            // トランザクションを使用する（途中で失敗して「本文だけ更新されてタグが消えた投稿」が残らないようにするため）
+            DB::transaction(function () use ($post, $validated) {
+                // 投稿データを更新
+                $post->content = $validated['content'];
+                $post->save();
 
-        if (array_key_exists('tags', $validated)) {
-            $post->tags()->sync($this->resolveTagIds($validated['tags']));
+                if (array_key_exists('tags', $validated)) {
+                    $post->tags()->sync($this->resolveTagIds($validated['tags']));
+                }
+            });
+        } catch (\Throwable $e) {
+            // 扱っていたデータを例外メッセージに詰め直す（ロールバック後もモデルには更新後の値が残り、DBの状態と区別が付かないため）
+            throw new RuntimeException(sprintf(
+                '本文とタグの更新に失敗しました。投稿ID: %d, タグ: %s, 発生箇所: %s:%d, エラー内容: %s',
+                $post->id,
+                $validated['tags'] ?? 'なし',
+                $e->getFile(),
+                $e->getLine(),
+                $e->getMessage(),
+            ), previous: $e);
         }
 
         return $post->load(['user', 'tags', 'comments.user']);
