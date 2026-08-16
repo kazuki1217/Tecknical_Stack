@@ -256,13 +256,28 @@ class PostService
             return [];
         }
 
-        $tagIds = [];
-        foreach ($tagNames as $name) {
-            // タグ名が既に存在する場合はそのIDを、存在しない場合は新規作成してIDを取得
-            $tag = Tag::firstOrCreate(['name' => $name]);
-            $tagIds[] = $tag->id;
+        // 既存タグをまとめて取得する（タグ1件ごとにSELECTとINSERTを繰り返さないようにするため）
+        $tagIdByName = Tag::whereIn('name', $tagNames)->pluck('id', 'name');
+
+        // 未登録のタグ名だけを抽出する
+        $newTagNames = $tagNames->diff($tagIdByName->keys())->values();
+
+        // すべて登録済みなら、取得済みのIDをそのまま返して追加のクエリを発行しない
+        if ($newTagNames->isEmpty()) {
+            return $tagIdByName->values()->all();
         }
 
-        return $tagIds;
+        // 未登録のタグを1回のINSERTでまとめて登録する。
+        // Tag::insert はモデルを経由しないためタイムスタンプが自動設定されず、created_at / updated_at を明示する。
+        // 同名タグを同時に登録しようとした場合は tags.name のUNIQUE制約違反となり、呼び出し元のトランザクションごとロールバックされる。
+        $now = now();
+        Tag::insert($newTagNames->map(fn (string $name): array => [
+            'name' => $name,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ])->all());
+
+        // 登録済みになったタグのIDをまとめて取得する（insert は採番されたIDを返さないため）
+        return Tag::whereIn('name', $tagNames)->pluck('id')->all();
     }
 }
