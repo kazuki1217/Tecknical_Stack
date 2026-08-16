@@ -41,6 +41,22 @@ tasks:
     cmds:
       - '{{if eq .APP_ENV "production"}}sudo {{end}}docker compose exec backend php artisan migrate:fresh --seed'
 
+  db-backup:
+    desc: DBのバックアップを取得（backup/ に保存、最新5世代を保持）
+    silent: false
+    cmds:
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}bash scripts/db-backup.sh'
+
+  db-restore:
+    desc: DBをバックアップから復元（例：task db-restore FILE=backup/xxx.sql.gz）
+    silent: false
+    requires:
+      vars: [FILE]
+    # データベースを削除して作り直す破壊的な操作のため、実行前に確認を求める
+    prompt: DBを削除して {{.FILE}} から復元します。よろしいですか？
+    cmds:
+      - '{{if eq .APP_ENV "production"}}sudo {{end}}bash scripts/db-restore.sh {{.FILE}}'
+
   cache-clear:
     desc: キャッシュクリア
     silent: false
