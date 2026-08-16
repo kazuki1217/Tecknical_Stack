@@ -8,6 +8,7 @@ use App\Http\Requests\PostUpdateRequest;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -147,6 +148,11 @@ class PostController extends Controller
             Log::info('[投稿更新] データの更新に成功しました。', ['実行したユーザーID' => Auth::user()->id]);
 
             return response()->json(['message' => '投稿データを更新しました。', 'data' => $post], 200);
+        } catch (ModelNotFoundException $e) {
+            // 更新対象の取得後から排他ロック取得までの間に、別のリクエストが投稿を削除した場合
+            Log::warning('[投稿更新] 対象の投稿が既に削除されています。', ['実行したユーザーID' => Auth::user()->id, '投稿ID' => $post->id]);
+
+            return response()->json(['message' => '対象の投稿データが見つかりません。'], 404);
         } catch (\Throwable $e) {
             Log::error('[投稿更新] 想定外のエラーが発生しました。', ['エラー内容' => $e->getMessage(), 'ファイル名' => $e->getFile(), '行番号' => $e->getLine()]);
 

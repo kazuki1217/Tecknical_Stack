@@ -432,6 +432,14 @@ paths:
                 message: 投稿者本人の投稿データではないため、許可されていません。
               schema:
                 $ref: "#/components/schemas/MessageResponse"
+        "404":
+          description: 対象の投稿が存在しない（更新処理中に別のリクエストで削除された場合を含む）
+          content:
+            application/json:
+              example:
+                message: 対象の投稿データが見つかりません。
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: バリデーションエラー
           content:

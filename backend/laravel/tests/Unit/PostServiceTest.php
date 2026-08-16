@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\PostService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -204,6 +205,36 @@ class PostServiceTest extends TestCase
         $this->assertDatabaseHas('posts', ['id' => $post->id, 'content' => '更新前の本文']);
         $this->assertDatabaseHas('post_tag', ['post_id' => $post->id, 'tag_id' => $existingTag->id]);
         $this->assertDatabaseMissing('tags', ['name' => '新規タグ']);
+    }
+
+    /**
+     * 更新対象が既に削除されている場合、本文もタグも書き込まずに中断することを確認する
+     */
+    public function test_update_throws_model_not_found_when_post_is_already_deleted(): void
+    {
+        // 本文とタグを持つ更新対象の投稿を用意する
+        $user = User::create([
+            'name' => 'テストユーザー',
+            'email' => 'user_'.Str::random(10).'@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $post = Post::create(['user_id' => $user->id, 'content' => '更新前の本文']);
+
+        // 更新対象を取得した後、排他ロックを取得するまでの間に別のリクエストが削除した状況を再現する。
+        // モデルは手元に残したまま行だけを消すため、Eloquent を経由せずDELETEを実行する。
+        DB::table('posts')->where('id', $post->id)->delete();
+
+        $service = new PostService;
+
+        // 保存失敗ではなく「対象なし」として、RuntimeException に包まれずそのまま伝わることを確認する
+        $this->assertThrows(
+            fn () => $service->update($post, ['content' => '更新後の本文', 'tags' => '新規タグ']),
+            ModelNotFoundException::class,
+        );
+
+        // 削除済みの投稿に対して、タグもタグの紐付けも作られていないことを確認する
+        $this->assertDatabaseMissing('tags', ['name' => '新規タグ']);
+        $this->assertDatabaseMissing('post_tag', ['post_id' => $post->id]);
     }
 
     /**
