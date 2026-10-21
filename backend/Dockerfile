@@ -1,4 +1,4 @@
-FROM php:8.2.0-fpm-alpine
+FROM php:8.2.35-fpm-alpine
 ARG APP_ENV
 ARG UID
 ARG GID
